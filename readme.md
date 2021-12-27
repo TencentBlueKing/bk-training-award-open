@@ -47,20 +47,20 @@ git pull bk-award
 2. 本地创建数据库
 
    ```
-   CREATE DATABASE `bk-training-award-open` DEFAULT CHARACTER SET utf8 COLLATE utf8_general_ci;
+   CREATE DATABASE `bk-award-open` DEFAULT CHARACTER SET utf8 COLLATE utf8_general_ci;
    ```
 
 3. 在项目根目录下创建`local_settings.py`，然后在`local_settings.py`添加数据库配置
 
    ```python
-   from config import APP_CODE
+   from blueapps.patch.settings_open_saas import APP_CODE
    
    DATABASES = {
        "default": {
            "ENGINE": "django.db.backends.mysql",
            "NAME": APP_CODE,
-           "USER": "", #数据库用户名
-           "PASSWORD": "", #数据库密码
+           "USER": "", # 数据库用户名
+           "PASSWORD": "", # 数据库密码
            "HOST": "localhost",
            "PORT": "3306",
        },
@@ -124,7 +124,7 @@ git pull bk-award
 
    ```
    # 进入前端工作目录
-   cd frontend
+   cd frontend/desktop
    # 下载依赖
    npm i
    # 运行项目
@@ -154,7 +154,7 @@ git pull bk-award
 
       ```
       git add .
-      git commit -m 提交信息
+      git commit -m "提交信息"
       git push origin
       ```
 
@@ -187,6 +187,7 @@ git pull bk-award
     .idea
     node_modules
     local_settings.py
+    venv
     ```
 
   - 配置`pre-commit`
