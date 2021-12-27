@@ -53,6 +53,8 @@ git pull bk-award
 3. 在项目根目录下创建`local_settings.py`，然后在`local_settings.py`添加数据库配置
 
    ```python
+   # -*- coding: utf-8 -*-
+   
    from blueapps.patch.settings_open_saas import APP_CODE
    
    DATABASES = {
@@ -76,11 +78,6 @@ git pull bk-award
    APP_ID=xxxxxxxxxxxxx
    APP_TOKEN=xxxxxxxxxxxxx
 
-
-   + 在PyCharm中配置环境变量以及主机名
-
-   ![PyCharm配置环境变量](static/images/image-202111229321321908.png)
-
    + 配置Terminal和Python Console的环境变量
 
      只配置Django Server的环境变量的话，无法直接在Terminal中执行migrate命令，需要在执行前手动设置相关的环境变量
@@ -97,10 +94,16 @@ git pull bk-award
      macOS:
      export APP_ID=xxxx
      export APP_TOKEN=xxxx
+   
+   
+   + 在PyCharm中配置环境变量以及主机名
+
+   如下图所示
      ```
   ![set_environ_1](static/images/set_environ_1.png)
   ![set_environ_2](static/images/set_environ_2.png)
   ![set_environ_3](static/images/set_environ_3.png)
+
 5. 运行
 
    ```shell
@@ -127,7 +130,7 @@ git pull bk-award
    cd frontend/desktop
    # 下载依赖
    npm i
-   # 运行项目
+   # 运行项目(后端服务保持启动)
    npm run dev
    ```
 
