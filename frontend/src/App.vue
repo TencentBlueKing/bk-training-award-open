@@ -380,8 +380,8 @@
 </script>
 
 <style lang="postcss">
-    @import './css/reset.css';
-    @import './css/app.css';
+    @import 'css/reset.css';
+    @import 'css/app.css';
 
     .monitor-navigation-header {
         -webkit-box-flex: 1;
