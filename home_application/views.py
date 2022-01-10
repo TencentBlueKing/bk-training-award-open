@@ -33,7 +33,7 @@ def test_get_or_post(request):
         return JsonResponse({
             "code": 0,
             "result": True,
-            "message": "get success",
+            "message": "get success!",
             "data": {
                 "timestamp": time.time()
             }
@@ -43,7 +43,7 @@ def test_get_or_post(request):
         return JsonResponse({
             "code": 0,
             "result": True,
-            "message": "post success",
+            "message": "post success!",
             "data": {
                 "timestamp": time.time()
             }
