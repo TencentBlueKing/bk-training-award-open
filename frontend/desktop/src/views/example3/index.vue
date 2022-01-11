@@ -105,13 +105,15 @@
              */
             async btn2 () {
                 try {
-                    const res = await this.$store.dispatch('example/btn2', { btn: 'btn2', delay: 2000 }, { cancelPrevious: false })
+                    const res = await this.$store.dispatch('example/btn2', {
+                        params: { btn: 'btn2', delay: 2000 },
+                        config: { cancelPrevious: false }
+                    })
                     this.btn2Msg = res.data.msg
                 } catch (e) {
                     console.error(e)
                 }
             },
-
             /**
              * del
              */

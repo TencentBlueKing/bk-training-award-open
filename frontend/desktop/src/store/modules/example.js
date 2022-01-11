@@ -63,10 +63,10 @@ export default {
          *
          * @return {Promise} promise 对象
          */
-        btn2 (context, params, config = {}) {
+        btn2 (context, payload, config = {}) {
             // mock 的地址，示例先使用 mock 地址
-            const mockUrl = `?${AJAX_MOCK_PARAM}=index&invoke=btn2&${queryString.stringify(params)}`
-            return http.post(mockUrl, params, config)
+            const mockUrl = `?${AJAX_MOCK_PARAM}=index&invoke=btn2&${queryString.stringify(payload.params)}`
+            return http.post(mockUrl, payload.params, payload.config)
         },
 
         /**
