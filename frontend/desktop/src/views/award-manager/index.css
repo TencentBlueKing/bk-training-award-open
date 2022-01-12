@@ -1,0 +1,43 @@
+.award-container {
+    .f-c-center {
+        display: flex;
+        felx-direction: column;
+        justify-content: center;
+        align-items: center;
+    }
+    .f-c-space-arround {
+        display: flex;
+        felx-direction: column;
+        justify-content: space-around;
+        align-items: center;
+    }
+    .f-space-arround {
+        display: flex;
+        justify-content: space-around;
+    }
+    .header-container {
+        display: inline-block;
+        width: 100%;
+        .left-panel {
+            display: inline-block;
+            width: 70%;
+            align-self: flex-end;
+        }
+        .right-panel {
+            display: inline-block;
+            width: 20%;
+            float: right;
+            .fliter-button {
+                float: right;
+            }
+        }
+    }
+    .bk-collapse-item-header {
+        .no-trigger-area {
+            width: 100%;
+        }
+    }
+    .bk-inline-form {
+        width: 100%;
+    }
+}
