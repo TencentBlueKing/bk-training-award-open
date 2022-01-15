@@ -17,6 +17,10 @@ const Example1 = () => import(/* webpackChunkName: 'example1' */'@/views/example
 const Example2 = () => import(/* webpackChunkName: 'example2' */'@/views/example2')
 const Example3 = () => import(/* webpackChunkName: 'example3' */'@/views/example3')
 const NotFound = () => import(/* webpackChunkName: 'none' */'@/views/404')
+const Myapply = () => import(/* webpackChunkName: 'myapply' */'@/views/myapply')
+const Mycheck = () => import(/* webpackChunkName: 'myapply' */'@/views/mycheck')
+const Detail = () => import(/* webpackChunkName: 'myapply' */'@/views/detail')
+const Checkpage = () => import(/* webpackChunkName: 'myapply' */'@/views/checkpage')
 
 const routes = [
     {
@@ -40,6 +44,26 @@ const routes = [
                 path: 'example3',
                 name: 'example3',
                 component: Example3
+            },
+            {
+                path: 'myapply',
+                name: 'myapply',
+                component: Myapply
+            },
+            {
+                path: 'mycheck',
+                name: 'mycheck',
+                component: Mycheck
+            },
+            {
+                path: 'detail',
+                name: 'detail',
+                component: Detail
+            },
+            {
+                path: 'checkpage',
+                name: 'checkpage',
+                component: Checkpage
             }
         ]
     },
