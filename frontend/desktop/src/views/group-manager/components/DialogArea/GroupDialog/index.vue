@@ -1,7 +1,19 @@
 <template>
     <div class="dialog-container">
-        <bk-dialog v-model="visible">
-            <bk-form :label-width="80" :model="formData" :rules="rules">
+        <bk-dialog v-model="visible"
+            theme="primary"
+            header-position="left"
+            size="small"
+            :mask-close="false"
+            ext-cls="dialog"
+        >
+            <p slot="header"
+                class="dialog-title"
+                style="font-size: 17px;font-weight: bold;"
+            >
+                {{dialogOptions[dialogType].title}}
+            </p>
+            <bk-form :label-width="80" :model="formData" :rules="rules" v-if="visible">
                 <bk-form-item v-for="option in settings" :key="option.prop" :label="option.label" :required="true" :property="'name'">
                     <bk-input v-model="formData[option.prop]" :placeholder="'请输入' + (option.placeholder ? option.placeholder : option.label)"></bk-input>
                 </bk-form-item>
@@ -13,10 +25,10 @@
     export default {
         name: 'group-dialog',
         props: {
-            isEditor: {
-                type: Boolean,
+            dialogType: {
+                type: String,
                 default () {
-                    return false
+                    return 'creator'
                 }
             }
         },
@@ -31,6 +43,14 @@
                     organisation: '',
                     organizationName: ''
                 },
+                dialogOptions: {
+                    editor: {
+                        title: '编辑组'
+                    },
+                    creator: {
+                        title: '新增组'
+                    }
+                },
                 // 用于结合字段配置表单字段
                 settings: [
                     {
@@ -44,10 +64,6 @@
                     {
                         prop: 'master',
                         label: '负责人'
-                    },
-                    {
-                        prop: 'organisation',
-                        label: '所属组织'
                     }
                 ]
             }
@@ -74,6 +90,6 @@
         }
     }
 </script>
-<style>
-
+<style scoped>
+    @import "./index.css";
 </style>

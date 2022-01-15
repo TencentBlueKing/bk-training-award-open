@@ -1,3 +1,11 @@
 .notification-form-container {
-    
+    .em {
+        font-weight: bold;
+    }
+    .form-container {
+        .bk-grid-row {
+            margin-top: 10px;
+            margin-bottom: 10px;
+        }
+    }
 }

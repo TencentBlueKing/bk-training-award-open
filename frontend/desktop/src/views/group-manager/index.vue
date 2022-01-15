@@ -1,27 +1,37 @@
 <template>
-    <div class="group-manager-container">
-        <div>
-            <bk-button theme="primary" @click="toAddNewGroup($refs['newGroupDialogForm'])">新增组</bk-button>
-            <bk-table style="margin-top: 15px;"
-                :data="tableData"
-                :size="size"
-                :pagination="pagination"
-                height="500px"
-                @page-change="handlePageChange"
-                @page-limit-change="handlePageLimitChange">
-                <bk-table-column prop="organizationName" label="组织名"></bk-table-column>
-                <bk-table-column prop="level" label="级别"></bk-table-column>
-                <bk-table-column prop="organisation" label="所属组织"></bk-table-column>
-                <bk-table-column prop="master" label="负责人"></bk-table-column>
-                <bk-table-column label="操作" width="150">
-                    <template slot-scope="props">
-                        <bk-button theme="primary" text @click="toEditRow($refs['EditorDialogForm'],props.row)">编辑</bk-button>
-                    </template>
-                </bk-table-column>
-            </bk-table>
-        </div>
-        <GroupDialog ref="newGroupDialogForm"></GroupDialog>
-        <GroupDialog ref="EditorDialogForm"></GroupDialog>
+    <div class="group-manager-container" v-adjust-table="'container'">
+        <bk-button theme="primary"
+            icon="plus-circle-shape"
+            @click="toAddNewGroup($refs['newGroupDialogForm'])"
+        >
+            新增组
+        </bk-button>
+        <bk-table style="margin-top: 15px;"
+            :data="tableData"
+            :size="size"
+            :pagination="pagination"
+            height="80%"
+            max-height="calc(100vh-52px)"
+            :highlight-current-row="true"
+            @page-change="handlePageChange"
+            @page-limit-change="handlePageLimitChange"
+        >
+            <bk-table-column v-for="(rowLabel,rowProp) in tableSettings"
+                :key="rowProp"
+                :label="rowLabel"
+            >
+                <template slot-scope="prop">
+                    <span>{{prop.row[rowProp]}}</span>
+                </template>
+            </bk-table-column>
+            <bk-table-column label="操作" width="150">
+                <template slot-scope="props">
+                    <bk-button theme="primary" text @click="toEditRow($refs['EditorDialogForm'],props.row)">编辑</bk-button>
+                </template>
+            </bk-table-column>
+        </bk-table>
+        <GroupDialog ref="newGroupDialogForm" dialog-type="creator"></GroupDialog>
+        <GroupDialog ref="EditorDialogForm" dialog-type="editor"></GroupDialog>
     </div>
 </template>
 <script>
@@ -34,7 +44,14 @@
         data () {
             return {
                 size: 'small',
-                remoteData: new Array(100).fill({}),
+                // S 信息控制区
+                tableSettings: {
+                    organizationName: '组织名',
+                    level: '级别',
+                    master: '负责人'
+                },
+                // E 信息控制区
+                remoteData: new Array(1000).fill({}),
                 pagination: {
                     current: 1,
                     count: 10,
@@ -44,10 +61,10 @@
         },
         computed: {
             tableData () {
-                const tableData = this.remoteData.map(rowData => {
+                const tableData = this.remoteData.map((rawData, index) => {
                     // TODO: 装填数据
                     return {
-                        organizationName: '测试组织名',
+                        organizationName: '测试组织名' + index,
                         level: '测试级别',
                         organisation: '测试所属组织',
                         master: '测试操作'
@@ -63,7 +80,15 @@
                 throw new Error(message)
             }
         },
+        mounted () {
+            this.adjustTable()
+        },
         methods: {
+            adjustTable () {
+                // 用于零食改变main-content的状态
+                document.querySelector('.main-content').style.minHeight = '0'
+                document.querySelector('.main-content').style.height = '100%'
+            },
             // 弹出框控制区域
             toAddNewGroup (toAddNewGroup) {
                 // TODO: 弹出

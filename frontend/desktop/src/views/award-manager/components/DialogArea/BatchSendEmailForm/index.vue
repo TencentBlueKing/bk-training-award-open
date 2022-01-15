@@ -1,49 +1,123 @@
 <template>
     <div class="batch-send-email-container">
-        <bk-dialog v-model="visible"
-            theme="primary"
-            :mask-close="false"
-            width="70%"
-            header-position="left"
-            title="业务邮件预约">
-            <!-- 表单主体 -->
-            <bk-form :label-width="200">
-                <bk-form-item label="项目名称">
-                    <bk-input v-model="formData.name"></bk-input>
-                </bk-form-item>
-                <bk-form-item label="知会人">
-                    <bk-input v-model="formData.name"></bk-input>
-                </bk-form-item>
-                <bk-form-item label="主题">
-                    <bk-input v-model="formData.name"></bk-input>
-                </bk-form-item>
-                <bk-form-item label="协同编辑人">
-                    <bk-input v-model="formData.name"></bk-input>
-                </bk-form-item>
-                <bk-form-item label="邮件正文">
+        <!-- 表单主体 -->
+        <bk-container :col="12" ext-cls="form-container" :gutter="4">
+            <bk-row>
+                <bk-col :span="2">
+                    <label class="input-label">日期</label>
+                </bk-col>
+                <bk-col :span="10">
+                    <bk-date-picker v-model="initDateTime"
+                        style="width: 100%;"
+                        :placeholder="'选择日期时间'"
+                        :type="'datetime'"
+                    ></bk-date-picker>
+                </bk-col>
+            </bk-row>
+
+            <bk-row>
+                <bk-col :span="2">
+                    <label class="input-label">知会人</label>
+                </bk-col>
+                <bk-col :span="10">
+                    <bk-tag-input
+                        v-model="tags"
+                        :list="remainData"
+                        placeholder="请选择知会人"
+                        :trigger="'focus'"
+                        :allow-next-focus="false"
+                        :has-delete-icon="true"
+                        save-key="$index"
+                        search-key="awardName"
+                        display-key="awardName"
+                    >
+                    </bk-tag-input>
+                </bk-col>
+            </bk-row>
+            <bk-row>
+                <bk-col :span="2">
+                    <label class="input-label">邮件主题</label>
+                </bk-col>
+                <bk-col :span="10">
+                    <bk-input v-model="formData.name"
+                        placeholder="请输入邮件主题"
+                    >
+                    </bk-input>
+                </bk-col>
+            </bk-row>
+            <bk-row>
+                <bk-col :span="2">
+                    <label class="input-label">协同编辑人</label>
+                </bk-col>
+                <bk-col :span="10">
+                    <bk-tag-input
+                        v-model="tags"
+                        :list="remainData"
+                        placeholder="请选择协同编辑人"
+                        :trigger="'focus'"
+                        :allow-next-focus="false"
+                        :has-delete-icon="true"
+                        save-key="$index"
+                        search-key="awardName"
+                        display-key="awardName"
+                    >
+                    </bk-tag-input>
+                </bk-col>
+            </bk-row>
+            <bk-row>
+                <bk-col :span="3">
+                    <label class="input-label em">邮件正文</label>
+                </bk-col>
+            </bk-row>
+            <bk-row>
+                <bk-col :span="12">
                     <Editor :content="emailText"></Editor>
-                </bk-form-item>
-            </bk-form>
-            <!-- /表单主体 -->
-        </bk-dialog>
+                </bk-col>
+            </bk-row>
+        </bk-container>
+    <!-- /表单主体 -->
     </div>
 </template>
 <script>
-    import Editor from '../../Editor'
-    import { dialogMixins } from '../mixins'
+    import { getRawTable } from '../../CustomTable/utils'
     export default {
-        name: 'batch-send-email-container',
+        name: 'notification-form',
         components: {
-            Editor
+            Editor: () => import('../../Editor')
         },
-        mixins: [dialogMixins],
+        props: {
+            selectData: {
+                type: Array,
+                default: []
+            }
+        },
         data () {
             return {
-                formData: {}
+                theadList: [
+                    { label: '奖项名称', prop: 'awardName' },
+                    { label: '评审周期', prop: 'bonus' },
+                    { label: '导向', prop: 'committer' },
+                    { label: '接口人', prop: 'interface' }
+                ],
+                formData: {
+                    name: '',
+                    content: '',
+                    emailText: ''
+                }
             }
+        },
+        computed: {
+            externalData () {
+                const selectData = this.selectData
+                const theadList = this.theadList
+                return getRawTable(theadList, selectData)
+            }
+        },
+        beforeMount () {
+            this.emailText = this.externalData
         }
     }
 </script>
 <style>
-    @import "./index.css";
+@import "./index.css";
 </style>

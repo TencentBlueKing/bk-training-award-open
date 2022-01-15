@@ -1,3 +1,17 @@
 .new-award-form-container {
-    
+  .award-form-container {
+    .form-group {
+      display: flex;
+      align-items: center;
+      width: inherit;
+    }
+    .uploader {
+      height: 100%;
+    }
+  }
+  .uploader {
+    .file-wrapper {
+      height: 120px;
+    }
+  }
 }
