@@ -13,6 +13,7 @@ specific language governing permissions and limitations under the License.
 
 from django.db import models
 
+
 # Create your models here.
 class Awards(models.Model):
     award_name = models.CharField(max_length=128, verbose_name="奖项名称")
