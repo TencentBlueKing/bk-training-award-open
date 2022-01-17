@@ -1,6 +1,5 @@
 .award-container {
     height: inherit;
-// S 抽离方法区
 
     .f-center {
         display: flex;
@@ -48,7 +47,6 @@
         width: 80% !important;
     }
 
-// E 抽离方法区
 
     .header-container {
         display: inline-block;
