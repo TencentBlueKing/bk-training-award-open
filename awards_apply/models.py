@@ -1,4 +1,5 @@
 from django.db import models
+from django_jsonfield_backport import models as json_models
 
 
 # Create your models here.
@@ -23,3 +24,24 @@ class Awards(models.Model):
 class Secretary(models.Model):
     user_id = models.CharField(max_length=128, verbose_name="用户id")
     group_id = models.CharField(max_length=128, verbose_name="组id")
+
+
+# 申请表
+class AwardApplicationRecord(models.Model):
+    award_id = models.IntegerField(verbose_name="奖项id")
+    application_time = models.DateTimeField(verbose_name="申请时间")
+    application_reason = models.TextField(verbose_name="申请理由")
+    application_id = json_models.JSONField(verbose_name="申请人id列表")
+    application_attachments = json_models.JSONField(verbose_name="申请附件地址列表")
+    APPROVAL_STATE = [
+        (0, "待评审"),
+        (1, "评审通过"),
+        (2, "评审不通过"),
+        (3, "草稿"),
+    ]
+    approval_state = models.IntegerField(
+        choices=APPROVAL_STATE, default=3, verbose_name="评审状态"
+    )
+    approval_id = models.IntegerField(verbose_name="评审人id", null=True)
+    approval_time = models.DateTimeField(verbose_name="评审时间", null=True)
+    approval_text = models.TextField(verbose_name="评审评语", null=True)
