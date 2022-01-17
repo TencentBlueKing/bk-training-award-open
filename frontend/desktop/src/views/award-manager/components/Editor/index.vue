@@ -2,13 +2,14 @@
     <div>
         <div ref="editor" id="editor">
             <!-- 需要注入的内容 -->
-            <div v-html="content"></div>
+            <div v-html="intelContent"></div>
         </div>
     </div>
 </template>
 
 <script>
     import Editor from 'wangeditor'
+    import xss from 'xss'
     export default {
         name: 'editor',
         components: {
@@ -23,12 +24,20 @@
                 editorInstance: null
             }
         },
+        computed: {
+            intelContent: {
+                get (self) {
+                    console.log('self.content', self.content)
+                    return xss(self.content)
+                }
+            }
+        },
         mounted () {
             this.$nextTick(() => this.handleInit())
         },
         beforeDestroy () {
             // 销毁编辑器
-            
+
         },
         methods: {
             handleInit () {
@@ -55,7 +64,7 @@
                 ]
             },
             getHTML () {
-                return this.editorInstance.txt.html()
+                return xss(this.editorInstance.txt.html())
             }
 
         }
@@ -63,5 +72,5 @@
 </script>
 
 <style>
-    
+
 </style>
