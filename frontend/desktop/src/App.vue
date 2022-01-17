@@ -137,94 +137,28 @@
                     list: [
                         {
                             id: 'home',
-                            name: '首页',
+                            name: '奖项管理',
                             icon: 'icon-tree-application-shape',
                             children: [
+                               
                                 {
-                                    id: 'home1',
-                                    name: 'example1',
-                                    pathName: 'example1',
-                                    active: true
+                                    id: 'group-manager',
+                                    name: '组管理',
+                                    icon: 'icon-tree-group-shape',
+                                    group: false,
+                                    pathName: 'group-manager'
                                 },
                                 {
-                                    id: 'home2',
-                                    name: 'example2',
-                                    pathName: 'example2'
-                                },
-                                {
-                                    id: 'home3',
-                                    name: 'example3',
-                                    pathName: 'example3'
-                                }
-                            ]
-                        },
-                        {
-                            id: 'test',
-                            name: '测试页',
-                            icon: 'icon-tree-group-shape',
-                            group: true
-                        },
-                        {
-                            id: 'test2',
-                            name: '测试页二',
-                            icon: 'icon-tree-module-shape',
-                            disabled: true
-                        },
-                        {
-                            id: 'test3',
-                            name: '测试页三',
-                            icon: 'icon-tree-process-shape',
-                            group: true
-                        },
-                        {
-                            id: 'menu1',
-                            name: '一级菜单',
-                            icon: 'icon-tree-process-shape',
-                            children: [
-                                {
-                                    id: 'menu1-1',
-                                    name: '二级菜单1'
-                                },
-                                {
-                                    id: 'menu1-2',
-                                    name: '二级菜单2'
-                                },
-                                {
-                                    id: 'menu1-3',
-                                    name: '二级菜单3'
-                                },
-                                {
-                                    id: 'menu1-4',
-                                    name: '二级菜单4'
-                                },
-                                {
-                                    id: 'menu1-5',
-                                    name: '二级菜单5'
-                                },
-                                {
-                                    id: 'menu1-6',
-                                    name: '二级菜单6'
-                                },
-                                {
-                                    id: 'menu1-7',
-                                    name: '二级菜单7'
-                                },
-                                {
-                                    id: 'menu1-8',
-                                    name: '二级菜单8'
-                                },
-                                {
-                                    id: 'menu1-9',
-                                    name: '二级菜单9'
-                                },
-                                {
-                                    id: 'menu1-10',
-                                    name: '二级菜单10'
+                                    id: 'award-manager',
+                                    name: '奖项管理',
+                                    icon: 'icon-tree-group-shape',
+                                    group: false,
+                                    pathName: 'award-manager'
                                 }
                             ]
                         }
                     ],
-                    id: 'home1',
+                    id: 'group-manager',
                     toggle: true,
                     submenuActive: false,
                     title: '蓝鲸测试平台'
