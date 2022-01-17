@@ -1,0 +1,113 @@
+.award-container {
+    height: inherit;
+
+    .f-center {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+    }
+
+    .f-c-center {
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+    }
+
+    .f-c-space-arround {
+        display: flex;
+        flex-direction: column;
+        justify-content: space-around;
+        align-items: center;
+    }
+
+    .f-space-arround {
+        display: flex;
+        justify-content: space-around;
+    }
+
+    .f-space-between {
+        display: flex;
+        justify-content: space-between;
+    }
+
+    .w-100 {
+        width: 100% !important;
+    }
+
+    .w-99 {
+        width: 99% !important;
+    }
+
+    .w-90 {
+        width: 90% !important;
+    }
+
+    .w-80 {
+        width: 80% !important;
+    }
+
+
+    .header-container {
+        display: inline-block;
+        width: 100%;
+
+        .filter-panel {
+
+            /deep/ .bk-collapse-item-header {
+
+                .trigger-area {
+                    display: none;
+                }
+
+                .no-trigger-area {
+                    width: 100%;
+                }
+
+                .button-panel {
+                    display: flex;
+                    justify-content: space-between;
+                    align-items: center;
+
+                    .left-panel {
+                        display: inline-block;
+                        width: 70%;
+                    }
+
+                    .right-panel {
+                        display: flex;
+                        align-items: center;
+                        justify-content: flex-end;
+                        width: 20%;
+
+                        .filter-button {
+                            width: 28px;
+                            min-width: 0;
+                        }
+                    }
+                }
+
+            }
+
+            /deep/ .bk-collapse-item-content {
+                .bk-inline-form {
+                    width: 100%;
+                }
+
+                .filter-form {
+                    .bk-form-item {
+                        width: 100%;
+
+                        .bk-form-content {
+                            width: 60% !important;
+                        }
+                    }
+                }
+
+            }
+
+        }
+
+    }
+
+}
