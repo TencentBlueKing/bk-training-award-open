@@ -11,7 +11,6 @@
             :size="size"
             :pagination="pagination"
             height="80%"
-            max-height="calc(100vh-52px)"
             :highlight-current-row="true"
             @page-change="handlePageChange"
             @page-limit-change="handlePageLimitChange"
@@ -109,6 +108,6 @@
     }
 </script>
 
-<style>
+<style scoped>
     @import "./index.css";
 </style>

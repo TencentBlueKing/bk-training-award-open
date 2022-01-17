@@ -104,7 +104,8 @@
                     name: '',
                     content: '',
                     emailText: ''
-                }
+                },
+                emailText: ''
             }
         },
         computed: {

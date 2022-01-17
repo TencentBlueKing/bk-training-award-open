@@ -47,12 +47,6 @@
                 default () {
                     return '标题'
                 }
-            },
-            sideslider: {
-                type: Boolean,
-                default () {
-                    return false
-                }
             }
         },
         data () {

@@ -4,7 +4,9 @@
         <div class="header-container f-c-space-arround">
             <div class="filter-panel">
                 <bk-collapse v-model="isFilter">
-                    <bk-collapse-item name="filter-panel" :hide-arrow="true" :custom-trigger-area="true">
+                    <bk-collapse-item name="filter-panel"
+                        :hide-arrow="true"
+                        :custom-trigger-area="true">
                         <div class="button-panel" slot="no-trigger">
                             <!-- 左边按钮盘 -->
                             <div class="left-panel">
@@ -33,7 +35,7 @@
                             <!-- /左边按钮盘 -->
                             <!-- 右边按钮区域 -->
                             <div class="right-panel">
-                                <bk-button ext-cls="fliter-button f-center"
+                                <bk-button ext-cls="filter-button f-center"
                                     type="default"
                                     @click="toShowFilterPanel($event)">
                                     <!-- TODO: 替换图标 -->
@@ -133,8 +135,8 @@
             @page-change="handlePageChange"
             @page-limit-change="handlePageLimitChange"
             @selection-change="handleSetSelectData"
-            :virtual-render="true">
-            <!-- TODO 转化为 配置型 -->
+            :virtual-render="true"
+        >
             <bk-table-column type="selection" width="60"></bk-table-column>
             <bk-table-column v-for="(rowLabel,rowProp) in tableSettings"
                 :key="rowProp"
@@ -175,7 +177,7 @@
         <DialogArea ref="GetDetailDialog" title="奖项详情">
             <NewAwardForm slot="custom"></NewAwardForm>
         </DialogArea>
-        
+
         <DialogArea ref="BatchCloneForm" title="批量克隆">
             <BatchCloneForm slot="custom" :form-data="selectData" :total-data="tableData"></BatchCloneForm>
         </DialogArea>
@@ -310,7 +312,7 @@
             // 删除单行
             toDelRow (DelRowDialog) {
             },
-            
+
             // 获取单行详情
             toGetDetail (rowData, GetDetailDialog) {
                 GetDetailDialog.show()
@@ -344,6 +346,6 @@
         }
     }
 </script>
-<style>
+<style scoped>
     @import "./index.css";
 </style>
