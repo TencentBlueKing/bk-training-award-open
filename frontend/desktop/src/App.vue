@@ -11,63 +11,24 @@
                 <div class="monitor-navigation-header">
                     <ol class="header-nav">
                         <bk-popover v-for="(item,index) in header.list" :key="item.id" theme="light navigation-message" :arrow="false" offset="0, -5" placement="bottom" :tippy-options="{ 'hideOnClick': false, flipBehavior: ['bottom'] }">
-                            <li v-show="item.show" class="header-nav-item" :class="{ 'item-active': index === header.active }">
+                            <li v-show="item.show" class="header-nav-item" style="font-size: 17px;margin-left: 25px" :class="{ 'item-active': index === header.active }">
                                 {{item.name}}
                             </li>
-                            <template slot="content">
-                                <ul class="monitor-navigation-nav">
-                                    <li class="nav-item" v-for="headerNavItem in curHeaderNav.navList" :key="headerNavItem.id">
-                                        {{headerNavItem.name}}
-                                    </li>
-                                </ul>
-                            </template>
                         </bk-popover>
                     </ol>
-                    <bk-select class="header-select" v-model="header.bizId" :clearable="false" searchable>
-                        <bk-option v-for="option in header.selectList"
-                            :key="option.id"
-                            :id="option.id"
-                            :name="option.name">
-                        </bk-option>
-                    </bk-select>
+                    <bk-popover theme="light navigation-message" style="margin-left: auto;" placement="bottom" :arrow="false" offset="0, 5" trigger="mouseenter" :tippy-options="{ 'hideOnClick': false }">
+                        <div class="header-mind" @click="toCheckview()">
+                            <bk-icon type="pc" />
+                            <div style="padding-left: 5px;font-size: 15px;color: #96A2B9;">我的审批</div>
+                        </div>
+                    </bk-popover>
                     <bk-popover theme="light navigation-message" placement="bottom" :arrow="false" offset="0, 5" trigger="mouseenter" :tippy-options="{ 'hideOnClick': false }">
-                        <div class="header-mind">
-                            <span class="bk-icon icon-chinese lang-icon"></span>
+                        <div class="header-mind" @click="toMyapply()">
+                            <!-- <span class="bk-icon icon-chinese lang-icon"></span> -->
+                            <bk-icon type="panel-permission" />
+                            <div style="padding-left: 5px;font-size: 15px;color: #96A2B9;">我的申请</div>
                         </div>
-                        <template slot="content">
-                            <ul class="monitor-navigation-admin">
-                                <li class="nav-item" v-for="langItem in lang.list" :key="langItem.id">
-                                    <i :class="`bk-icon icon-${langItem.id} lang-icon`"></i>{{langItem.name}}
-                                </li>
-                            </ul>
-                        </template>
                     </bk-popover>
-                    <bk-popover theme="light navigation-message" :arrow="false" offset="-150, 5" trigger="mouseenter" :tippy-options="{ 'hideOnClick': false }">
-                        <div class="header-mind">
-                            <svg style="width: 1em; height: 1em;vertical-align: middle;fill: currentColor;overflow: hidden;" viewBox="0 0 64 64" version="1.1" xmlns="http://www.w3.org/2000/svg">
-                                <path d="M32,56c-1.3,0-2.6-0.6-3.4-1.6h-4.5c0.5,1.5,1.4,2.7,2.6,3.7c3.1,2.5,7.5,2.5,10.6,0c1.2-1,2.1-2.3,2.6-3.7h-4.5C34.6,55.4,33.3,56,32,56z"></path>
-                                <path d="M53.8,49.1L50,41.5V28c0-8.4-5.8-15.7-14-17.6V8c0-2.2-1.8-4-4-4s-4,1.8-4,4v2.4c-8.2,1.9-14,9.2-14,17.6v13.5l-3.8,7.6c-0.3,0.6-0.3,1.3,0.1,1.9c0.4,0.6,1,1,1.7,1h40c0.7,0,1.3-0.4,1.7-1C54,50.4,54.1,49.7,53.8,49.1z"></path>
-                            </svg>
-                            <span class="header-mind-mark"></span>
-                        </div>
-                        <template slot="content">
-                            <div class="monitor-navigation-message">
-                                <h5 class="message-title">消息中心</h5>
-                                <ul class="message-list">
-                                    <li class="message-list-item" v-for="(item,index) in message.list" :key="index">
-                                        <span class="item-message">{{item.message}}</span>
-                                        <span class="item-date">{{item.date}}</span>
-                                    </li>
-                                </ul>
-                                <div class="message-footer">进入消息中心</div>
-                            </div>
-                        </template>
-                    </bk-popover>
-                    <div class="header-help">
-                        <svg class="bk-icon" style="width: 1em; height: 1em;vertical-align: middle;fill: currentColor;overflow: hidden;" viewBox="0 0 64 64" version="1.1" xmlns="http://www.w3.org/2000/svg">
-                            <path d="M32,4C16.5,4,4,16.5,4,32c0,3.6,0.7,7.1,2,10.4V56c0,1.1,0.9,2,2,2h13.6C36,63.7,52.3,56.8,58,42.4S56.8,11.7,42.4,6C39.1,4.7,35.6,4,32,4z M31.3,45.1c-1.7,0-3-1.3-3-3s1.3-3,3-3c1.7,0,3,1.3,3,3S33,45.1,31.3,45.1z M36.7,31.7c-2.3,1.3-3,2.2-3,3.9v0.9H29v-1c-0.2-2.8,0.7-4.4,3.2-5.8c2.3-1.4,3-2.2,3-3.8s-1.3-2.8-3.3-2.8c-1.8-0.1-3.3,1.2-3.5,3c0,0.1,0,0.1,0,0.2h-4.8c0.1-4.4,3.1-7.4,8.5-7.4c5,0,8.3,2.8,8.3,6.9C40.5,28.4,39.2,30.3,36.7,31.7z"></path>
-                        </svg>
-                    </div>
                     <bk-popover theme="light navigation-message" :arrow="false" offset="-20, 10" placement="bottom-start" :tippy-options="{ 'hideOnClick': false }">
                         <div class="header-user">
                             admin
@@ -88,7 +49,11 @@
                     ref="menu"
                     @select="handleSelect"
                     :default-active="nav.id"
-                    :toggle-active="nav.toggle">
+                    :toggle-active="nav.toggle"
+                    :item-active-bg-color="bckcolor"
+                    :item-active-color="fontcolor"
+                    :item-child-icon-active-color="iconcolor"
+                    :item-active-icon-color="iconcolor">
                     <bk-navigation-menu-item
                         v-for="item in nav.list"
                         :has-child="item.children && !!item.children.length"
@@ -133,14 +98,22 @@
             return {
                 routerKey: +new Date(),
                 systemCls: 'mac',
+                bckcolor: 'linear-gradient(90deg,rgba(63,135,255,1) 0%,rgba(58,132,255,1) 100%)',
+                fontcolor: '#FFFFFF',
+                iconcolor: '#B0BDD5',
                 nav: {
                     list: [
                         {
                             id: 'home',
-                            name: '奖项管理',
-                            icon: 'icon-tree-application-shape',
+                            name: '奖项中心',
+                            icon: 'icon-order-shape',
                             children: [
-                               
+                                {
+                                    id: 'home1',
+                                    name: '可申报奖项',
+                                    pathName: 'canawards',
+                                    active: true
+                                },
                                 {
                                     id: 'group-manager',
                                     name: '组管理',
@@ -156,98 +129,88 @@
                                     pathName: 'award-manager'
                                 }
                             ]
+                        },
+                        {
+                            id: 'test',
+                            name: '测试页',
+                            icon: 'icon-tree-group-shape',
+                            group: true
+                        },
+                        {
+                            id: 'test2',
+                            name: '测试页二',
+                            icon: 'icon-tree-module-shape',
+                            disabled: true
+                        },
+                        {
+                            id: 'test3',
+                            name: '测试页三',
+                            icon: 'icon-tree-process-shape',
+                            group: true
+                        },
+                        {
+                            id: 'menu1',
+                            name: '一级菜单',
+                            icon: 'icon-tree-process-shape',
+                            children: [
+                                {
+                                    id: 'menu1-1',
+                                    name: '二级菜单1'
+                                },
+                                {
+                                    id: 'menu1-2',
+                                    name: '二级菜单2'
+                                },
+                                {
+                                    id: 'menu1-3',
+                                    name: '二级菜单3'
+                                },
+                                {
+                                    id: 'menu1-4',
+                                    name: '二级菜单4'
+                                },
+                                {
+                                    id: 'menu1-5',
+                                    name: '二级菜单5'
+                                },
+                                {
+                                    id: 'menu1-6',
+                                    name: '二级菜单6'
+                                },
+                                {
+                                    id: 'menu1-7',
+                                    name: '二级菜单7'
+                                },
+                                {
+                                    id: 'menu1-8',
+                                    name: '二级菜单8'
+                                },
+                                {
+                                    id: 'menu1-9',
+                                    name: '二级菜单9'
+                                },
+                                {
+                                    id: 'menu1-10',
+                                    name: '二级菜单10'
+                                }
+                            ]
                         }
                     ],
-                    id: 'group-manager',
+                    id: 'home1',
                     toggle: true,
                     submenuActive: false,
-                    title: '蓝鲸测试平台'
+                    title: '奖项申报'
                 },
                 header: {
                     list: [
                         {
-                            name: '作业平台',
+                            name: '',
                             id: 1,
                             show: true
-                        },
-                        {
-                            name: '配置平台',
-                            id: 2,
-                            show: true
-                        },
-                        {
-                            name: '监控平台',
-                            id: 3,
-                            show: true,
-                            navList: [
-                                {
-                                    name: '插件管理',
-                                    id: 1
-                                },
-                                {
-                                    name: '采集配置',
-                                    id: 2
-                                },
-                                {
-                                    name: '策略配置',
-                                    id: 3
-                                },
-                                {
-                                    name: '事件中心',
-                                    id: 4
-                                }
-                            ]
-                        },
-                        {
-                            name: '蓝盾平台',
-                            id: 4,
-                            show: true
-                        }
-                    ],
-                    selectList: [
-                        {
-                            name: '英雄联盟',
-                            id: 1
-                        },
-                        {
-                            name: '和平精英',
-                            id: 2
-                        },
-                        {
-                            name: '王者荣耀',
-                            id: 3
-                        }
-                    ],
-                    active: 2,
-                    bizId: 1
-                },
-                message: {
-                    list: [
-                        {
-                            message: '你的“20181212112308”单据已通过',
-                            date: '刚刚'
-                        },
-                        {
-                            message: '你的“20181212112308”单据被驳回',
-                            date: '45分钟前'
-                        },
-                        {
-                            message: '你的“20181212112308”单据部分被驳回',
-                            date: '3天前'
-                        },
-                        {
-                            message: '你的“20181212112308”单据部分被驳回',
-                            date: '12月14日'
-                        },
-                        {
-                            message: '你的“20181212112308”单据部分被驳回',
-                            date: '12月14日'
-                        },
-                        {
-                            message: 'jinnyyang 提醒了你',
-                            date: '12月14日'
                         }
                     ]
+                },
+                message: {
                 },
                 user: {
                     list: [
@@ -258,18 +221,6 @@
                 },
                 lang: {
                     list: [
-                        {
-                            name: '中文',
-                            id: 'chinese'
-                        },
-                        {
-                            name: 'English',
-                            id: 'english'
-                        },
-                        {
-                            name: '日本語',
-                            id: 'japanese'
-                        }
                     ]
                 }
             }
@@ -300,6 +251,9 @@
         },
         methods: {
             handleSelect (id, item) {
+                console.log(item)
+                this.changeColor()
+                this.header.list[0].name = item.name // 提示用户此时页面的位置
                 this.nav.id = id
                 console.info(`你选择了${id}`)
                 this.$router.push({
@@ -308,6 +262,38 @@
             },
             handleToggle (v) {
                 this.nav.toggle = v
+            },
+            toCheckview () {
+                this.tofirstColor()
+                this.header.list[0].name = '我的审核' // 提示用户此时页面的位置
+                console.log('去我的审核')
+                this.$router.push({
+                    name: 'mycheck'
+                })
+            },
+            toMyapply () {
+                this.tofirstColor()
+                this.header.list[0].name = '我的申请' // 提示用户此时页面的位置
+                console.log('去我的申请页面')
+                this.$router.push({
+                    name: 'myapply'
+                })
+            },
+            /**
+             * 将左侧导航栏中的背景色、字体色、图标色恢复为默认的颜色
+             */
+            tofirstColor () {
+                this.bckcolor = 'rgb(255, 255, 255)'
+                this.fontcolor = 'rgb(99, 101, 110)'
+                this.iconcolor = 'rgb(99, 101, 110)'
+            },
+            /**
+             * 将左侧导航栏中的背景色、字体色、图标色恢复为选中后的颜色
+             */
+            changeColor () {
+                this.bckcolor = 'linear-gradient(90deg,rgba(63,135,255,1) 0%,rgba(58,132,255,1) 100%)'
+                this.fontcolor = '#FFFFFF'
+                this.iconcolor = '#FFFFFF'
             }
         }
     }
@@ -393,10 +379,10 @@
         }
         .header-mind {
             color: #768197;
-            font-size: 16px;
+            font-size: 15px;
             position: relative;
             height: 32px;
-            width: 32px;
+            width: 100px;
             display: -webkit-box;
             display: -ms-flexbox;
             display: flex;
