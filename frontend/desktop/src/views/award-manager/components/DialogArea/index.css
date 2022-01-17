@@ -1,0 +1,10 @@
+.dialog-area-container {
+    .footer-panel {
+        display: flex;
+        justify-content: flex-start;
+        align-items: center;
+        .footer-button {
+            margin: 0 24px;
+        }
+    }
+}
