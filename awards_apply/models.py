@@ -22,8 +22,11 @@ class Awards(models.Model):
 
 
 class Secretary(models.Model):
-    user_id = models.CharField(max_length=128, verbose_name="用户id")
-    group_id = models.CharField(max_length=128, verbose_name="组id")
+    user_id = models.CharField(max_length=50, verbose_name="用户id")
+    group_id = models.IntegerField(verbose_name="组id")
+
+    class Meta:
+        unique_together = ("user_id", "group_id",)
 
 
 # 申请表
@@ -31,8 +34,8 @@ class AwardApplicationRecord(models.Model):
     award_id = models.IntegerField(verbose_name="奖项id")
     application_time = models.DateTimeField(verbose_name="申请时间")
     application_reason = models.TextField(verbose_name="申请理由")
-    application_id = json_models.JSONField(verbose_name="申请人id列表")
-    application_attachments = json_models.JSONField(verbose_name="申请附件地址列表")
+    application_id = json_models.JSONField(verbose_name="申请人id列表", default=list)
+    application_attachments = json_models.JSONField(verbose_name="申请附件地址列表", default=list)
     APPROVAL_STATE = [
         (0, "待评审"),
         (1, "评审通过"),
@@ -42,6 +45,6 @@ class AwardApplicationRecord(models.Model):
     approval_state = models.IntegerField(
         choices=APPROVAL_STATE, default=3, verbose_name="评审状态"
     )
-    approval_id = models.IntegerField(verbose_name="评审人id", null=True)
+    approval_id = models.CharField(max_length=50, verbose_name="评审人id", null=True)
     approval_time = models.DateTimeField(verbose_name="评审时间", null=True)
     approval_text = models.TextField(verbose_name="评审评语", null=True)
