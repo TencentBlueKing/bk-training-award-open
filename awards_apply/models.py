@@ -22,8 +22,11 @@ class Awards(models.Model):
 
 
 class Secretary(models.Model):
-    user_id = models.CharField(max_length=128, verbose_name="用户id")
-    group_id = models.CharField(max_length=128, verbose_name="组id")
+    user_id = models.IntegerField(verbose_name="用户id")
+    group_id = models.IntegerField(verbose_name="组id")
+
+    class Meta:
+        unique_together = ("user_id", "group_id",)
 
 
 # 申请表
