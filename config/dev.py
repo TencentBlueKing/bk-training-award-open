@@ -12,6 +12,9 @@ specific language governing permissions and limitations under the License.
 """
 from config import RUN_VER
 from config.default import FRONTEND_BACKEND_SEPARATION
+from pathlib import Path
+
+BASE_DIR = Path(__file__).resolve().parent.parent
 
 if RUN_VER == "open":
     from blueapps.patch.settings_open_saas import *  # noqa
@@ -30,8 +33,9 @@ BK_STATIC_URL = STATIC_URL + "dist/"
 # LOG_LEVEL = "DEBUG"
 # LOGGING = set_log_level(locals())
 
-# APP本地静态资源目录
-STATIC_URL = "/static/"
+# APP上传资源目录
+MEDIA_ROOT = os.path.join(BASE_DIR,'media')
+MEDIA_URL = '/media/'
 
 # APP静态资源目录url
 # REMOTE_STATIC_URL = '%sremote/' % STATIC_URL
