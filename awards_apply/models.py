@@ -1,6 +1,7 @@
 from django.db import models
 from django_mysql.models import JSONField
 
+
 # Create your models here.
 class Awards(models.Model):
     award_name = models.CharField(max_length=128, verbose_name="奖项名称")
@@ -12,8 +13,8 @@ class Awards(models.Model):
     award_image = models.ImageField(max_length=1000, upload_to='img')
     create_time = models.DateTimeField(auto_now_add=True, verbose_name="创建时间")
     update_time = models.DateTimeField(auto_now=True, verbose_name="更新时间")
-    start_time = models.DateTimeField(verbose_name="开始申请时间")
-    end_time = models.DateTimeField(verbose_name="截止申请时间")
+    start_time = models.DateField(verbose_name="开始申请时间")
+    end_time = models.DateField(verbose_name="截止申请时间")
     APPROVAL_STATE = [
         (0, "未开始"),
         (1, "已开始"),
