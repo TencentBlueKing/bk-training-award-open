@@ -35,7 +35,9 @@ from blueapps.conf.log import get_logging_config_dict
 INSTALLED_APPS += (  # noqa
     "home_application",
     "mako_application",
+    "rest_framework",
     'awards_apply',
+    'django_mysql',
 )
 
 # 这里是默认的中间件，大部分情况下，不需要改动
@@ -66,6 +68,7 @@ INSTALLED_APPS += (  # noqa
 # 自定义中间件
 MIDDLEWARE += (
     "blueapps.middleware.bkui.middlewares.BkuiPageMiddleware",
+    "awards_apply.utils.middlerwares.AppExceptionMiddleware",
 )
 
 # 添加首页搜索范围
@@ -167,3 +170,14 @@ if locals().get("DISABLED_APPS"):
         locals()[_key] = tuple(
             [_item for _item in locals()[_key] if not _item.startswith(_app + ".")]
         )
+# 上传文件相对路径文件夹
+MEDIA_URL = "media/"
+
+# rest_framework配置
+REST_FRAMEWORK = {
+    # 自定义rest_framework异常处理,一般为rest_framework.exceptions.APIException
+    'EXCEPTION_HANDLER': 'awards_apply.utils.exception_handler.custom_exception_handler',
+    # 取消rest_framework API 调试页面
+    'DEFAULT_RENDERER_CLASSES':
+        ('rest_framework.renderers.JSONRenderer',)
+}
