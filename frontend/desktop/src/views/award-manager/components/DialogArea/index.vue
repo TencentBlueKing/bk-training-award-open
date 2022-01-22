@@ -10,16 +10,19 @@
         >
             <template slot="content" v-if="visible">
                 <div style="height: 80vh;padding-top: 10px;">
-                    <slot name="custom"
-                        :data="formData"
-                    >
+                    <slot name="custom">
                     </slot>
                 </div>
             </template>
 
             <div slot="footer" class="footer-panel">
-                <bk-button class="footer-button ok-button" theme="primary">确认</bk-button>
-                <bk-button class="footer-button cancel-button" theme="danger">取消</bk-button>
+                <div v-if="!$slots.footer">
+                    <bk-button @click="$emit('confirm')" class="footer-button ok-button" theme="primary">确认</bk-button>
+                    <bk-button @click="$emit('cancel')" class="footer-button cancel-button" theme="danger">取消</bk-button>
+                </div>
+                <div v-else>
+                    <slot name="footer"></slot>
+                </div>
             </div>
         </bk-sideslider>
     </div>
@@ -63,7 +66,7 @@
             },
             show (options = {}) {
                 if (options.data) {
-                    this.formData = [...options.data]
+                    this.formData = { ...options.data }
                 }
                 this.visible = true
             },

@@ -6,6 +6,8 @@
             size="small"
             :mask-close="false"
             ext-cls="dialog"
+            @confirm="$emit('confirm',formData)"
+            @cancel="$emit('cancel',formData)"
         >
             <p slot="header"
                 class="dialog-title"

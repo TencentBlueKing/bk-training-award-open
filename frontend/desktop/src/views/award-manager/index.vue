@@ -12,7 +12,7 @@
                             <div class="left-panel">
                                 <bk-button theme="primary"
                                     icon="plus-circle-shape"
-                                    @click="toAddNewAward($refs['NewAwardForm'])">
+                                    @click="toAddNewAward($refs['NewAwardDialog'])">
                                     新增
                                 </bk-button>
                                 <bk-button theme="default"
@@ -168,8 +168,21 @@
         </bk-table>
         <!-- /表格按钮区域 -->
         <!-- 弹出区域 -->
-        <DialogArea ref="NewAwardForm" title="新增奖项">
-            <NewAwardForm slot="custom"></NewAwardForm>
+        <DialogArea ref="NewAwardDialog"
+            title="新增奖项"
+        >
+            <NewAwardForm slot="custom"
+                ref="NewAwardForm"
+            ></NewAwardForm>
+            <div slot="footer">
+                <bk-button class="footer-button cancel-button"
+                    theme="danger"
+                >取消</bk-button>
+                <bk-button @click="handleConfirmSubmit($refs['NewAwardForm'])"
+                    class="footer-button ok-button"
+                    theme="success"
+                >确认新增</bk-button>
+            </div>
         </DialogArea>
         <DialogArea ref="EditRowDialog" title="编辑奖项">
             <NewAwardForm slot="custom"></NewAwardForm>
@@ -179,7 +192,10 @@
         </DialogArea>
 
         <DialogArea ref="BatchCloneForm" title="批量克隆">
-            <BatchCloneForm slot="custom" :form-data="selectData" :total-data="tableData"></BatchCloneForm>
+            <BatchCloneForm slot="custom"
+                :form-data="selectData"
+                :total-data="tableData"
+            ></BatchCloneForm>
         </DialogArea>
         <DialogArea ref="BatchSendEmailForm" title="批量发送邮件">
             <BatchSendEmailForm slot="custom"></BatchSendEmailForm>
@@ -324,6 +340,19 @@
             confirmDelAward () {
                 this.notImplemented('确认删除奖项')
             },
+            /**
+             * 获取表单信息并提交
+             * */
+            handleConfirmSubmit (NewAwardForm) {
+                const fields = NewAwardForm.getFields()
+                console.log('fields', fields)
+                fields.then(
+                    (...args) => {
+                        console.log('args', args)
+                    }
+                )
+            },
+
             // 信息提示二次封装
             handleShowMessage (message, theme) {
                 this.$bkMessage({
@@ -332,10 +361,11 @@
                     offsetY: 80
                 })
             },
+
             handleErrorMessageTips (message) {
                 this.handleShowMessage(message, 'error')
             },
-            handleSucessMessageTips (message) {
+            handleSuccessMessageTips (message) {
                 this.handleShowMessage(message, 'success')
             },
 
