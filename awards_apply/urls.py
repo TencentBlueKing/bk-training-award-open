@@ -3,6 +3,7 @@ from django.views.static import serve
 from . import views
 from config.dev import MEDIA_ROOT
 
+
 urlpatterns = (
     re_path(r'media/(?P<path>.*)$', serve, {'document_root': MEDIA_ROOT}),
     path("", views.home),

@@ -1,1 +1,1 @@
-from .award_serializers import AwardsSerializers, AwardsRecordSerializers
+from .award_serializers import AwardsSerializers, AwardsRecordSerializers # noqa
