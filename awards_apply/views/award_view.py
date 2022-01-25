@@ -8,7 +8,7 @@ from django.utils import timezone
 from django.views.decorators.http import require_http_methods
 from rest_framework.views import APIView
 
-from awards_apply.tools.const import false_code,success_code,object_not_exist_error
+from awards_apply.tools.const import false_code, success_code, object_not_exist_error
 from awards_apply.serializers.award_serializers import AwardsSerializers, AwardsRecordSerializers
 from awards_apply.models import Awards, AwardApplicationRecord
 from awards_apply.tools.my_pagination import MyPageNumberPagination
