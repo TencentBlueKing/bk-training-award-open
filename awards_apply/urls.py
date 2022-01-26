@@ -21,4 +21,10 @@ urlpatterns = [
     ),
     url(r"^upload/$", views.upload),
     url(r"^media/(?P<filename>.*)/$", views.download),
+    re_path(r'media/(?P<path>.*)$', serve, {'document_root': MEDIA_ROOT}),
+    url(r"get_awards_list/", views.AwardView.as_view()),
+    url(r"make_an_application/$", views.make_an_application),
+    url(r"^withdraw_an_application/$", views.withdraw_an_application),
+    url(r"^create_award/$", views.create_award),
+    url(r"^get_available_awards/", views.AvailableAwardsView.as_view()),
 ]
