@@ -10,10 +10,10 @@
             <template slot="header">
                 <div class="monitor-navigation-header">
                     <ol class="header-nav">
-                        <bk-popover v-for="(item,index) in header.list" :key="item.id" theme="light navigation-message" :arrow="false" offset="0, -5" placement="bottom" :tippy-options="{ 'hideOnClick': false, flipBehavior: ['bottom'] }">
-                            <li v-show="item.show" class="header-nav-item" style="font-size: 17px;margin-left: 25px" :class="{ 'item-active': index === header.active }">
-                                {{item.name}}
-                            </li>
+                        <bk-popover theme="light navigation-message" :arrow="false" offset="0, -5" placement="bottom" :tippy-options="{ 'hideOnClick': false, flipBehavior: ['bottom'] }">
+                            <bk-breadcrumb>
+                                <bk-breadcrumb-item v-for="(item) in header.list" :key="item.id">{{item.name}}</bk-breadcrumb-item>
+                            </bk-breadcrumb>
                         </bk-popover>
                     </ol>
                     <bk-popover theme="light navigation-message" style="margin-left: auto;" placement="bottom" :arrow="false" offset="0, 5" trigger="mouseenter" :tippy-options="{ 'hideOnClick': false }">
@@ -24,20 +24,19 @@
                     </bk-popover>
                     <bk-popover theme="light navigation-message" placement="bottom" :arrow="false" offset="0, 5" trigger="mouseenter" :tippy-options="{ 'hideOnClick': false }">
                         <div class="header-mind" @click="toMyapply()">
-                            <!-- <span class="bk-icon icon-chinese lang-icon"></span> -->
                             <bk-icon type="panel-permission" />
                             <div style="padding-left: 5px;font-size: 15px;color: #96A2B9;">我的申请</div>
                         </div>
                     </bk-popover>
                     <bk-popover theme="light navigation-message" :arrow="false" offset="-20, 10" placement="bottom-start" :tippy-options="{ 'hideOnClick': false }">
                         <div class="header-user">
-                            admin
+                            {{user.username || 'admin'}}
                             <i class="bk-icon icon-down-shape"></i>
                         </div>
                         <template slot="content">
                             <ul class="monitor-navigation-admin">
-                                <li class="nav-item" v-for="userItem in user.list" :key="userItem">
-                                    {{userItem}}
+                                <li class="nav-item" v-for="userItem in userMenu.list" :key="userItem.label">
+                                    <span @click="userItem.func()">{{userItem.label}}</span>
                                 </li>
                             </ul>
                         </template>
@@ -106,92 +105,33 @@
                         {
                             id: 'home',
                             name: '奖项中心',
-                            icon: 'icon-order-shape',
+                            icon: 'icon-dashboard',
                             children: [
                                 {
                                     id: 'home1',
                                     name: '可申报奖项',
+                                    icon: 'icon-star',
                                     pathName: 'canawards',
                                     active: true
-                                },
+                                }
+                            ]
+                        },
+                        {
+                            id: 'manager',
+                            name: '管理中心',
+                            icon: 'icon-tree-module-shape',
+                            children: [
                                 {
                                     id: 'group-manager',
                                     name: '组管理',
-                                    icon: 'icon-tree-group-shape',
-                                    group: false,
+                                    icon: 'icon-sitemap',
                                     pathName: 'group-manager'
                                 },
                                 {
                                     id: 'award-manager',
                                     name: '奖项管理',
-                                    icon: 'icon-tree-group-shape',
-                                    group: false,
+                                    icon: 'icon-data',
                                     pathName: 'award-manager'
-                                }
-                            ]
-                        },
-                        {
-                            id: 'test',
-                            name: '测试页',
-                            icon: 'icon-tree-group-shape',
-                            group: true
-                        },
-                        {
-                            id: 'test2',
-                            name: '测试页二',
-                            icon: 'icon-tree-module-shape',
-                            disabled: true
-                        },
-                        {
-                            id: 'test3',
-                            name: '测试页三',
-                            icon: 'icon-tree-process-shape',
-                            group: true
-                        },
-                        {
-                            id: 'menu1',
-                            name: '一级菜单',
-                            icon: 'icon-tree-process-shape',
-                            children: [
-                                {
-                                    id: 'menu1-1',
-                                    name: '二级菜单1'
-                                },
-                                {
-                                    id: 'menu1-2',
-                                    name: '二级菜单2'
-                                },
-                                {
-                                    id: 'menu1-3',
-                                    name: '二级菜单3'
-                                },
-                                {
-                                    id: 'menu1-4',
-                                    name: '二级菜单4'
-                                },
-                                {
-                                    id: 'menu1-5',
-                                    name: '二级菜单5'
-                                },
-                                {
-                                    id: 'menu1-6',
-                                    name: '二级菜单6'
-                                },
-                                {
-                                    id: 'menu1-7',
-                                    name: '二级菜单7'
-                                },
-                                {
-                                    id: 'menu1-8',
-                                    name: '二级菜单8'
-                                },
-                                {
-                                    id: 'menu1-9',
-                                    name: '二级菜单9'
-                                },
-                                {
-                                    id: 'menu1-10',
-                                    name: '二级菜单10'
                                 }
                             ]
                         }
@@ -212,11 +152,14 @@
                 },
                 message: {
                 },
-                user: {
+                userMenu: {
                     list: [
-                        '项目管理',
-                        '权限中心',
-                        '退出'
+                        {
+                            label: '退出',
+                            func: () => {
+                                console.log()
+                            }
+                        }
                     ]
                 },
                 lang: {
@@ -226,7 +169,7 @@
             }
         },
         computed: {
-            ...mapGetters(['mainContentLoading']),
+            ...mapGetters(['mainContentLoading', 'user']),
             curHeaderNav () {
                 return this.header.list[this.header.active] || {}
             }
@@ -236,6 +179,7 @@
             if (platform.indexOf('win') === 0) {
                 this.systemCls = 'win'
             }
+            console.log(this.user)
         },
         mounted () {
             const self = this
@@ -396,7 +340,7 @@
             &:hover {
                 background: -webkit-gradient(linear,right top, left top,from(rgba(37,48,71,1)),to(rgba(38,50,71,1)));
                 background: linear-gradient(270deg,rgba(37,48,71,1) 0%,rgba(38,50,71,1) 100%);
-                border-radius: 100%;
+                border-radius: 50%;
                 cursor: pointer;
                 color: #d3d9e4;
             }

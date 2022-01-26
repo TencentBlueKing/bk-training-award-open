@@ -6,16 +6,23 @@
 import Vue from 'vue'
 import Vuex from 'vuex'
 
-import example from './modules/example'
 import http from '@/api'
 import { unifyObjectStyle } from '@/common/util'
-
+import groupModule from './modules/group.module'
+import awardModule from './modules/award.module'
 Vue.use(Vuex)
 
 const store = new Vuex.Store({
     // 模块
     modules: {
-        example
+        /**
+         * 组信息模块
+         * */
+        groupModule,
+        /**
+         * 奖项信息模块
+         * */
+        awardModule
     },
     // 公共 store
     state: {

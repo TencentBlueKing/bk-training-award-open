@@ -1,10 +1,11 @@
 <template>
     <div class="detail-container">
         <bk-sideslider :is-show.sync="isShow"
-            :width="800"
+            :width="600"
             :title="applyForm['award_name'] || '未定义奖项'"
             @hidden="hidden"
         >
+            <!-- ! 需要确保表单组件重渲染，防止留下数据 -->
             <div v-if="isShow"
                 slot="content"
                 style="height: 80vh"
@@ -12,6 +13,7 @@
                 <!-- 编辑部分 -->
                 <ApplyForm v-if="isShowApplyForm"
                     ref="applyForm"
+                    :id="applyForm['id']"
                 ></ApplyForm>
                 <!-- /编辑部分 -->
 
@@ -19,6 +21,8 @@
                 <Detail :award-form="applyForm"></Detail>
                 <!-- /详情部分 -->
             </div>
+
+            <!-- 底部按钮组 -->
             <div class="tc w100" style="width: 100%" slot="footer">
                 <!-- 用于申请奖项的按钮 -->
                 <div v-if="isShowApplyForm"
@@ -26,7 +30,7 @@
                 >
                     <bk-button theme="warning"
                         class="mr10"
-                        @click="handleCancel()"
+                        @click="hidden()"
                         ext-cls="button-item"
                     >
                         <bk-icon type="minus-circle" />
@@ -64,12 +68,12 @@
                 </div>
                 <!-- /用于跳转申请奖项的按钮 -->
             </div>
+            <!-- /底部按钮组 -->
         </bk-sideslider>
     </div>
 </template>
 <script>
     import { mapGetters } from 'vuex'
-    import { isDef } from './utils'
 
     export default {
         name: 'detail',
@@ -78,10 +82,6 @@
             ApplyForm: () => import('./ApplyForm')
         },
         props: {
-            awardInfo: {
-                type: Object,
-                default: () => ({})
-            },
             type: {
                 type: String,
                 default: () => null
@@ -96,6 +96,9 @@
         },
         computed: {
             ...mapGetters(['user']),
+            /**
+             * 用于判断是否为编辑型表格
+             * */
             isShowApplyForm () {
                 return ['apply', 'edit'].includes(this.formType)
             },
@@ -103,9 +106,10 @@
              * 主要用于拼接一些比如 id 的信息 此类默认信息
              * */
             defaultInfo () {
+                console.log(this.awardInfo)
                 return {
-                    award_apply_record_id: this.awardForm.award_apply_record_id,
-                    award_id: this.awardForm.id
+                    award_apply_record_id: this.applyForm.award_apply_record_id,
+                    award_id: this.applyForm.id
                 }
             }
         },
@@ -114,7 +118,7 @@
              * 保存草稿
              * */
             handleToSaveApplyForm (applyForm) {
-                this.handleToDealWidthApply(0, applyForm).then(res => {
+                this.handleToDealWidthApply(true, applyForm).then(res => {
                     console.log('res', res)
                 })
             },
@@ -122,40 +126,30 @@
              * 发起申请
              * */
             handleToSendApplyForm (applyForm) {
-                this.handleToDealWidthApply(1, applyForm).then(res => {
+                // console.log('applyForm',)
+                this.handleToDealWidthApply(false, applyForm).then(res => {
                     console.log('res', res)
                 })
             },
             /**
              * 处理奖项的统一入口
              * */
-            handleToDealWidthApply (operationCode, applyForm) {
+            handleToDealWidthApply (isDraft, applyForm) {
                 const defaultInfo = this.defaultInfo
+                console.log('applyForm', defaultInfo)
                 const params = applyForm.getFields()
                 console.log('params', params)
                 if (!params) {
                     return
                 }
-                return this.$http.post('deal_with_an_apply/', {
-                    operation_code: operationCode,
-                    ...applyForm,
+                return this.$http.post('make_an_application/', {
+                    is_draft: isDraft,
+                    ...params,
                     ...defaultInfo
                 })
             },
-            /**
-             * 取消申请
-             * */
-            handleCancel () {
-                this.hidden()
-            },
-            show (options) {
-                if (typeof options.cb === 'function') {
-                    options.cb()
-                }
+            show (options = {}) {
                 this.applyForm = Object.assign({ ...options })
-                if (!isDef(this.applyForm.id)) {
-                    return this.$bkMessage({ theme: 'warning', message: '出错啦' })
-                }
                 this.isShow = true
             },
             hidden () {

@@ -20,7 +20,7 @@
                                     批量克隆
                                 </bk-button>
                                 <bk-button theme="default"
-                                    @click="toSendEmail($refs['BatchSendEmailForm'])">
+                                    @click="toSendEmail($refs['BatchSendEmailForm'],selectData)">
                                     邮件通知
                                 </bk-button>
                                 <bk-button theme="default"
@@ -131,9 +131,8 @@
             :data="tableData"
             :size="size"
             :pagination="pagination"
-            :height="isFilter ? '70%' : '80%'"
-            @page-change="handlePageChange"
-            @page-limit-change="handlePageLimitChange"
+            @page-change="handleCurrentChange($event)"
+            @page-limit-change="handlePageSizeChange($event)"
             @selection-change="handleSetSelectData"
             :virtual-render="true"
         >
@@ -175,12 +174,13 @@
                 ref="NewAwardForm"
             ></NewAwardForm>
             <div slot="footer">
-                <bk-button class="footer-button cancel-button"
+                <bk-button class="footer-button"
                     theme="danger"
                 >取消</bk-button>
                 <bk-button @click="handleConfirmSubmit($refs['NewAwardForm'])"
-                    class="footer-button ok-button"
+                    class="footer-button"
                     theme="success"
+                    :loading="loading.newAwardFormLoading"
                 >确认新增</bk-button>
             </div>
         </DialogArea>
@@ -198,10 +198,14 @@
             ></BatchCloneForm>
         </DialogArea>
         <DialogArea ref="BatchSendEmailForm" title="批量发送邮件">
-            <BatchSendEmailForm slot="custom"></BatchSendEmailForm>
+            <BatchSendEmailForm slot="custom"
+                :select-data="selectData"
+            ></BatchSendEmailForm>
         </DialogArea>
         <DialogArea ref="NotificationForm" title="编辑公示">
-            <NotificationForm slot="custom"></NotificationForm>
+            <NotificationForm slot="custom"
+                :select-data="selectData"
+            ></NotificationForm>
         </DialogArea>
         <DialogArea ref="EndAwardForm" title="删除奖项">
             <EndAwardForm slot="custom"></EndAwardForm>
@@ -210,6 +214,7 @@
     </div>
 </template>
 <script>
+    import { fixMixins, tableMixins } from '@/common/mixins'
     export default {
         components: {
             DialogArea: () => import('./components/DialogArea'),
@@ -220,11 +225,25 @@
             EndAwardForm: () => import('./components/DialogArea/EndAwardForm'),
             FilterSvg: () => import('./components/Svg/FilterSvg')
         },
+        mixins: [
+            /**
+             * 修复 bug 的混入
+             * */
+            fixMixins,
+            /**
+             * 分页器的混入
+             * */
+            tableMixins
+        ],
         data () {
             return {
                 // S 控制信息区
                 // 表格尺寸
                 size: 'small',
+                // loading 状态
+                loading: {
+                    newAwardFormLoading: false
+                },
 
                 // 是否展示高级筛选区域
                 isFilter: '',
@@ -238,21 +257,7 @@
                 // E 控制信息区
 
                 // S 用于接收远程数据
-                remoteData: new Array(10).fill({}).map((item, index) => {
-                    if (index === 2) {
-                        return {
-                            ...item,
-                            isProcess: true
-                        }
-                    }
-                    return { ...item }
-                }),
-                // 分页信息
-                pagination: {
-                    current: 1,
-                    count: 10,
-                    limit: 10
-                },
+                remoteData: [],
                 // E 用于接收远程数据
                 // S 表单
                 formData: {},
@@ -279,44 +284,46 @@
             }
         },
         created () {
-            this.notImplemented = (feature) => {
-                const message = `正在开发: ${feature}`
-                alert(message)
-                throw new Error(message)
-            }
+            this.handleInit()
         },
         mounted () {
         },
         methods: {
-            // S 修复区域
-            adjustTable () {
-                document.querySelector('.main-content').style.minHeight = '0'
-                document.querySelector('.main-content').style.height = '100%'
+            handleInit () {
+                this.handlePageSizeChange(10)
             },
-            // E 修复区域
-            // 弹出框控制区
+            // S 弹框控制区域
+            // 新增
             toAddNewAward (newAwardDialog) {
                 newAwardDialog.show()
             },
+            // 批量克隆
             toBatchClone (batchCloneDialog, selectData) {
                 if (!selectData.length) {
-                    this.handleErrorMessageTips('请先选择奖项')
+                    this.messageError('请先选择奖项')
                     return null
                 }
                 batchCloneDialog.show()
             },
-            toSendEmail (sendEmailDialog) {
-                // console.log('batchCloneDialog->', batchCloneDialog)
+            // 批量发送邮件
+            toSendEmail (sendEmailDialog, selectData) {
+                if (!selectData.length) {
+                    this.messageError('请先选择奖项')
+                    return null
+                }
                 sendEmailDialog.show()
                 this.notImplemented('数据接口对接')
             },
+            // 批量导出
             toBatchExport (batchExportDialog) {
                 this.notImplemented('导出数据')
             },
+            // 展示公告弹框
             toSendNotification (sendNotificationDialog) {
                 sendNotificationDialog.show()
                 this.notImplemented('获取成员信息')
             },
+            // 展示高级筛选
             toShowFilterPanel () {
                 this.isFilter = this.isFilter ? '' : 'filter-panel'
             },
@@ -334,44 +341,77 @@
                 GetDetailDialog.show()
                 this.notImplemented('获取详情数据传入')
             },
+            // 弹出结束奖项
             toEndAward (rawData, EndAwardForm) {
                 EndAwardForm.show()
             },
+            // E 弹框控制区域
             confirmDelAward () {
                 this.notImplemented('确认删除奖项')
             },
             /**
              * 获取表单信息并提交
              * */
-            handleConfirmSubmit (NewAwardForm) {
-                const fields = NewAwardForm.getFields()
+            async handleConfirmSubmit (NewAwardForm) {
+                const loading = this.loading
+                if (loading.newAwardFormLoading) {
+                    return
+                }
+                loading.newAwardFormLoading = true
+                const fields = await NewAwardForm.getFields()
                 console.log('fields', fields)
-                fields.then(
-                    (...args) => {
-                        console.log('args', args)
-                    }
-                )
+                if (!fields) {
+                    loading.newAwardFormLoading = false
+                    return
+                }
+                if (fields) {
+                    return this.$http.post('create_award/', fields).then(res => {
+                        this.messageSuccess('创建成功')
+                    }).finally(_ => {
+                        loading.newAwardFormLoading = false
+                    })
+                }
             },
-
-            // 信息提示二次封装
-            handleShowMessage (message, theme) {
-                this.$bkMessage({
-                    message,
-                    theme,
-                    offsetY: 80
-                })
-            },
-
-            handleErrorMessageTips (message) {
-                this.handleShowMessage(message, 'error')
-            },
-            handleSuccessMessageTips (message) {
-                this.handleShowMessage(message, 'success')
-            },
-
             handleSetSelectData (selectData) {
                 console.log('selectData->', selectData)
                 this.selectData = [...selectData]
+            },
+
+            /**
+             * 获取表格信息
+             * */
+            handlePageSizeChange (limit) {
+                /**
+                 * 尺寸变化的时候应该让当前页面回到初始状态
+                 * */
+                this.pagination.current = 1
+                this.pagination.limit = limit
+                this.handleGetPageData(this.pagination.current, limit)
+            },
+            /**
+             * 页面变化的时候获取可申请奖项页面数据
+             * */
+            handleCurrentChange (current) {
+                this.pagination.current = current
+                this.handleGetPageData(current, this.pagination.limit)
+            },
+            /**
+             * 获取可申请奖项页面数据
+             * */
+            handleGetPageData (current, size) {
+                this.isLoading = true
+
+                return this.$http.get('get_awards_list/', {
+                    params: {
+                        page_num: current,
+                        page_size: size
+                    }
+                }).then(res => {
+                    this.remoteData = res.data['awards']
+                    this.pagination.count = res.data['total_count']
+                }).finally(_ => {
+                    this.isLoading = false
+                })
             }
         }
     }

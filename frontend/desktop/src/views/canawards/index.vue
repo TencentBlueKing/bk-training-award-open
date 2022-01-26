@@ -1,57 +1,54 @@
 <template>
-    <div class="example1-wrapper">
-        <div>
-            <bk-table style="margin-top: 15px;"
-                :data="tableData"
-                size="small"
-                :pagination="pagination"
-                @page-change="handleCurrentChange($event)"
-                @page-limit-change="handlePageSizeChange($event)"
-                v-bkloading="{ isLoading: isLoading }"
-            >
-                <bk-table-column label="奖项名称" prop="award_name"></bk-table-column>
-                <bk-table-column label="奖项级别" prop="award_level"></bk-table-column>
-                <bk-table-column label="接口人(可咨询奖项相关信息)" prop="award_description"></bk-table-column>
-                <bk-table-column label="开始申请时间" prop="start_time"></bk-table-column>
-                <bk-table-column label="截止申请时间" prop="end_time"></bk-table-column>
-                <bk-table-column label="操作" width="150">
-                    <template slot-scope="props">
-                        <bk-button class="mr10" theme="primary"
-                            :disabled="['创建中'].includes(props.row.approval_state)"
-                            @click="toApply(props.row,$refs['applyDialog'])"
-                            text
-                        >申请
-                        </bk-button>
-                        <bk-button class="mr10"
-                            theme="primary"
-                            @click="getDetail(props.row,$refs['detailDialog'])"
-                            text
-                        >详情
-                        </bk-button>
-                    </template>
-                </bk-table-column>
-            </bk-table>
-        </div>
+    <div class="canawards-container">
+        <bk-table style="margin-top: 15px;"
+            :data="tableData"
+            size="small"
+            :pagination="pagination"
+            @page-change="handleCurrentChange($event)"
+            @page-limit-change="handlePageSizeChange($event)"
+            v-bkloading="{ isLoading: isLoading,title: '加载中' }"
+        >
+            <bk-table-column label="奖项名称" prop="award_name"></bk-table-column>
+            <bk-table-column label="奖项级别" prop="award_level"></bk-table-column>
+            <bk-table-column label="接口人(可咨询奖项相关信息)" prop="award_description"></bk-table-column>
+            <bk-table-column label="开始申请时间" prop="start_time"></bk-table-column>
+            <bk-table-column label="截止申请时间" prop="end_time"></bk-table-column>
+            <bk-table-column label="操作" width="150">
+                <template slot-scope="props">
+                    <bk-button class="mr10" theme="primary"
+                        :disabled="['创建中'].includes(props.row.approval_state)"
+                        @click="toApply(props.row,$refs['applyDialog'])"
+                        text
+                    >申请
+                    </bk-button>
+                    <bk-button class="mr10"
+                        theme="primary"
+                        @click="toDetail(props.row,$refs['detailDialog'])"
+                        text
+                    >详情
+                    </bk-button>
+                </template>
+            </bk-table-column>
+        </bk-table>
         <Detail ref="applyDialog" type="apply"></Detail>
         <Detail ref="detailDialog" type="detail"></Detail>
     </div>
 </template>
 
 <script>
-    import Detail from '../detail'
+    import { isDef } from '@/common/util'
+    import { tableMixins } from '@/common/mixins'
+
     export default {
-        components: { Detail },
+        components: {
+            Detail: () => import('../detail')
+        },
+        mixins: [tableMixins],
         data () {
             return {
                 userInfo: null,
                 remoteData: [],
-                pagination: {
-                    current: 1,
-                    count: 0,
-                    limit: 1
-                },
                 awardInfo: null,
-                slideType: 'detail',
                 isLoading: false
             }
         },
@@ -80,21 +77,34 @@
         created () {
             this.handleInit()
         },
+
         methods: {
             handleInit () {
                 this.handleGetPageData(this.pagination.current, this.pagination.limit)
             },
             toApply (awardInfo, applyDialog) {
+                if (!isDef(awardInfo.id)) {
+                    return this.messageError('出错啦')
+                }
                 applyDialog.show({ ...awardInfo })
             },
-            getDetail (awardInfo, detailDialog) {
+            toDetail (awardInfo, detailDialog) {
+                if (!isDef(awardInfo.id)) {
+                    return this.messageError('出错啦')
+                }
                 detailDialog.show({ ...awardInfo })
             },
             handlePageSizeChange (limit) {
-                this.pagination.limit = limit
+                /**
+                 * 尺寸变化的时候应该让当前页面回到初始状态
+                 * */
                 this.pagination.current = 1
+                this.pagination.limit = limit
                 this.handleGetPageData(this.pagination.current, limit)
             },
+            /**
+             * 页面变化的时候获取可申请奖项页面数据
+             * */
             handleCurrentChange (current) {
                 this.pagination.current = current
                 this.handleGetPageData(current, this.pagination.limit)
@@ -105,7 +115,6 @@
             handleGetPageData (current, size) {
                 this.isLoading = true
 
-                this.remoteData = [{}].fill(1)
                 return this.$http.get('get_awards_list/', {
                     params: {
                         page_num: current,
@@ -121,7 +130,3 @@
         }
     }
 </script>
-
-<style scoped>
-    @import './index.css';
-</style>

@@ -21,7 +21,14 @@
                 </bk-table-column>
                 <bk-table-column label="操作">
                     <template slot-scope="props">
-                        <bk-button class="mr10" v-if="props.row.status === '待审核'" theme="primary" text @click="handleToDelApply(props.row)">撤回申请</bk-button>
+                        <bk-popconfirm
+                            :title="'确认撤销申请该奖项（' + props.row['award_name'] + '）？'"
+                            trigger="click"
+                            content="删除操作无法撤回，请谨慎操作！"
+                            @confirm="handleToDelApply(props.row)"
+                        >
+                            <bk-button class="mr10" v-if="props.row.status === '待审核'" theme="primary" text>撤回申请</bk-button>
+                        </bk-popconfirm>
                         <bk-button class="mr10" v-if="props.row.status === '草稿'" theme="primary" text @click="handleToDelApply(props.row)">发起申请</bk-button>
                         <bk-button class="mr10" v-if="props.row.status === '草稿'" theme="primary" text @click="handleToDelApply(props.row)">编辑申请</bk-button>
                         <bk-button class="mr10" v-if="props.row.status === '已通过'" theme="primary" text @click="handleToDelApply(props.row)" :disabled="true" style="color: black;">--</bk-button>
@@ -80,10 +87,8 @@
              * 撤销申请
              * */
             handleToDelApply (applyId) {
-                console.log('applyId', applyId)
-                return this.$http.post('deal_with_an_apply/', {
-                    award_apply_record_id: 9,
-                    operation_code: 2
+                return this.$http.post('withdraw_an_application/', {
+                    award_apply_record_id: applyId
                 }).then(res => {
                     console.log('res', res)
                 })
