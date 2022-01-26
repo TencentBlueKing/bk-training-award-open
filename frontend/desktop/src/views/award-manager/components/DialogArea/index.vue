@@ -4,14 +4,13 @@
             v-if="$slots.custom"
             :is-show.sync="visible"
             :quick-close="true"
-            :width="800"
+            :width="600"
             :title="title"
             :before-close="handleClose"
         >
             <template slot="content" v-if="visible">
-                <div style="height: 80vh;padding-top: 10px;">
-                    <slot name="custom">
-                    </slot>
+                <div class="pt10" style="height: 80vh;">
+                    <slot name="custom"></slot>
                 </div>
             </template>
 
@@ -77,7 +76,7 @@
                 return new Promise((resolve, reject) => {
                     this.$bkInfo({
                         type: 'warning',
-                        title: '退出出将不会保留表单信息',
+                        title: '退出将不会保留表单信息',
                         confirmFn: () => resolve(true),
                         cancelFn: () => resolve(false)
                     })

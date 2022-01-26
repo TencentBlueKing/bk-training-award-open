@@ -80,10 +80,8 @@
              * 撤销申请
              * */
             handleToDelApply (applyId) {
-                console.log('applyId', applyId)
-                return this.$http.post('deal_with_an_apply/', {
-                    award_apply_record_id: 9,
-                    operation_code: 2
+                return this.$http.post('withdraw_an_application/', {
+                    award_apply_record_id: applyId
                 }).then(res => {
                     console.log('res', res)
                 })
