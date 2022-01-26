@@ -8,10 +8,10 @@ from django.utils import timezone
 from django.views.decorators.http import require_http_methods
 from rest_framework.views import APIView
 
-from awards_apply.tools.const import false_code, success_code, object_not_exist_error
+from awards_apply.utils.const import false_code, success_code, object_not_exist_error, page_num_exception, value_exception, value_type_exception
 from awards_apply.serializers.award_serializers import AwardsSerializers, AwardsRecordSerializers
 from awards_apply.models import Awards, AwardApplicationRecord
-from awards_apply.tools.my_pagination import MyPageNumberPagination
+from awards_apply.utils.my_pagination import MyPageNumberPagination
 
 # 奖项的状态
 AwardsStatus = {'未开始': 0, '已开始': 1, '已结束': 2}
@@ -42,7 +42,7 @@ class AwardView(APIView):
             ser = AwardsSerializers(instance=pager_roles, many=True)
             return pg.get_paginated_response(ser.data)
         except Exception:
-            return JsonResponse(false_code("页码超出范围"))
+            return JsonResponse(page_num_exception)
 
 
 @require_http_methods(["POST"])
@@ -80,9 +80,9 @@ def withdraw_an_application(request):
         record.approval_state = RecordStatus['草稿']
         record.save()
     except TypeError:
-        return JsonResponse(false_code("未传参数"))
+        return JsonResponse(value_type_exception)
     except ValueError:
-        return JsonResponse(false_code("参数类型错误"))
+        return JsonResponse(value_exception)
     except AwardApplicationRecord.DoesNotExist:
         return JsonResponse(object_not_exist_error("AwardApplicationRecord"))
     return JsonResponse(success_code({}))
@@ -97,7 +97,7 @@ def upload_img(request, award_id):
         award.award_image = image
         award.save()
     except ValueError:
-        return JsonResponse(false_code("参数类型错误"))
+        return JsonResponse(page_num_exception)
     except Awards.DoesNotExist:
         return JsonResponse(object_not_exist_error("Award"))
     return JsonResponse(success_code({}))
@@ -136,4 +136,4 @@ class AvailableAwardsView(APIView):
             ser = AwardsSerializers(instance=pager_roles, many=True)
             return JsonResponse(success_code(ser.data))
         except BaseException as e:
-            return JsonResponse(false_code("页码超出范围"))
+            return JsonResponse(page_num_exception)
