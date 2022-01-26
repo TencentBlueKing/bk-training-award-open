@@ -1,134 +1,132 @@
 <template>
-    <div class="example1-wrapper">
-        <div>
-            <bk-table style="margin-top: 15px;"
-                :data="data"
-                :size="size"
-                :pagination="pagination"
-                @row-mouse-enter="handleRowMouseEnter"
-                @row-mouse-leave="handleRowMouseLeave"
-                @page-change="handlePageChange"
-                @page-limit-change="handlePageLimitChange">
-                <bk-table-column label="奖项名称" prop="award_name"></bk-table-column>
-                <bk-table-column label="奖项级别" prop="class"></bk-table-column>
-                <bk-table-column label="接口人(可咨询奖项相关信息)" prop="director"></bk-table-column>
-                <bk-table-column label="开始申请时间" prop="create_time"></bk-table-column>
-                <bk-table-column label="截止申请时间" prop="deadline"></bk-table-column>
-                <bk-table-column label="操作" width="150">
-                    <template slot-scope="props">
-                        <bk-button class="mr10" theme="primary" text :disabled="props.row.status === '创建中'" @click="apply(props.row)">申请</bk-button>
-                        <bk-button class="mr10" theme="primary" text @click="remove(props.row)">详情</bk-button>
-                        <bk-popover class="dot-menu" placement="bottom-start" theme="dot-menu light" trigger="click" :arrow="false" offset="15" :distance="0">
-                        </bk-popover>
-                    </template>
-                </bk-table-column>
-            </bk-table>
-        </div>
+    <div class="canawards-container">
+        <bk-table style="margin-top: 15px;"
+            :data="tableData"
+            size="small"
+            :pagination="pagination"
+            @page-change="handleCurrentChange($event)"
+            @page-limit-change="handlePageSizeChange($event)"
+            v-bkloading="{ isLoading: isLoading,title: '加载中' }"
+        >
+            <bk-table-column label="奖项名称" prop="award_name"></bk-table-column>
+            <bk-table-column label="奖项级别" prop="award_level"></bk-table-column>
+            <bk-table-column label="接口人(可咨询奖项相关信息)" prop="award_description"></bk-table-column>
+            <bk-table-column label="开始申请时间" prop="start_time"></bk-table-column>
+            <bk-table-column label="截止申请时间" prop="end_time"></bk-table-column>
+            <bk-table-column label="操作" width="150">
+                <template slot-scope="props">
+                    <bk-button class="mr10" theme="primary"
+                        :disabled="['创建中'].includes(props.row.approval_state)"
+                        @click="toApply(props.row,$refs['applyDialog'])"
+                        text
+                    >申请
+                    </bk-button>
+                    <bk-button class="mr10"
+                        theme="primary"
+                        @click="toDetail(props.row,$refs['detailDialog'])"
+                        text
+                    >详情
+                    </bk-button>
+                </template>
+            </bk-table-column>
+        </bk-table>
+        <Detail ref="applyDialog" type="apply"></Detail>
+        <Detail ref="detailDialog" type="detail"></Detail>
     </div>
 </template>
 
 <script>
-    import { bkTable, bkTableColumn, bkButton, bkPopover } from 'bk-magic-vue'
+    import { isDef } from '@/common/util'
+    import { tableMixins } from '@/common/mixins'
+
     export default {
         components: {
-            bkTable,
-            bkTableColumn,
-            bkButton,
-            bkPopover
+            Detail: () => import('../detail')
         },
+        mixins: [tableMixins],
         data () {
             return {
-                btn1Msg: '',
-                btn2Msg: '',
                 userInfo: null,
-                size: 'small',
-                data: [
-                    {
-                        award_name: '全国大学生数学建模竞赛',
-                        class: '部门',
-                        director: '奖项负责人',
-                        create_time: '2018-05-25 15:02:24',
-                        deadline: '2018-05-25 15:02:24'
-                    },
-                    {
-                        award_name: '全国大学生数学建模竞赛',
-                        class: '部门',
-                        director: '奖项负责人',
-                        create_time: '2018-05-25 15:02:24',
-                        deadline: '2018-05-25 15:02:24'
-                    }
-                ],
-                pagination: {
-                    current: 1,
-                    count: 500,
-                    limit: 20
+                remoteData: [],
+                awardInfo: null,
+                isLoading: false
+            }
+        },
+        computed: {
+            tableData () {
+                const remoteData = this.remoteData
+                if (!remoteData.map) {
+                    return []
                 }
+                return remoteData.map((rowData) => {
+                    return {
+                        id: rowData['id'],
+                        award_name: rowData['award_name'],
+                        award_level: rowData['award_level'],
+                        award_description: rowData['award_description'],
+                        award_consultant: rowData['award_consultant'],
+                        award_image: rowData['award_image'],
+                        create_time: rowData['create_time'],
+                        start_time: rowData['start_time'],
+                        end_time: rowData['end_time'],
+                        approval_state: rowData['approval_state']
+                    }
+                })
             }
         },
         created () {
+            this.handleInit()
         },
+
         methods: {
-            /**
-             * 获取页面数据
-             *
-             * @return {Promise} promise 对象
-             */
-            fetchPageData () {
+            handleInit () {
+                this.handleGetPageData(this.pagination.current, this.pagination.limit)
             },
-
-            /**
-             * btn1
-             */
-            async btn1 () {
-                this.$http.get('/test_get_or_post/').then(res => {
-                    if (res.result) {
-                        this.btn1Msg = res
-                    }
-                })
-            },
-
-            /**
-             * btn2
-             */
-            async btn2 () {
-                this.$http.post('/test_get_or_post/').then(res => {
-                    if (res.result) {
-                        this.btn2Msg = res
-                    }
-                })
-            },
-            /**
-             * getUser
-             */
-            async getUser () {
-                try {
-                    const data = await this.$store.dispatch('userInfo', {}, { fromCache: true })
-                    this.userInfo = Object.assign({}, data)
-                } catch (e) {
-                    console.error(e)
+            toApply (awardInfo, applyDialog) {
+                if (!isDef(awardInfo.id)) {
+                    return this.messageError('出错啦')
                 }
+                applyDialog.show({ ...awardInfo })
             },
-            handlePageLimitChange () {
-                console.log('handlePageLimitChange', arguments)
+            toDetail (awardInfo, detailDialog) {
+                if (!isDef(awardInfo.id)) {
+                    return this.messageError('出错啦')
+                }
+                detailDialog.show({ ...awardInfo })
             },
-            toggleTableSize () {
-                const size = ['small', 'medium', 'large']
-                const index = (size.indexOf(this.size) + 1) % 3
-                this.size = size[index]
+            handlePageSizeChange (limit) {
+                /**
+                 * 尺寸变化的时候应该让当前页面回到初始状态
+                 * */
+                this.pagination.current = 1
+                this.pagination.limit = limit
+                this.handleGetPageData(this.pagination.current, limit)
             },
-            handlePageChange (page) {
-                this.pagination.current = page
+            /**
+             * 页面变化的时候获取可申请奖项页面数据
+             * */
+            handleCurrentChange (current) {
+                this.pagination.current = current
+                this.handleGetPageData(current, this.pagination.limit)
             },
-            apply (awardInfo) {
-                console.log(awardInfo)
-                this.$router.push({
-                    name: 'detail'
+            /**
+             * 获取可申请奖项页面数据
+             * */
+            handleGetPageData (current, size) {
+                this.isLoading = true
+
+                return this.$http.get('get_awards_list/', {
+                    params: {
+                        page_num: current,
+                        page_size: size
+                    }
+                }).then(res => {
+                    this.remoteData = res.data['awards']
+                    this.pagination.count = res.data['total_count']
+                }).finally(_ => {
+                    this.isLoading = false
                 })
             }
         }
     }
 </script>
-
-<style scoped>
-    @import './index.css';
-</style>

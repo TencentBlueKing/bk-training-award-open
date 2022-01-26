@@ -71,7 +71,7 @@
             </bk-row>
             <bk-row>
                 <bk-col :span="12">
-                    <Editor :content="emailText"></Editor>
+                    <Editor :content="formData.emailText"></Editor>
                 </bk-col>
             </bk-row>
         </bk-container>
@@ -110,11 +110,13 @@
             externalData () {
                 const selectData = this.selectData
                 const theadList = this.theadList
+
                 return getRawTable(theadList, selectData)
             }
         },
         beforeMount () {
-            this.emailText = this.externalData
+            this.formData.emailText = this.externalData
+            console.log('externalData', this.externalData)
         }
     }
 </script>

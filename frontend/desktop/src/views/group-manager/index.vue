@@ -6,15 +6,20 @@
         >
             新增组
         </bk-button>
-        <bk-table style="margin-top: 15px;"
+        <bk-table size="small"
+            ext-cls="mt15"
             :data="tableData"
-            :size="size"
             :pagination="pagination"
-            height="80%"
             :highlight-current-row="true"
-            @page-change="handlePageChange"
-            @page-limit-change="handlePageLimitChange"
+            @page-change="handlePageChange($event)"
+            @page-limit-change="handlePageLimitChange($event)"
+            v-bkloading="{ isLoading: tableDataIsLoading ,title: '加载中' }"
+            height="80%"
         >
+            <bk-table-column type="index"
+                label="序号"
+                :width="80"
+            ></bk-table-column>
             <bk-table-column v-for="(rowLabel,rowProp) in tableSettings"
                 :key="rowProp"
                 :label="rowLabel"
@@ -25,7 +30,10 @@
             </bk-table-column>
             <bk-table-column label="操作" width="150">
                 <template slot-scope="props">
-                    <bk-button theme="primary" text @click="toEditRow($refs['EditorDialogForm'],props.row)">编辑</bk-button>
+                    <bk-button theme="primary"
+                        @click="toEditRow($refs['EditorDialogForm'],props.row)"
+                        outline
+                    >编辑</bk-button>
                 </template>
             </bk-table-column>
         </bk-table>
@@ -34,75 +42,90 @@
     </div>
 </template>
 <script>
-    import { GroupDialog } from './components/DialogArea'
+    import { fixMixins, tableMixins } from '@/common/mixins'
     export default {
         name: 'group-manager',
+
         components: {
-            GroupDialog
+            GroupDialog: () => import('./components/DialogArea/GroupDialog')
         },
+        mixins: [fixMixins, tableMixins],
         data () {
             return {
-                size: 'small',
                 // S 信息控制区
                 tableSettings: {
-                    organizationName: '组织名',
+                    name: '组织名',
                     level: '级别',
                     master: '负责人'
                 },
                 // E 信息控制区
-                remoteData: new Array(1000).fill({}),
-                pagination: {
-                    current: 1,
-                    count: 10,
-                    limit: 10
-                }
+                remoteData: []
             }
         },
         computed: {
             tableData () {
-                const tableData = this.remoteData.map((rawData, index) => {
-                    // TODO: 装填数据
+                const remoteData = this.remoteData
+                if (!remoteData.map) {
+                    return []
+                }
+                return remoteData.map((rawData, index) => {
                     return {
-                        organizationName: '测试组织名' + index,
-                        level: '测试级别',
-                        organisation: '测试所属组织',
+                        ...rawData,
+                        name: rawData['name'],
+                        level: rawData['level'],
+                        organisation: rawData['full_name'],
                         master: '测试操作'
                     }
                 })
-                return tableData
             }
         },
-        create () {
-            this.notImplemented = (feature) => {
-                const message = `正在开发: ${feature}`
-                alert(message)
-                throw new Error(message)
-            }
-        },
-        mounted () {
-            this.adjustTable()
+        created () {
+            this.handleInit()
         },
         methods: {
-            adjustTable () {
-                // 用于零食改变main-content的状态
-                document.querySelector('.main-content').style.minHeight = '0'
-                document.querySelector('.main-content').style.height = '100%'
+            /**
+             *  初始化函数
+             * */
+            handleInit () {
+                this.handleGetPageData(1, 10)
             },
             // 弹出框控制区域
             toAddNewGroup (toAddNewGroup) {
-                // TODO: 弹出
-                console.log(toAddNewGroup)
                 toAddNewGroup.show()
             },
             toEditRow (toEditDialogForm, rawData) {
-                console.log(rawData)
                 toEditDialogForm.show({
                     data: rawData
                 })
             },
-            // 请求发起区域
-            handlePageChange () {
-                this.notImplemented('切换页面')
+            /**
+             * 页面改变发起请求
+             * */
+            handlePageChange (page) {
+                this.pagination.page = page
+                return this.handleGetPageData(page, this.pagination.limit)
+            },
+            /**
+             * 页面尺寸改变触发请求，需要把页面归为 1
+             * */
+            handlePageLimitChange (limit) {
+                this.pagination.page = 1
+                this.pagination.limit = limit
+                return this.handleGetPageData(this.pagination.page, limit)
+            },
+            /**
+             * @description 获取组信息
+             * @param {number} page
+             * @param {number} size
+             * */
+            handleGetPageData (page, size) {
+                this.tableDataIsLoading = true
+
+                return this.$http.get('/usermanage/list_departments/').then(res => {
+                    this.remoteData = res.data.results
+                }).finally(_ => {
+                    this.tableDataIsLoading = false
+                })
             }
         }
     }

@@ -1,5 +1,6 @@
 .new-award-form-container {
   .award-form-container {
+    width: 95%;
     .form-group {
       display: flex;
       align-items: center;

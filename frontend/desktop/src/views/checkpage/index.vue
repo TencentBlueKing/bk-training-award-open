@@ -19,11 +19,9 @@
         </div>
         <div>
             <bk-table style="margin-top: 15px;"
-                :data="data"
+                :data="tableData"
                 :size="size"
                 :pagination="pagination"
-                @row-mouse-enter="handleRowMouseEnter"
-                @row-mouse-leave="handleRowMouseLeave"
                 @page-change="handlePageChange"
                 @page-limit-change="handlePageLimitChange">
                 <bk-table-column type="index" label="序列" width="150"></bk-table-column>
@@ -38,8 +36,6 @@
                     <template slot-scope="props">
                         <bk-button class="mr10" theme="primary" text :disabled="props.row.source === '创建中'" @click="consent(props.row)">通过</bk-button>
                         <bk-button class="mr10" theme="primary" text @click="disconsent(props.row)">不通过</bk-button>
-                        <bk-popover class="dot-menu" placement="bottom-start" theme="dot-menu light" trigger="click" :arrow="false" offset="15" :distance="0">
-                        </bk-popover>
                     </template>
                 </bk-table-column>
             </bk-table>
@@ -48,21 +44,15 @@
 </template>
 
 <script>
-    import { bkTable, bkTableColumn, bkButton, bkDialog } from 'bk-magic-vue'
     export default {
-        components: {
-            bkTable,
-            bkTableColumn,
-            bkButton,
-            bkDialog
-        },
+        components: {},
         data () {
             return {
                 userInfo: null,
                 size: 'small',
                 departValue: '',
                 awardName: '全国大学生数学建模大赛',
-                data: [
+                remoteData: [
                     {
                         apply_user: '边成',
                         source: '公司',
@@ -71,40 +61,12 @@
                         create_time: '2018-05-25 15:02:24',
                         end_time: '2018-05-25 15:02:24',
                         text: ''
-                    },
-                    {
-                        apply_user: '边成',
-                        source: '公司',
-                        materials: '材料1、材料二',
-                        class: '部门',
-                        create_time: '2018-05-25 15:02:24',
-                        end_time: '2018-05-25 15:02:24',
-                        text: 'dsadas'
-                    },
-                    {
-                        apply_user: '边成',
-                        source: '公司',
-                        class: '部门',
-                        materials: '材料1、材料二',
-                        create_time: '2018-05-25 15:02:24',
-                        end_time: '2018-05-25 15:02:24',
-                        text: 'dsadas'
-                    },
-                    {
-                        apply_user: '边成',
-                        source: '公司',
-                        materials: '材料1、材料二',
-                        class: '部门',
-                        create_time: '2018-05-25 15:02:24',
-                        end_time: '2018-05-25 15:02:24',
-                        text: 'dsadas'
                     }
-
                 ],
                 pagination: {
                     current: 1,
-                    count: 500,
-                    limit: 20
+                    count: 0,
+                    limit: 10
                 },
                 mystyle: {
                     height: '15px',
@@ -122,38 +84,22 @@
                 }
             }
         },
+        computed: {
+            tableData () {
+                const remoteData = this.remoteData
+                if (!remoteData.map) {
+                    return []
+                }
+                return remoteData.map(item => {
+                    return {
+
+                    }
+                })
+            }
+        },
         created () {
         },
         methods: {
-            /**
-             * 获取页面数据
-             *
-             * @return {Promise} promise 对象
-             */
-            fetchPageData () {
-            },
-
-            /**
-             * btn1
-             */
-            async btn1 () {
-                this.$http.get('/test_get_or_post/').then(res => {
-                    if (res.result) {
-                        this.btn1Msg = res
-                    }
-                })
-            },
-
-            /**
-             * btn2
-             */
-            async btn2 () {
-                this.$http.post('/test_get_or_post/').then(res => {
-                    if (res.result) {
-                        this.btn2Msg = res
-                    }
-                })
-            },
             /**
              * getUser
              */
