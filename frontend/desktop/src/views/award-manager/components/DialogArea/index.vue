@@ -4,22 +4,24 @@
             v-if="$slots.custom"
             :is-show.sync="visible"
             :quick-close="true"
-            :width="800"
+            :width="600"
             :title="title"
             :before-close="handleClose"
         >
             <template slot="content" v-if="visible">
-                <div style="height: 80vh;padding-top: 10px;">
-                    <slot name="custom"
-                        :data="formData"
-                    >
-                    </slot>
+                <div class="pt10" style="height: 80vh;">
+                    <slot name="custom"></slot>
                 </div>
             </template>
 
             <div slot="footer" class="footer-panel">
-                <bk-button class="footer-button ok-button" theme="primary">确认</bk-button>
-                <bk-button class="footer-button cancel-button" theme="danger">取消</bk-button>
+                <div v-if="!$slots.footer">
+                    <bk-button @click="$emit('confirm')" class="footer-button ok-button" theme="primary">确认</bk-button>
+                    <bk-button @click="$emit('cancel')" class="footer-button cancel-button" theme="danger">取消</bk-button>
+                </div>
+                <div v-else>
+                    <slot name="footer"></slot>
+                </div>
             </div>
         </bk-sideslider>
     </div>
@@ -63,7 +65,7 @@
             },
             show (options = {}) {
                 if (options.data) {
-                    this.formData = [...options.data]
+                    this.formData = { ...options.data }
                 }
                 this.visible = true
             },
@@ -74,7 +76,7 @@
                 return new Promise((resolve, reject) => {
                     this.$bkInfo({
                         type: 'warning',
-                        title: '退出出将不会保留表单信息',
+                        title: '退出将不会保留表单信息',
                         confirmFn: () => resolve(true),
                         cancelFn: () => resolve(false)
                     })

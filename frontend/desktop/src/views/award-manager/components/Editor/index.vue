@@ -33,7 +33,7 @@
             }
         },
         mounted () {
-            this.$nextTick(() => this.handleInit())
+            this.$nextTick(this.handleInit)
         },
         beforeDestroy () {
             // 销毁编辑器

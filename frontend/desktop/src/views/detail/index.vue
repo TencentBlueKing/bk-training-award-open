@@ -1,119 +1,167 @@
 <template>
-    <div>
-        <div class="detail-head">基本信息</div>
-        <div>
-            <span>
-                <div class="input-demo" style="margin-left: 6%;margin-top:1%;width: 23%;">
-                    <span class="item-name" style="width: 23%;">奖项名称</span>
-                    <bk-input :placeholder="'奖项名称'" :disabled="true" v-model="name" class="item-Info" style="width: 70%;"></bk-input>
-                </div>
-                <div class="input-demo" style="width: 12%;">
-                    <span class="item-name">接口人</span>
-                    <bk-input :placeholder="'接口人'" :disabled="true" v-model="manager" class="item-Info"></bk-input>
-                </div>
-                <div class="input-demo" style="width: 10%;">
-                    <span class="item-name">奖项级别</span>
-                    <bk-input :placeholder="'奖项级别'" :disabled="true" v-model="awardClass" class="item-Info"></bk-input>
-                </div>
-                <div class="input-demo" style="width: 18.5%;">
-                    <span class="item-name" style="width: 37%;">开始申请时间</span>
-                    <bk-input :placeholder="'开始申请时间'" :disabled="true" v-model="startDate" class="item-Info"></bk-input>
-                </div>
-                <div class="input-demo" style="width: 18.5%;">
-                    <span class="item-name">截止时间</span>
-                    <bk-input :placeholder="'截止时间'" :disabled="true" v-model="endDate" class="item-Info"></bk-input>
-                </div>
-            </span>
-        </div>
-        <div style="margin-left: 6%">
-            <div class="second-name">奖项描述</div>
-            <div class="describe">
-                {{describe}}
-            </div>
-        </div>
-        <bk-divider align="right" style=""></bk-divider>
-        <div class="detail-head" style="">申请奖项</div>
-        <div style="height:auto;">
-            <span class="bottom-detail" style="padding-bottom:0px;float: left">
-                <span class="apply-user">申请人</span>
-                <bk-input type="text" class="user-input" :input-style="mystyle"></bk-input>
-                <span class="apply-user" style="width: 100%;margin-top: 30px;">申请理由</span>
-                <bk-input type="textarea" :input-style="mystyle" style="width: 85%;margin-top: 10px" placeholder="请输入描述"></bk-input>
-            </span>
-            <span class="bottom-detail" style="height:250px;">
-                <span class="apply-user" style="width: 100%;">申请材料</span>
-                <span class="file-upload">
-                    <bk-upload
-                        :tip="'只允许上传JPG、PNG、JPEG、ZIP的文件'"
-                        :with-credentials="true"
-                        :handle-res-code="handleRes"
-                        @on-success="testSuccess"
-                        @on-progress="testProgress"
-                        @on-done="testDone"
-                        @on-error="testErr"
-                        :url="'https://jsonplaceholder.typicode.com/posts/'"
-                        style="margin-top: 20px"
-                    ></bk-upload>
-                </span>
+    <div class="detail-container">
+        <bk-sideslider :is-show.sync="isShow"
+            :width="600"
+            :title="applyForm['award_name'] || '未定义奖项'"
+            @hidden="hidden"
+        >
+            <!-- ! 需要确保表单组件重渲染，防止留下数据 -->
+            <div v-if="isShow"
+                slot="content"
+                style="height: 80vh"
+            >
+                <!-- 编辑部分 -->
+                <ApplyForm v-if="isShowApplyForm"
+                    ref="applyForm"
+                    :id="applyForm['id']"
+                ></ApplyForm>
+                <!-- /编辑部分 -->
 
-            </span>
-        </div>
-        <div style="margin-left: 35%">
-            <bk-button class="mr10">发起申请</bk-button>
-            <bk-button class="mr10">保存草稿</bk-button>
-            <bk-button class="mr10">取消</bk-button>
-        </div>
+                <!-- 详情部分 -->
+                <Detail :award-form="applyForm"></Detail>
+                <!-- /详情部分 -->
+            </div>
+
+            <!-- 底部按钮组 -->
+            <div class="tc w100" style="width: 100%" slot="footer">
+                <!-- 用于申请奖项的按钮 -->
+                <div v-if="isShowApplyForm"
+                    class="button-item"
+                >
+                    <bk-button theme="warning"
+                        class="mr10"
+                        @click="hidden()"
+                        ext-cls="button-item"
+                    >
+                        <bk-icon type="minus-circle" />
+                        <span>取消</span>
+                    </bk-button>
+                    <bk-button theme="primary"
+                        class="mr10"
+                        @click="handleToSaveApplyForm($refs['applyForm'])"
+                        ext-cls="button-item"
+                    >
+                        <bk-icon type="save" />
+                        <span>保存草稿</span>
+                    </bk-button>
+                    <bk-button theme="success"
+                        class="mr10"
+                        @click="handleToSendApplyForm($refs['applyForm'])"
+                        ext-cls="button-item"
+                    >
+                        <bk-icon type="check-circle" />
+                        <span>发起申请</span>
+                    </bk-button>
+                </div>
+                <!-- /用于申请奖项的按钮 -->
+
+                <!-- 用于跳转申请奖项的按钮 -->
+                <div v-else
+                    class="tc mr15 mt15"
+                >
+                    <bk-button theme="primary"
+                        @click="formType = 'apply'"
+                    >
+                        <span class="m5">前往申请</span>
+                        <bk-icon type="arrows-right-circle" />
+                    </bk-button>
+                </div>
+                <!-- /用于跳转申请奖项的按钮 -->
+            </div>
+            <!-- /底部按钮组 -->
+        </bk-sideslider>
     </div>
 </template>
-
 <script>
-    import { bkInput, bkDivider, bkButton } from 'bk-magic-vue'
+    import { mapGetters } from 'vuex'
+
     export default {
+        name: 'detail',
         components: {
-            bkInput,
-            bkDivider,
-            bkButton
+            Detail: () => import('./DetailInfo'),
+            ApplyForm: () => import('./ApplyForm')
+        },
+        props: {
+            type: {
+                type: String,
+                default: () => null
+            }
         },
         data () {
             return {
-                startDate: '2018-10-01-13.00',
-                awardClass: '校级',
-                manager: '大声道',
-                endDate: '2018-10-01-12.00',
-                name: '全国大学生数学建模大赛',
-                searchText: '测试',
-                describe: '全国大学生数学建模大赛 全国大学生数学建模大赛 全国大学生数学建模大赛 全国大学生数学建模大赛',
-                mystyle: {
-                    width: '100%',
-                    backgroundColor: 'rgb(250, 251, 253)'
+                applyForm: {},
+                formType: this.type || 'detail',
+                isShow: false
+            }
+        },
+        computed: {
+            ...mapGetters(['user']),
+            /**
+             * 用于判断是否为编辑型表格
+             * */
+            isShowApplyForm () {
+                return ['apply', 'edit'].includes(this.formType)
+            },
+            /**
+             * 主要用于拼接一些比如 id 的信息 此类默认信息
+             * */
+            defaultInfo () {
+                console.log(this.awardInfo)
+                return {
+                    award_apply_record_id: this.applyForm.award_apply_record_id,
+                    award_id: this.applyForm.id
                 }
             }
         },
-        created () {
-        },
         methods: {
-            testSuccess (file, fileList) {
-                console.log(file, fileList, 'success')
+            /**
+             * 保存草稿
+             * */
+            handleToSaveApplyForm (applyForm) {
+                this.handleToDealWidthApply(true, applyForm).then(res => {
+                    console.log('res', res)
+                })
             },
-            testProgress (e, file, fileList) {
-                console.log(e, file, fileList, 'progress')
+            /**
+             * 发起申请
+             * */
+            handleToSendApplyForm (applyForm) {
+                // console.log('applyForm',)
+                this.handleToDealWidthApply(false, applyForm).then(res => {
+                    console.log('res', res)
+                })
             },
-            testDone () {
-                console.log('done')
-            },
-            testErr (file, fileList) {
-                console.log(file, fileList, 'error')
-            },
-            handleRes (response) {
-                if (response.id) {
-                    return true
+            /**
+             * 处理奖项的统一入口
+             * */
+            handleToDealWidthApply (isDraft, applyForm) {
+                const defaultInfo = this.defaultInfo
+                console.log('applyForm', defaultInfo)
+                const params = applyForm.getFields()
+                console.log('params', params)
+                if (!params) {
+                    return
                 }
-                return false
+                return this.$http.post('make_an_application/', {
+                    is_draft: isDraft,
+                    ...params,
+                    ...defaultInfo
+                })
+            },
+            show (options = {}) {
+                this.applyForm = Object.assign({ ...options })
+                this.isShow = true
+            },
+            hidden () {
+                this.formType = this.type
+                this.isShow = false
             }
         }
     }
 </script>
-
 <style scoped>
-    @import './index.css';
+    .button-item {
+        display: flex;
+        align-items: center;justify-content: center;
+    }
 </style>

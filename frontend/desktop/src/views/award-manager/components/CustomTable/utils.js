@@ -8,6 +8,7 @@
  * @returns {string} 返回生成的表体
 */
 export function getRawTable (theadList = [], selectData = [], titleKey = 'label', propKey = 'prop') {
+    console.log(selectData)
     const theadHTML = theadList
         .map((item) => {
             return '<th>' + item[titleKey] + '</th>'
@@ -16,7 +17,8 @@ export function getRawTable (theadList = [], selectData = [], titleKey = 'label'
     const getCellInfo = (item) =>
         theadList
             .map((cell) => {
-                return `<td>${cell[item[propKey]]}</td>`
+                console.log(item, cell)
+                return `<td>${item[cell[propKey]]}</td>`
             })
             .join('')
     const tbodyHTML = selectData
@@ -25,15 +27,19 @@ export function getRawTable (theadList = [], selectData = [], titleKey = 'label'
         })
         .join('')
     return (
-        '<table border="0" width="100%" cellpadding="0" cellspacing="0" >'
-    + '<thead>'
-    + '<tr>'
-    + theadHTML
-    + '</tr>'
-    + '</thead>'
-    + '<tbody>'
-    + (tbodyHTML || '<tr>' + '<td></td>'.repeat(theadList.length) + '</tr>')
-    + '</tbody>'
-    + '</table>'
+        '<table border="0" '
+        + 'width="100%" '
+        + 'cellpadding="0" '
+        + 'cellspacing="0" '
+        + ' >'
+        + '<thead>'
+        + '<tr>'
+        + theadHTML
+        + '</tr>'
+        + '</thead>'
+        + '<tbody>'
+        + (tbodyHTML || '<tr>' + '<td></td>'.repeat(theadList.length) + '</tr>')
+        + '</tbody>'
+        + '</table>'
     )
 }
