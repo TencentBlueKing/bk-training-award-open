@@ -87,7 +87,7 @@
         computed: {
             tableData () {
                 const remoteData = this.remoteData
-                if (!remoteData) {
+                if (!remoteData.map) {
                     return []
                 }
                 return remoteData.map(item => {
