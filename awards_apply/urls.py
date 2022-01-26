@@ -12,4 +12,5 @@ urlpatterns = (
     path("withdraw_an_application/", views.withdraw_an_application),
     path("create_award/", views.create_award),
     path("upload_img/<int:award_id>/", views.upload_img),
+    path("get_available_awards/", views.AvailableAwardsView.as_view()),
 )

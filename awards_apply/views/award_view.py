@@ -112,3 +112,28 @@ def create_award(request):
         award.save()
         return JsonResponse(success_code(award.data))
     return JsonResponse(false_code(award.errors))
+
+
+class AvailableAwardsView(APIView):
+    def get(self, request):
+        """获取用户已申请的奖项和可申请的奖项
+        """
+        client = get_client_by_request(request)
+        query_params = {"id": request.user.username}
+        data = getattr(client.usermanage, 'retrieve_user')(query_params)
+        # 获取用户所在的组列表
+        user_departments = []
+        for item in data['data']['departments']:
+            user_departments.append(item['full_name'])
+        now = timezone.now()
+        # 当前用户申请过的所有申请记录（包括草稿和正式申请）中的所有奖项id列表
+        award_ids = AwardApplicationRecord.objects.filter(application_users__contain=request.user.username).values_list("award_id")
+        # valid_awards表示：符合规定时间内的，用户申请过的奖项与所在组可申请的奖项
+        valid_awards = Awards.objects.filter(Q(id__in=award_ids) | Q(award_department_fullname__in=user_departments)).filter(Q(start_time__lt=now) & Q(end_time__gt=now))
+        pg = MyPageNumberPagination()
+        try:
+            pager_roles = pg.paginate_queryset(queryset=valid_awards, request=request, view=self)
+            ser = AwardsSerializers(instance=pager_roles, many=True)
+            return JsonResponse(success_code(ser.data))
+        except BaseException as e:
+            return JsonResponse(false_code("页码超出范围"))
