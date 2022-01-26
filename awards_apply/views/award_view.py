@@ -120,5 +120,12 @@ class ApplyedRecordView(APIView):
         record = AwardApplicationRecord.objects.filter(application_users__contains=username)
         if record.count() == 0:
             return JsonResponse(false_code("该用户没有获得过奖项"))
-        AwardsRecord = AwardsRecordSerializers(instance=record, many=True)
-        return JsonResponse(success_code(AwardsRecord.data))
+        pagination = PageNumberPagination()
+        try:
+            pager_roles = pagination.paginate_queryset(queryset=record, request=request, view=self)
+            ser = AwardsSerializers(instance=pager_roles, many=True)
+            return JsonResponse(success_code(ser.data))
+        except EmptyPage:
+            return JsonResponse(page_num_exception())
+        except BaseException:
+            return JsonResponse(value_exception())
