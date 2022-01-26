@@ -101,7 +101,7 @@ def value_exception():
 
 
 def value_type_exception():
-    """参数类型异常"""
+    """参数异常"""
     return {
         "code": "1",
         "result": False,
