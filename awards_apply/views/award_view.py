@@ -110,3 +110,15 @@ class AvailableAwardsView(APIView):
             return JsonResponse(page_num_exception())
         except BaseException:
             return JsonResponse(value_exception())
+
+
+class ApplyedRecordView(APIView):
+
+    def get(self, request):
+        """获取用户已经获得的奖项"""
+        username = request.user.username
+        record = AwardApplicationRecord.objects.filter(application_users__contains=username)
+        if record.count() == 0:
+            return JsonResponse(false_code("该用户没有获得过奖项"))
+        AwardsRecord = AwardsRecordSerializers(instance=record, many=True)
+        return JsonResponse(success_code(AwardsRecord.data))
