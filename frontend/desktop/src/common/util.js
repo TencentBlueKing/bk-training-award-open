@@ -173,8 +173,8 @@ export function json2Query (param, key) {
     let paramStr = ''
 
     if (param instanceof String || typeof param === 'string'
-            || param instanceof Number || typeof param === 'number'
-            || param instanceof Boolean || typeof param === 'boolean'
+        || param instanceof Number || typeof param === 'number'
+        || param instanceof Boolean || typeof param === 'boolean'
     ) {
         paramStr += separator + key + mappingOperator + encodeURIComponent(param)
     } else {
@@ -341,4 +341,37 @@ export function loadScript (url, callback) {
     }
 
     document.getElementsByTagName('head')[0].appendChild(script)
+}
+
+/**
+ * 检测是否定义
+ *
+ * @param {any} target
+ * */
+export function isDef (target) {
+    return typeof target !== 'undefined' && target !== null
+}
+
+/**
+ * 表单中的必须项配置
+ *
+ * @param {string} message
+ * @returns 返回构造的
+ * */
+export function checkRequired (message) {
+    return {
+        required: true,
+        message
+    }
+}
+
+/**
+ * 利用 ISO 的日期和时间是通过 T 分割
+ * 利用 UTC 的日期和时间是通过 Z 分割
+ *
+ * @param {date|object|string} date
+ * @returns string
+ * */
+export function toYYYYMMDDTime (date) {
+    return new Date(date).toISOString().split('T')[0]
 }

@@ -5,10 +5,10 @@
                 :data="data"
                 :size="size"
                 :pagination="pagination"
-                @row-mouse-enter="handleRowMouseEnter"
-                @row-mouse-leave="handleRowMouseLeave"
-                @page-change="handlePageChange"
-                @page-limit-change="handlePageLimitChange">
+                @page-change="handleGetPageData($event,pagination.limit)"
+                @page-limit-change="handleGetPageData(pagination.current,$event)"
+                v-bkloading="{ isLoading: isLoading }"
+            >
                 <bk-table-column label="奖项名称" prop="award_name" width="350"></bk-table-column>
                 <bk-table-column label="申请时间" prop="create_time" width="350"></bk-table-column>
                 <bk-table-column label="状态">
@@ -21,13 +21,18 @@
                 </bk-table-column>
                 <bk-table-column label="操作">
                     <template slot-scope="props">
-                        <bk-button class="mr10" v-if="props.row.status === '待审核'" theme="primary" text @click="reset(props.row)">撤回申请</bk-button>
-                        <bk-button class="mr10" v-if="props.row.status === '草稿'" theme="primary" text @click="remove(props.row)">发起申请</bk-button>
-                        <bk-button class="mr10" v-if="props.row.status === '草稿'" theme="primary" text @click="remove(props.row)">编辑申请</bk-button>
-                        <bk-button class="mr10" v-if="props.row.status === '已通过'" theme="primary" text @click="remove(props.row)" :disabled="true" style="color: black;">--</bk-button>
-                        <bk-button class="mr10" v-if="props.row.status === '不通过'" theme="primary" text @click="remove(props.row)">重新申请</bk-button>
-                        <bk-popover class="dot-menu" placement="bottom-start" theme="dot-menu light" trigger="click" :arrow="false" offset="15" :distance="0">
-                        </bk-popover>
+                        <bk-popconfirm
+                            :title="'确认撤销申请该奖项（' + props.row['award_name'] + '）？'"
+                            trigger="click"
+                            content="删除操作无法撤回，请谨慎操作！"
+                            @confirm="handleToDelApply(props.row)"
+                        >
+                            <bk-button class="mr10" v-if="props.row.status === '待审核'" theme="primary" text>撤回申请</bk-button>
+                        </bk-popconfirm>
+                        <bk-button class="mr10" v-if="props.row.status === '草稿'" theme="primary" text @click="handleToDelApply(props.row)">发起申请</bk-button>
+                        <bk-button class="mr10" v-if="props.row.status === '草稿'" theme="primary" text @click="handleToDelApply(props.row)">编辑申请</bk-button>
+                        <bk-button class="mr10" v-if="props.row.status === '已通过'" theme="primary" text @click="handleToDelApply(props.row)" :disabled="true" style="color: black;">--</bk-button>
+                        <bk-button class="mr10" v-if="props.row.status === '不通过'" theme="primary" text @click="handleToDelApply(props.row)">重新申请</bk-button>
                     </template>
                 </bk-table-column>
             </bk-table>
@@ -36,14 +41,8 @@
 </template>
 
 <script>
-    import { bkTable, bkTableColumn, bkButton, bkPopover } from 'bk-magic-vue'
     export default {
-        components: {
-            bkTable,
-            bkTableColumn,
-            bkButton,
-            bkPopover
-        },
+        components: { },
         data () {
             return {
                 userInfo: null,
@@ -54,90 +53,45 @@
                         award_name: '全国大学生数学建模竞赛',
                         status: '待审核',
                         create_time: '2018-05-25 15:02:24'
-                    },
-                    {
-                        award_name: '全国大学生数学建模竞赛',
-                        status: '已通过',
-                        create_time: '2018-05-25 15:02:24'
-                    },
-                    {
-                        award_name: '全国大学生数学建模竞赛',
-                        status: '不通过',
-                        create_time: '2018-05-25 15:02:24'
-                    },
-                    {
-                        award_name: '全国大学生数学建模竞赛',
-                        status: '草稿',
-                        create_time: '2018-05-25 15:02:24'
                     }
-
                 ],
                 pagination: {
                     current: 1,
                     count: 500,
                     limit: 20
-                }
+                },
+                isLoading: false
             }
         },
         created () {
         },
         methods: {
             /**
-             * 获取页面数据
-             *
-             * @return {Promise} promise 对象
-             */
-            fetchPageData () {
+             * 针对消息通知做处理
+             * */
+            handleMessage () {
+                return this.$bkMessage()
             },
-
             /**
-             * btn1
-             */
-            async btn1 () {
-                this.$http.get('/test_get_or_post/').then(res => {
-                    if (res.result) {
-                        this.btn1Msg = res
-                    }
-                })
-            },
-
-            /**
-             * btn2
-             */
-            async btn2 () {
-                this.$http.post('/test_get_or_post/').then(res => {
-                    if (res.result) {
-                        this.btn2Msg = res
-                    }
+             * 查询页面数据统一接口
+             * */
+            handleGetPageData (current, size) {
+                return this.$http.get('get_awards_list/', {
+                    pageNum: current,
+                    pageCount: size
+                }).then(res => {
+                    this.remoteData = res.data
                 })
             },
             /**
-             * getUser
-             */
-            async getUser () {
-                try {
-                    const data = await this.$store.dispatch('userInfo', {}, { fromCache: true })
-                    this.userInfo = Object.assign({}, data)
-                } catch (e) {
-                    console.error(e)
-                }
-            },
-            handlePageLimitChange () {
-                console.log('handlePageLimitChange', arguments)
-            },
-            toggleTableSize () {
-                const size = ['small', 'medium', 'large']
-                const index = (size.indexOf(this.size) + 1) % 3
-                this.size = size[index]
-            },
-            handlePageChange (page) {
-                this.pagination.current = page
-            },
-            remove (item) {
-                console.log(item)
-            },
-            reset (item) {
-                console.log(item)
+             * 撤销申请
+             * */
+            handleToDelApply (applyId) {
+                return this.$http.post('withdraw_an_application/', {
+                    award_apply_record_id: applyId
+                }).then(res => {
+                    console.log('res', res)
+                })
             }
         }
     }
