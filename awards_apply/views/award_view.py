@@ -10,7 +10,7 @@ from awards_apply.utils.const import success_code, false_code, object_not_exist_
     value_exception
 from awards_apply.serializers.award_serializers import AwardsSerializers, AwardsRecordSerializers
 from awards_apply.models import Awards, AwardApplicationRecord
-from awards_apply.utils.pagination import PageNumberPagination
+from awards_apply.utils.pagination import PagePagination
 
 # 奖项的状态
 AwardsStatus = {'not_start': 0, 'started': 1, 'end': 2}
@@ -36,7 +36,7 @@ class AwardView(APIView):
         # valid_awards表示：符合规定时间内的，用户没申请过的奖项
         valid_awards = Awards.objects.exclude(id__in=ids).filter(start_time__lt=now).filter(end_time__gt=now).order_by(
             "id")
-        pagination = PageNumberPagination()
+        pagination = PagePagination()
         try:
             pager_roles = pagination.paginate_queryset(queryset=valid_awards, request=request, view=self)
             ser = AwardsSerializers(instance=pager_roles, many=True)
@@ -101,7 +101,7 @@ class AvailableAwardsView(APIView):
         now = timezone.now()
         valid_awards = Awards.objects.filter(award_department_fullname__in=user_departments).filter(
             Q(start_time__lt=now) & Q(end_time__gt=now)).order_by('id')
-        pagination = PageNumberPagination()
+        pagination = PagePagination()
         try:
             pager_roles = pagination.paginate_queryset(queryset=valid_awards, request=request, view=self)
             ser = AwardsSerializers(instance=pager_roles, many=True)
@@ -119,9 +119,7 @@ class ApplyedRecordView(APIView):
         username = request.user.username
         record = AwardApplicationRecord.objects.filter(
             Q(APPROVAL_STATE == RecordStatus["pass"]) & Q(application_users__contains=username))
-        if record.count() == 0:
-            return JsonResponse(false_code("该用户没有获得过奖项"))
-        pagination = PageNumberPagination()
+        pagination = PagePagination()
         try:
             pager_roles = pagination.paginate_queryset(queryset=record, request=request, view=self)
             ser = AwardsSerializers(instance=pager_roles, many=True)

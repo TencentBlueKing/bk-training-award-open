@@ -20,7 +20,7 @@ urlpatterns = [
         views.SecretaryViewSet.as_view({"put": "update"}),
     ),
     url(r"^upload/$", views.upload),
-    re_path(r'media/(?P<path>.*)$', serve, {'document_root': MEDIA_ROOT}),
+    url(r"^media/(?P<filename>.*)/$", views.download),
     path("", views.home),
     url(r"^awards/", views.AwardView.as_view()),
     url(r"^record/$", views.RecordView.as_view()),
