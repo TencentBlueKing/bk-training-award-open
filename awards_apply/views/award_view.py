@@ -59,11 +59,12 @@ class RecordView(APIView):
 
     def get(self, request, *args, **kwargs):
         """撤回申请"""
+        num = {"no_change": 0}
         award_apply_record_id = request.query_params['id']
         award_apply_record_id = int(award_apply_record_id)
         record = AwardApplicationRecord.objects.filter(id=award_apply_record_id).update(
             approval_state=RecordStatus['draft'])
-        if record is 0:
+        if record is num["no_change"]:
             return JsonResponse(false_code("修改申请记录失败，该奖项的申请装填已经是草稿或奖项id不存在"))
         return JsonResponse(success_code({}))
 
