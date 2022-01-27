@@ -117,7 +117,8 @@ class ApplyedRecordView(APIView):
     def get(self, request):
         """获取用户已经获得的奖项"""
         username = request.user.username
-        record = AwardApplicationRecord.objects.filter(application_users__contains=username)
+        record = AwardApplicationRecord.objects.filter(
+            Q(APPROVAL_STATE == RecordStatus["pass"]) & Q(application_users__contains=username))
         if record.count() == 0:
             return JsonResponse(false_code("该用户没有获得过奖项"))
         pagination = PageNumberPagination()
