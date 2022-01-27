@@ -40,7 +40,7 @@ class AwardView(APIView):
         try:
             pager_roles = pagination.paginate_queryset(queryset=valid_awards, request=request, view=self)
             ser = AwardsSerializers(instance=pager_roles, many=True)
-            return JsonResponse(success_code(ser.data))
+            return JsonResponse(success_code(pagination.get_paginated_response(ser.data)))
         except EmptyPage:
             return JsonResponse(page_num_exception())
         except BaseException:
@@ -105,7 +105,7 @@ class AvailableAwardsView(APIView):
         try:
             pager_roles = pagination.paginate_queryset(queryset=valid_awards, request=request, view=self)
             ser = AwardsSerializers(instance=pager_roles, many=True)
-            return JsonResponse(success_code(ser.data))
+            return JsonResponse(success_code(pagination.get_paginated_response(ser.data)))
         except EmptyPage:
             return JsonResponse(page_num_exception())
         except BaseException:
@@ -123,7 +123,7 @@ class ApplyedRecordView(APIView):
         try:
             pager_roles = pagination.paginate_queryset(queryset=record, request=request, view=self)
             ser = AwardsSerializers(instance=pager_roles, many=True)
-            return JsonResponse(success_code(ser.data))
+            return JsonResponse(success_code(pagination.get_paginated_response(ser.data)))
         except EmptyPage:
             return JsonResponse(page_num_exception())
         except BaseException:
