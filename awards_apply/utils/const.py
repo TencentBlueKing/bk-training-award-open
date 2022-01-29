@@ -56,3 +56,55 @@ def permission_denied():
         "message": "permission denied",
         "data": None,
     }
+
+
+def serializer_errors(errors):
+    """反序列化参数错误返回信息模板
+
+    :param errors: 错误信息
+    """
+    return {
+        "code": "40001",
+        "result": False,
+        "message": "params is missing",
+        "data": errors,
+    }
+
+def false_code(message):
+    """自定义失败返回信息"""
+    return {
+        "code": "1",
+        "result": False,
+        "message": message,
+        "data": None,
+    }
+
+
+def page_num_exception():
+    """页面超出范围异常"""
+    return {
+        "code": "1",
+        "result": False,
+        "message": "页码超出范围",
+        "data": None,
+    }
+
+
+def value_exception():
+    """参数类型异常"""
+    return {
+        "code": "1",
+        "result": False,
+        "message": "参数类型异常",
+        "data": None,
+    }
+
+
+def value_type_exception():
+    """参数异常"""
+    return {
+        "code": "1",
+        "result": False,
+        "message": "未传参数",
+        "data": None,
+    }
