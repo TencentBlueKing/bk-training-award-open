@@ -7,6 +7,7 @@
                     更多
                 </bk-button>
             </header>
+            <div class="loading" v-bkloading="{ isLoading: !validData.length, title: '数据加载中', zIndex: 10 }"></div>
             <div class="cards">
                 <template v-for="award in validData">
                     <bk-card
@@ -35,8 +36,9 @@
                     更多
                 </bk-button>
             </header>
+            <div class="loading" v-bkloading="{ isLoading: !historyData.length, title: '数据加载中', zIndex: 10 }"></div>
             <div class="cards">
-                <template v-for="award in validData">
+                <template v-for="award in historyData">
                     <bk-card
                         title="卡片标题"
                         :show-head="true"
@@ -48,7 +50,7 @@
                             <span><bk-tag :theme="themeMap[award.award_level]" radius="10px">{{levelMap[award.award_level]}}</bk-tag></span>
                         </div>
                         <p>{{award.award_description}}</p>
-                        <bk-image :src="img" fit="cover"></bk-image>
+                        <bk-image :src="award.award_image" fit="cover"></bk-image>
                     </bk-card>
                 </template>
             </div>
@@ -61,48 +63,8 @@
         name: 'index',
         data () {
             return {
-                validData: [
-                    {
-                        id: 1,
-                        award_name: 'test1',
-                        award_level: 1,
-                        award_description: 'this is a long sdaghbfbafbaergajhytLmdkhnjg;oivuhfkl;vkl;vmjckbnvzmkmdjaovhdLM<nvkahvdhncm bzbvhahjNM<N,mn djLKnkdnKHuidha description.this is a long asfaffffffffffffffffffffffffffffffffffffffffffffffffff description.this is a long mndfgxxvbtfaegbcfx description.',
-                        award_department_fullname: '总公司/高校联合开发组',
-                        award_reviewers: [['cyb']],
-                        award_consultant: 'cyb',
-                        award_image: 'img/BlueK.jpg',
-                        start_time: '2022-01-24',
-                        end_time: '2022-02-20',
-                        approval_state: 0
-                    },
-                    {
-                        id: 2,
-                        award_name: 'test2',
-                        award_level: 2,
-                        award_description: 'this is a long ........................ description',
-                        award_department_fullname: '总公司/高校联合开发组',
-                        award_reviewers: [['cyb']],
-                        award_consultant: 'cyb',
-                        award_image: 'img/BlueK.jpg',
-                        start_time: '2022-01-24',
-                        end_time: '2022-02-20',
-                        approval_state: 1
-                    },
-                    {
-                        id: 3,
-                        award_name: 'test3',
-                        award_level: 0,
-                        award_description: 'this is a long ........................ description',
-                        award_department_fullname: '总公司/高校联合开发组',
-                        award_reviewers: [['cyb']],
-                        award_consultant: 'cyb',
-                        award_image: 'img/BlueK.jpg',
-                        start_time: '2022-01-24',
-                        end_time: '2022-02-20',
-                        approval_state: 2
-                    }
-                ],
-                img: 'http://dev.paas-edu.bktencent.com:8000/media/img/1348720859594.jpg',
+                validData: [],
+                historyData: [],
                 levelMap: {
                     0: '总公司级',
                     1: '部门级',
@@ -126,6 +88,32 @@
                 }
             }
         },
+        created () {
+            this.$http.get(
+                'get_available_awards?page=1&size=3'
+            ).then(res => {
+                if (res.result) {
+                    this.validData = res.data.data
+                } else {
+                    this.$bkMessage({
+                        message: res.message,
+                        theme: 'error'
+                    })
+                }
+            })
+            this.$http.get(
+                'get_applyed_awards?page=1&size=3'
+            ).then(res => {
+                if (res.result) {
+                    this.historyData = res.data.data
+                } else {
+                    this.$bkMessage({
+                        message: res.message,
+                        theme: 'error'
+                    })
+                }
+            })
+        },
         methods: {
             toValidAwards () {
                 this.$router.push({
@@ -148,6 +136,12 @@
     display: flex;
     flex-direction: column;
     justify-content: flex-start;
+}
+.loading{
+    height: 300px;
+    line-height: 300px;
+    border: 1px solid #eee;
+    text-align: center;
 }
 .award-header{
     display: flex;
