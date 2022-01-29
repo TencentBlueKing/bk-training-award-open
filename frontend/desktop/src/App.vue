@@ -109,10 +109,16 @@
                             icon: 'icon-order-shape',
                             children: [
                                 {
+                                    id: 'home',
+                                    name: '首页',
+                                    pathName: 'home',
+                                    active: true
+                                },
+                                {
                                     id: 'home1',
                                     name: '可申报奖项',
                                     pathName: 'canawards',
-                                    active: true
+                                    active: false
                                 },
                                 {
                                     id: 'group-manager',
@@ -196,7 +202,7 @@
                             ]
                         }
                     ],
-                    id: 'home1',
+                    id: 'home',
                     toggle: true,
                     submenuActive: false,
                     title: '奖项申报'
@@ -465,7 +471,7 @@
         padding: 5px 15px 15px 15px;
         font-size: 14px;
         color: #737987;
-        height: calc(100% - 84px);
+        min-height: calc(100% - 84px);
         background: #FFFFFF;
         -webkit-box-shadow: 0px 2px 4px 0px rgba(25,25,41,0.05);
         box-shadow: 0px 2px 4px 0px rgba(25,25,41,0.05);
@@ -473,6 +479,7 @@
         border: 1px solid rgba(220,222,229,1);
         .main-content {
             min-height: 600px;
+            height: 100%;
         }
     }
     .monitor-navigation-footer {

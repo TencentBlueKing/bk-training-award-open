@@ -15,6 +15,8 @@ Vue.use(VueRouter)
 const MainEntry = () => import(/* webpackChunkName: 'entry' */'@/views')
 const NotFound = () => import(/* webpackChunkName: 'none' */'@/views/404')
 
+// 首页
+const Home = () => import(/* webpackChunkName: 'home' */'@/views/home')
 // 组管理
 const GroupManager = () => import(/* webpackChunkName: 'group-manager' */'@/views/group-manager')
 // 奖项管理
@@ -36,6 +38,12 @@ const routes = [
         component: MainEntry,
         alias: '',
         children: [
+            {
+                path: 'home',
+                name: 'home',
+                alias: '',
+                component: Home
+            },
             {
                 path: 'group-manager',
                 name: 'group-manager',
