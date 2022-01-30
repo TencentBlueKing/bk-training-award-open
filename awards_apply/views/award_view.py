@@ -57,10 +57,10 @@ class AwardView(APIView):
 
 class RecordView(APIView):
 
-    def get(self, request, *args, **kwargs):
+    def delete(self, request, *args, **kwargs):
         """撤回申请"""
         num = {"no_change": 0}
-        award_apply_record_id = request.query_params['id']
+        award_apply_record_id = request.data.get('id')
         award_apply_record_id = int(award_apply_record_id)
         record = AwardApplicationRecord.objects.filter(id=award_apply_record_id).update(
             approval_state=RecordStatus['draft'])
