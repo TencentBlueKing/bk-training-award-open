@@ -16,7 +16,8 @@ def upload_file_handler(file):
         return None
     file_md5 = file_md5_calculate(file)
     suffix = Path(file.name).suffix
-    if default_storage.exists(path := MEDIA_URL + file_md5 + suffix):
+    path = MEDIA_URL + file_md5 + suffix
+    if default_storage.exists(path):
         return {"path": path, "name": file.name, "size": file.size}
     else:
         path = default_storage.save(MEDIA_URL + file_md5 + suffix, file)
