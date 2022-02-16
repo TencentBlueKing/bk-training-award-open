@@ -42,6 +42,7 @@
     </div>
 </template>
 <script>
+    import { LEVEL_MAP } from '@/constants'
     import { fixMixins, tableMixins } from '@/common/mixins'
     export default {
         name: 'group-manager',
@@ -63,16 +64,16 @@
             }
         },
         computed: {
-            tableData () {
-                const remoteData = this.remoteData
-                if (!remoteData.map) {
+            tableData (self) {
+                const remoteData = self.remoteData
+                if (!remoteData || !remoteData.map) {
                     return []
                 }
                 return remoteData.map((rawData, index) => {
                     return {
                         ...rawData,
                         name: rawData['name'],
-                        level: rawData['level'],
+                        level: LEVEL_MAP[rawData['level']],
                         organisation: rawData['full_name'],
                         master: '测试操作'
                     }
@@ -87,7 +88,11 @@
              *  初始化函数
              * */
             handleInit () {
-                this.handleGetPageData(1, 10)
+                return Promise.all(
+                    [
+                        this.handleGetPageData(1, 10)
+                    ]
+                )
             },
             // 弹出框控制区域
             toAddNewGroup (toAddNewGroup) {
@@ -120,8 +125,7 @@
              * */
             handleGetPageData (page, size) {
                 this.tableDataIsLoading = true
-
-                return this.$http.get('/usermanage/list_departments/').then(res => {
+                return this.$http.get('/secretary/').then(res => {
                     this.remoteData = res.data.results
                 }).finally(_ => {
                     this.tableDataIsLoading = false

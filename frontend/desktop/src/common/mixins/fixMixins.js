@@ -1,5 +1,5 @@
 /**
- * @file fixMixinx
+ * @file fixMixins
  * @author couriourc
  * @description 修复部分 bug 的函数放置在这里
  */
@@ -26,6 +26,6 @@ export default {
             alert(message)
             throw new Error(message)
         }
-     
+
     }
 }
