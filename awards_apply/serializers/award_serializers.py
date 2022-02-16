@@ -13,8 +13,8 @@ class AwardsSerializers(serializers.Serializer):
     award_reviewers = serializers.ListField()
     award_consultant = serializers.CharField()
     award_image = serializers.ImageField(required=False, read_only=True)
-    start_time = serializers.DateTimeField()
-    end_time = serializers.DateTimeField()
+    start_time = serializers.DateTimeField(format='%Y-%m-%d %H:%M:%S')
+    end_time = serializers.DateTimeField(format='%Y-%m-%d %H:%M:%S')
     approval_state = serializers.IntegerField(default=0, required=False)
 
     def create(self, validated_data):  # 调用Serializer必须重写create方法
@@ -24,7 +24,7 @@ class AwardsSerializers(serializers.Serializer):
 
 class AwardsRecordSerializers(serializers.Serializer):
     id = serializers.IntegerField(default=None, required=False)
-    award_id = serializers.IntegerField()
+    award_id = serializers.SerializerMethodField()
     application_reason = serializers.CharField()
     application_users = serializers.ListField()
     application_attachments = serializers.ListField()
@@ -45,3 +45,7 @@ class AwardsRecordSerializers(serializers.Serializer):
                 "application_time": timezone.now()
             })
         return record
+
+    def get_award_id(self, row):
+        res = Awards.objects.filter(id=row.award_id).first()
+        return res.award_name

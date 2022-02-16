@@ -95,9 +95,15 @@ class AvailableAwardsView(APIView):
         query_params = {"id": request.user.username}
         data = client.usermanage.retrieve_user(query_params)
         # 获取用户所在的组列表
-        user_departments = []
+        user_departments = set()
         for item in data['data']['departments']:
-            user_departments.append(item['full_name'])
+            item_department = item['full_name'].split('/')
+            department_child = ''
+            # 提取用户所在组的子列表
+            for i in range(len(item_department)):
+                department_child += item_department[i]
+                user_departments.add(department_child)
+                department_child += '/'
         now = timezone.now()
         valid_awards = Awards.objects.filter(award_department_fullname__in=user_departments).filter(
             Q(start_time__lt=now) & Q(end_time__gt=now)).order_by('id')
@@ -118,7 +124,23 @@ class ApplyedRecordView(APIView):
         """获取用户已经获得的奖项"""
         username = request.user.username
         record = AwardApplicationRecord.objects.filter(
-            Q(approval_state=RecordStatus["pass"]) & Q(application_users__contains=username))
+            Q(approval_state=RecordStatus["pass"]) & Q(application_users__contains=username)).order_by('id')
+        pagination = PagePagination()
+        try:
+            pager_roles = pagination.paginate_queryset(queryset=record, request=request, view=self)
+            ser = AwardsRecordSerializers(instance=pager_roles, many=True)
+            return JsonResponse(success_code(pagination.get_paginated_response(ser.data)))
+        except EmptyPage:
+            return JsonResponse(page_num_exception())
+        except BaseException:
+            return JsonResponse(value_exception())
+
+class MineRecordView(APIView):
+
+    def get(self, request):
+        """获取我的申请记录"""
+        username = request.user.username
+        record = AwardApplicationRecord.objects.filter(application_users__contains=username).order_by('id')
         pagination = PagePagination()
         try:
             pager_roles = pagination.paginate_queryset(queryset=record, request=request, view=self)
