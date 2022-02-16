@@ -6,8 +6,7 @@ from django.shortcuts import render
 from django.utils import timezone
 from rest_framework.views import APIView
 from blueking.component.shortcuts import get_client_by_request
-from awards_apply.utils.const import success_code, false_code, object_not_exist_error, page_num_exception, \
-    value_exception
+from awards_apply.utils.const import success_code, false_code, page_num_exception, value_exception
 from awards_apply.serializers.award_serializers import AwardsSerializers, AwardsRecordSerializers
 from awards_apply.models import Awards, AwardApplicationRecord
 from awards_apply.utils.pagination import PagePagination
@@ -57,10 +56,10 @@ class AwardView(APIView):
 
 class RecordView(APIView):
 
-    def get(self, request, *args, **kwargs):
+    def delete(self, request, *args, **kwargs):
         """撤回申请"""
         num = {"no_change": 0}
-        award_apply_record_id = request.query_params['id']
+        award_apply_record_id = request.data.get('id')
         award_apply_record_id = int(award_apply_record_id)
         record = AwardApplicationRecord.objects.filter(id=award_apply_record_id).update(
             approval_state=RecordStatus['draft'])
@@ -119,11 +118,11 @@ class ApplyedRecordView(APIView):
         """获取用户已经获得的奖项"""
         username = request.user.username
         record = AwardApplicationRecord.objects.filter(
-            Q(APPROVAL_STATE == RecordStatus["pass"]) & Q(application_users__contains=username))
+            Q(approval_state=RecordStatus["pass"]) & Q(application_users__contains=username))
         pagination = PagePagination()
         try:
             pager_roles = pagination.paginate_queryset(queryset=record, request=request, view=self)
-            ser = AwardsSerializers(instance=pager_roles, many=True)
+            ser = AwardsRecordSerializers(instance=pager_roles, many=True)
             return JsonResponse(success_code(pagination.get_paginated_response(ser.data)))
         except EmptyPage:
             return JsonResponse(page_num_exception())
