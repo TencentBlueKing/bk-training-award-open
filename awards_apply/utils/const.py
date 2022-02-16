@@ -91,12 +91,12 @@ def page_num_exception():
 
 
 def value_exception():
-    """参数类型异常"""
+    """数据为空或参数异常"""
     return {
         "code": "1",
         "result": False,
-        "message": "参数类型异常",
-        "data": None,
+        "message": "数据为空或参数异常",
+        "data": [],
     }
 
 
