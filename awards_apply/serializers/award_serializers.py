@@ -13,8 +13,8 @@ class AwardsSerializers(serializers.Serializer):
     award_reviewers = serializers.ListField()
     award_consultant = serializers.CharField()
     award_image = serializers.ImageField(required=False, read_only=True)
-    start_time = serializers.DateField()
-    end_time = serializers.DateField()
+    start_time = serializers.DateTimeField()
+    end_time = serializers.DateTimeField()
     approval_state = serializers.IntegerField(default=0, required=False)
 
     def create(self, validated_data):  # 调用Serializer必须重写create方法
