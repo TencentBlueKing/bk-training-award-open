@@ -1,6 +1,7 @@
 from django.db import models
 from django_mysql.models import JSONField
 
+
 # Create your models here.
 class Awards(models.Model):
     award_name = models.CharField(max_length=128, verbose_name="奖项名称")
