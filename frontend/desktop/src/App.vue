@@ -103,12 +103,12 @@
                 nav: {
                     list: [
                         {
-                            id: 'home',
+                            id: 'award-manager',
                             name: '奖项中心',
                             icon: 'icon-dashboard',
                             children: [
                                 {
-                                    id: 'home1',
+                                    id: 'available-award',
                                     name: '可申报奖项',
                                     icon: 'icon-star',
                                     pathName: 'canawards',
@@ -137,6 +137,7 @@
                         }
                     ],
                     id: 'home1',
+                    pathName: '',
                     toggle: true,
                     submenuActive: false,
                     title: '奖项申报'

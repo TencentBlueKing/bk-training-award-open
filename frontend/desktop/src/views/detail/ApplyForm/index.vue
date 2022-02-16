@@ -9,6 +9,7 @@
                     v-model="applyForm['application_users']"
                     placeholder="请选择申请人"
                     ext-cls="w-90"
+                    searchable
                 >
                     <bk-option v-for="user in groupUsers"
                         :key="user.username"
@@ -19,7 +20,7 @@
             </bk-form-item>
             <bk-form-item label="申请理由">
                 <bk-input v-model="applyForm['application_reason']"
-                    placeholder="申请理由"
+                    placeholder="请输入申请理由"
                     ext-cls="w-90"
                 ></bk-input>
             </bk-form-item>
@@ -49,7 +50,7 @@
                     /**
                      * 申请人列表
                      * */
-                    application_users: ['3234853521Q'],
+                    application_users: [],
                     /**
                      * 申请附件列表
                      * */
@@ -80,9 +81,16 @@
              * 部分需要手动判断的参数
              * */
             checkEmptyForm (awardForm) {
-                if (awardForm.application_users.length < 1) {
+              console.log(awardForm.application_users.length)
+              console.log(awardForm.application_users)
+
+                if (!awardForm.application_users.length) {
                     this.messageWarn('请选择申请人')
                     return false
+                }
+                if (!awardForm.application_reason.length) {
+                  this.messageWarn('请输入申请理由')
+                  return false
                 }
                 return true
             },

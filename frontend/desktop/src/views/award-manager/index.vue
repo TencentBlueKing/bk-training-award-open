@@ -176,12 +176,17 @@
             <div slot="footer">
                 <bk-button class="footer-button"
                     theme="danger"
-                >取消</bk-button>
+                    @click="$refs['NewAwardDialog'].hidden()"
+                >
+                    取消
+                </bk-button>
                 <bk-button @click="handleConfirmSubmit($refs['NewAwardForm'])"
                     class="footer-button"
                     theme="success"
                     :loading="loading.newAwardFormLoading"
-                >确认新增</bk-button>
+                >
+                    确认新增
+                </bk-button>
             </div>
         </DialogArea>
         <DialogArea ref="EditRowDialog" title="编辑奖项">
@@ -359,13 +364,12 @@
                 }
                 loading.newAwardFormLoading = true
                 const fields = await NewAwardForm.getFields()
-                console.log('fields', fields)
                 if (!fields) {
                     loading.newAwardFormLoading = false
                     return
                 }
                 if (fields) {
-                    return this.$http.post('create_award/', fields).then(res => {
+                    return this.$http.post('awards/', fields).then(res => {
                         this.messageSuccess('创建成功')
                     }).finally(_ => {
                         loading.newAwardFormLoading = false
@@ -401,14 +405,14 @@
             handleGetPageData (current, size) {
                 this.isLoading = true
 
-                return this.$http.get('get_awards_list/', {
+                return this.$http.get('awards/', {
                     params: {
                         page_num: current,
                         page_size: size
                     }
                 }).then(res => {
-                    this.remoteData = res.data['awards']
-                    this.pagination.count = res.data['total_count']
+                    this.remoteData = res.data['data']
+                    this.pagination.count = res.data['count']
                 }).finally(_ => {
                     this.isLoading = false
                 })

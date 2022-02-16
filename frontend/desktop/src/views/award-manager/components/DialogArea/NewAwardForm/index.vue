@@ -58,7 +58,7 @@
                                 v-model="awardForm['start_time']"
                                 :placeholder="'请选择开始申请时间'"
                                 :ext-popover-cls="'custom-popover-cls'"
-                                format="yyyy-MM-dd"
+                                type="datetime"
                             ></bk-date-picker>
                         </bk-form-item>
                     </bk-col>
@@ -72,7 +72,7 @@
                                 v-model="awardForm['end_time']"
                                 :placeholder="'请选择截止申请时间'"
                                 :ext-popover-cls="'custom-popover-cls'"
-                                format="yyyy-MM-dd"
+                                type="datetime"
                             ></bk-date-picker>
                         </bk-form-item>
                     </bk-col>
@@ -172,7 +172,7 @@
 </template>
 <script>
     import { mapActions, mapGetters } from 'vuex'
-    import { toYYYYMMDDTime } from '@/common/util'
+    import { formatDate } from '@/common/util'
 
     /**
      * 全局临时叠加的唯一值
@@ -277,7 +277,7 @@
                     this.$refs['NewAwardForm'].validate().then(res => {
                         const awardStartTime = this.awardForm['start_time'].getTime()
                         const awardEndTime = this.awardForm['end_time'].getTime()
-                        if (awardStartTime > awardEndTime) {
+                        if (awardStartTime >= awardEndTime) {
                             this.messageWarn('开始时间应该早于截止时间')
                             return resolve(false)
                         }
@@ -292,12 +292,12 @@
              * */
             async getFields () {
                 const valid = await this.validator()
-                console.log('valid', valid)
                 if (valid) {
                     const awardForm = this.awardForm
                     awardForm.award_reviewers = awardForm.reviewers.map(item => item['value'])
-                    awardForm.start_time = toYYYYMMDDTime(awardForm.start_time)
-                    awardForm.end_time = toYYYYMMDDTime(awardForm.end_time)
+                    awardForm.start_time = formatDate(awardForm.start_time).format('YYYY-MM-DD hh:mm:ss')
+                    awardForm.end_time = formatDate(awardForm.end_time).format('YYYY-MM-DD hh:mm:ss')
+                    console.log(awardForm)
                     return awardForm
                 }
                 return null

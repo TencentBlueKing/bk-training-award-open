@@ -15,6 +15,8 @@ Vue.use(VueRouter)
 const MainEntry = () => import(/* webpackChunkName: 'entry' */'@/views')
 const NotFound = () => import(/* webpackChunkName: 'none' */'@/views/404')
 
+// 首页信息
+const Home = () => import(/* webpackChunkName: 'home' */'@/views/home')
 // 组管理
 const GroupManager = () => import(/* webpackChunkName: 'group-manager' */'@/views/group-manager')
 // 奖项管理
@@ -29,6 +31,7 @@ const Detail = () => import(/* webpackChunkName: 'myapply' */'@/views/detail')
 const Checkpage = () => import(/* webpackChunkName: 'myapply' */'@/views/checkpage')
 // 可申报奖项
 const Canawards = () => import(/* webpackChunkName: 'example1' */'@/views/canawards')
+// 申请奖项表格
 const routes = [
     {
         path: window.PROJECT_CONFIG.SITE_URL,
@@ -37,15 +40,22 @@ const routes = [
         alias: '',
         children: [
             {
+                path: '',
+                name: '',
+                component: Home
+            },
+            {
                 path: 'group-manager',
                 name: 'group-manager',
-                alias: '',
                 component: GroupManager
             },
             {
                 path: 'award-manager',
                 name: 'award-manager',
-                component: AwardManager
+                component: AwardManager,
+                meta: {
+                    keepAlive: true
+                }
             },
             {
                 path: 'canawards',

@@ -10,6 +10,7 @@
 <script>
     import Editor from 'wangeditor'
     import xss from 'xss'
+
     export default {
         name: 'editor',
         components: {
