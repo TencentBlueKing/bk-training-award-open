@@ -29,6 +29,7 @@ class AwardsRecordSerializers(serializers.Serializer):
     application_users = serializers.ListField()
     application_attachments = serializers.ListField()
     approval_state = serializers.IntegerField(default=0, required=False)
+    application_time = serializers.DateTimeField(format='%Y-%m-%d %H:%M:%S')
 
     def create(self, validated_data):  # 调用Serializer必须重写create方法
         if self.initial_data["is_draft"]:

@@ -27,5 +27,5 @@ urlpatterns = [
     url(r"^record/$", views.RecordView.as_view()),
     url(r"^get_available_awards/", views.AvailableAwardsView.as_view()),
     url(r"^get_applyed_awards/", views.ApplyedRecordView.as_view()),
-    url(r"^get_my_awards/", views.MyRecordView.as_view()),
+    url(r"^get_my_records/", views.MyRecordView.as_view()),
 ]
