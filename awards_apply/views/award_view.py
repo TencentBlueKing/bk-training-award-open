@@ -7,7 +7,8 @@ from django.shortcuts import render
 from django.utils import timezone
 from rest_framework.views import APIView
 from blueking.component.shortcuts import get_client_by_request
-from awards_apply.utils.const import success_code, false_code, object_not_exist_error, page_num_exception, value_exception
+from awards_apply.utils.const import success_code, false_code, object_not_exist_error, page_num_exception,\
+    value_exception
 from awards_apply.serializers.award_serializers import AwardsSerializers, AwardsRecordSerializers
 from awards_apply.models import Awards, AwardApplicationRecord
 from awards_apply.utils.pagination import PagePagination
