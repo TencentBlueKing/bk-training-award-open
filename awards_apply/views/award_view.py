@@ -102,7 +102,6 @@ class RecordView(APIView):
         try:
             pager_roles = pagination.paginate_queryset(queryset=record, request=request, view=self)
             ser = AwardsRecordSerializers(instance=pager_roles, many=True)
-            print(ser.data)
             return JsonResponse(success_code(pagination.get_paginated_response(ser.data)))
         except EmptyPage:
             return JsonResponse(page_num_exception())
