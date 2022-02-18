@@ -1,3 +1,4 @@
+import operator
 from itertools import chain
 from django.core.paginator import EmptyPage
 from django.db.models import Q
@@ -6,7 +7,7 @@ from django.shortcuts import render
 from django.utils import timezone
 from rest_framework.views import APIView
 from blueking.component.shortcuts import get_client_by_request
-from awards_apply.utils.const import success_code, false_code, page_num_exception, value_exception
+from awards_apply.utils.const import success_code, false_code, object_not_exist_error, page_num_exception, value_exception
 from awards_apply.serializers.award_serializers import AwardsSerializers, AwardsRecordSerializers
 from awards_apply.models import Awards, AwardApplicationRecord
 from awards_apply.utils.pagination import PagePagination
@@ -53,8 +54,59 @@ class AwardView(APIView):
         award.save()
         return JsonResponse(success_code(award.data))
 
+    def put(self, request, *args, **kwargs):
+        """编辑奖项"""
+        data = AwardsSerializers(data=request.data)
+        if data.is_valid() is False:
+            return JsonResponse(false_code(data.errors))
+        try:
+            Awards.objects.get(id=data.initial_data['award_id'])
+        except Awards.DoesNotExist:
+            return JsonResponse(object_not_exist_error("award"))
+        Awards.objects.filter(id=data.initial_data['award_id']).update(
+            award_name=data.initial_data['award_name'],
+            award_level=data.initial_data['award_level'],
+            award_description=data.initial_data['award_description'],
+            award_department_fullname=data.initial_data['award_department_fullname'],
+            award_reviewers=data.initial_data['award_reviewers'],
+            award_image=data.initial_data['award_image'],
+            start_time=data.initial_data['start_time'],
+            end_time=data.initial_data['end_time'],
+            update_time=timezone.now()
+        )
+        award = Awards.objects.get(id=data.initial_data['award_id'])
+        ser = AwardsSerializers(instance=award)
+        return JsonResponse(success_code(ser.data))
+
+    def delete(self, request, *args, **kwargs):
+        """删除奖项"""
+        award_id = request.data.get('award_id')
+        try:
+            award = Awards.objects.get(id=award_id)
+        except Awards.DoesNotExist:
+            return JsonResponse(object_not_exist_error("award"))
+        if operator.not_(request.user.username == award.award_consultant):
+            return JsonResponse(false_code("您不是该奖项负责人，无法删除该奖项"))
+        award.delete()
+        return JsonResponse(success_code('删除奖项成功'))
+
 
 class RecordView(APIView):
+
+    def get(self, request):
+        """获取我的申请记录"""
+        username = request.user.username
+        record = AwardApplicationRecord.objects.filter(application_users__contains=username).order_by('id')
+        pagination = PagePagination()
+        try:
+            pager_roles = pagination.paginate_queryset(queryset=record, request=request, view=self)
+            ser = AwardsRecordSerializers(instance=pager_roles, many=True)
+            print(ser.data)
+            return JsonResponse(success_code(pagination.get_paginated_response(ser.data)))
+        except EmptyPage:
+            return JsonResponse(page_num_exception())
+        except BaseException:
+            return JsonResponse(value_exception())
 
     def delete(self, request, *args, **kwargs):
         """撤回申请"""
@@ -95,9 +147,15 @@ class AvailableAwardsView(APIView):
         query_params = {"id": request.user.username}
         data = client.usermanage.retrieve_user(query_params)
         # 获取用户所在的组列表
-        user_departments = []
+        user_departments = set()
         for item in data['data']['departments']:
-            user_departments.append(item['full_name'])
+            item_department = item['full_name'].split('/')
+            department_child = ''
+            # 提取用户所在组的子列表
+            for i in range(len(item_department)):
+                department_child += item_department[i]
+                user_departments.add(department_child)
+                department_child += '/'
         now = timezone.now()
         valid_awards = Awards.objects.filter(award_department_fullname__in=user_departments).filter(
             Q(start_time__lt=now) & Q(end_time__gt=now)).order_by('id')
