@@ -1,6 +1,6 @@
 <template>
     <div class="home-container">
-        <Divider>
+        <Divider @click="toGetMoreCanAvailableAward()">
             <bk-link>可申请奖项</bk-link>
         </Divider>
         <div class="available-bar mt10 mb10 bk-slide-fade-left p5">
@@ -8,7 +8,7 @@
             <bk-exception v-if="!availableAwardList.length" class="exception-wrap-item exception-part" type="empty"
                 scene="part"></bk-exception>
         </div>
-        <Divider>
+        <Divider @click="toGetMoreAppliedAward()">
             <bk-link>历史获得奖项</bk-link>
         </Divider>
         <div class="available-bar mt10 bk-slide-fade-left p5">
@@ -20,6 +20,8 @@
 </template>
 <script>
     import { fixMixins } from '../../common/mixins'
+    import { getAppliedAwards, getAvailableAwards } from '@/api/service/award-service'
+    import { AWARD_APPROVAL_STATE_EN_MAP, AWARD_APPROVAL_STATE_MAP } from '@/constants'
 
     export default {
         name: 'Home',
@@ -36,10 +38,21 @@
         },
         computed: {
             historyAwardList (self) {
+                console.log(self.availableAwardList)
                 return self.historyAwardListRemoteData
             },
             availableAwardList (self) {
-                return self.availableAwardListRemoteData
+                if (!self.availableAwardListRemoteData || !self.availableAwardListRemoteData.map) {
+                    return []
+                }
+
+                return self.availableAwardListRemoteData.map(item => {
+                    return {
+                        ...item,
+                        approval_state_en: AWARD_APPROVAL_STATE_EN_MAP[item['approval_state']],
+                        approval_state: AWARD_APPROVAL_STATE_MAP[item['approval_state']]
+                    }
+                })
             }
         },
         created () {
@@ -55,24 +68,27 @@
                     this.handleGetApplyedAwards()
                 ])
             },
+            toGetMoreAppliedAward () {
+                return this.$router.push({
+                    name: 'myapply'
+                })
+            },
+            toGetMoreCanAvailableAward () {
+                this.$router.push({
+                    name: 'canawards'
+                })
+            },
+            /**
+             * 请求区域开始
+             * */
             handleGetAvailableAwards () {
-                return this.$http.get('get_available_awards/', {
-                    params: {
-                        page: 1,
-                        size: 4
-                    }
-                }).then(res => {
+                return getAvailableAwards(1, 4).then(res => {
                     this.availableAwardListRemoteData = res['data']['data']
                     return res
                 })
             },
             handleGetApplyedAwards () {
-                return this.$http.get('get_applyed_awards/', {
-                    params: {
-                        page: 1,
-                        size: 4
-                    }
-                }).then(res => {
+                return getAppliedAwards(1, 4).then(res => {
                     return res
                 })
             }

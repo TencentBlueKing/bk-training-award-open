@@ -3,20 +3,11 @@
         <bk-divider align="center">申请奖项</bk-divider>
         <bk-form :label-width="140">
             <bk-form-item label="申请人">
-                <bk-select style="width:80%"
-                    multiple
-                    display-tag
-                    v-model="applyForm['application_users']"
+                <select-search
+                    :value.sync="applyForm['application_users']"
                     placeholder="请选择申请人"
                     ext-cls="w-90"
-                    searchable
-                >
-                    <bk-option v-for="user in groupUsers"
-                        :key="user.username"
-                        :id="user.username"
-                        :name="user.displayName">
-                    </bk-option>
-                </bk-select>
+                ></select-search>
             </bk-form-item>
             <bk-form-item label="申请理由">
                 <bk-input v-model="applyForm['application_reason']"
@@ -25,7 +16,7 @@
                 ></bk-input>
             </bk-form-item>
             <bk-form-item label="申请材料">
-                <Uploader v-model="applyForm.application_attachments"
+                <Uploader v-model="applyForm['application_attachments']"
                     ext-cls="w-90"
                 ></Uploader>
             </bk-form-item>
@@ -33,11 +24,12 @@
     </div>
 </template>
 <script>
-    import { mapActions, mapGetters } from 'vuex'
+    import { GROUP_USERS_KEYNAME } from '@/constants'
 
     export default {
         name: 'apply-form',
         components: {
+            SelectSearch: () => import('@/components/select-search'),
             Uploader: () => import('@/components/uploader')
         },
         data () {
@@ -60,38 +52,39 @@
             }
         },
         computed: {
-            ...mapGetters('groupModule', [
-                'groupUsers'
-            ])
+            groupUsers (self) {
+                return self.$http.cache.get(GROUP_USERS_KEYNAME)
+            }
         },
         mounted () {
             this.handleInit()
         },
         methods: {
-            ...mapActions('groupModule', [
-                'getUserManageListUsers'
-            ]),
             /**
              * 初始化函数
              * */
             handleInit () {
-                this.getUserManageListUsers()
             },
             /**
              * 部分需要手动判断的参数
              * */
             checkEmptyForm (awardForm) {
-              console.log(awardForm.application_users.length)
-              console.log(awardForm.application_users)
+                console.log(awardForm.application_users.length)
+                console.log(awardForm.application_users)
 
                 if (!awardForm.application_users.length) {
                     this.messageWarn('请选择申请人')
                     return false
                 }
                 if (!awardForm.application_reason.length) {
-                  this.messageWarn('请输入申请理由')
-                  return false
+                    this.messageWarn('请输入申请理由')
+                    return false
                 }
+                if (!awardForm.application_attachments.length) {
+                    this.messageWarn('请传入申请材料')
+                    return false
+                }
+
                 return true
             },
             handleCancel () {
@@ -107,6 +100,9 @@
             },
             handleConfirm (awardForm) {
                 if (this.checkEmptyForm(awardForm)) {
+                    awardForm['application_attachments'] = awardForm['application_attachments'].map(item => ({
+                        url: item.path
+                    }))
                     this.$emit('confirm', awardForm)
                 }
             },

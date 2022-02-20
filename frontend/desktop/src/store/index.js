@@ -8,22 +8,12 @@ import Vuex from 'vuex'
 
 import http from '@/api'
 import { unifyObjectStyle } from '@/common/util'
-import groupModule from './modules/group.module'
-import awardModule from './modules/award.module'
+
 Vue.use(Vuex)
 
 const store = new Vuex.Store({
     // 模块
-    modules: {
-        /**
-         * 组信息模块
-         * */
-        groupModule,
-        /**
-         * 奖项信息模块
-         * */
-        awardModule
-    },
+    modules: {},
     // 公共 store
     state: {
         mainContentLoading: false,

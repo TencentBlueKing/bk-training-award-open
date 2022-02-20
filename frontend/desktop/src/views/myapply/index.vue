@@ -43,6 +43,8 @@
 </template>
 
 <script>
+    import { deleteRecord, getAvailableAwards } from '@/api/service/award-service'
+
     export default {
         components: { },
         data () {
@@ -53,8 +55,8 @@
                 data: [],
                 pagination: {
                     current: 1,
-                    count: 500,
-                    limit: 20
+                    count: 0,
+                    limit: 10
                 },
                 isLoading: false
             }
@@ -68,12 +70,7 @@
             handleGetPageData (current, size) {
                 this.isLoading = true
 
-                return this.$http.get('get_available_awards/', {
-                    params: {
-                        page_num: current,
-                        page_size: size
-                    }
-                }).then(res => {
+                return getAvailableAwards(current, size).then(res => {
                     this.remoteData = res.data['data']
                     this.pagination.count = res.data['count']
                 }).finally(_ => {
@@ -84,10 +81,8 @@
              * 撤销申请
              * */
             handleToDelApply (applyId) {
-                return this.$http.delete('record/', {
-                    id: applyId
-                }).then(res => {
-                    console.log('res', res)
+                return deleteRecord(applyId).then(res => {
+                    this.messageSuccess('删除成功')
                 })
             }
         }
