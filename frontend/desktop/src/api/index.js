@@ -9,7 +9,6 @@ import cookie from 'cookie'
 
 import CachedPromise from './cached-promise'
 import RequestQueue from './request-queue'
-import { bus } from '../common/bus'
 import { messageError } from '@/common/bkmagic'
 import UrlParse from 'url-parse'
 import queryString from 'query-string'
@@ -178,7 +177,8 @@ function handleReject (error, config) {
         const { status, data } = error.response
         const nextError = { message: error.message, response: error.response }
         if (status === 401) {
-            bus.$emit('show-login-modal', nextError.response)
+            const loginError = nextError.response.data
+            window.location.href = loginError['login_url']
         } else if (status === 500) {
             nextError.message = '系统出现异常'
         } else if (data && data.message) {

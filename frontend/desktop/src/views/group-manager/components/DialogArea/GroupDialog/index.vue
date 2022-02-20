@@ -1,18 +1,20 @@
 <template>
     <div class="dialog-container">
         <bk-dialog v-model="visible"
+            :render-directive="'if'"
             theme="primary"
             header-position="left"
             size="small"
             ext-cls="dialog"
             :mask-close="false"
+            :loading="$attrs['loading']"
             :confirm-fn="handleDialogConfirm"
             @cancel="handleDialogCancel(formData)"
         >
             <p slot="header"
                 class="dialog-title f17 fb"
             >
-                {{dialogOptions[dialogType].title}}
+                {{ config[dialogType].title }}
             </p>
             <bk-form :label-width="80"
                 v-if="visible"
@@ -24,49 +26,36 @@
                     :required="true"
                     property="name"
                 >
-                    <bk-input placeholder="请输入组织名称"
-                        v-model="formData['name']"
-                    ></bk-input>
+                    <select-search
+                        placeholder="请选择现有组织"
+                        :value.sync="groupInfo"
+                        type="group"
+                        :multiple="false"
+                        :disabled="config[dialogType]['groupNameDisabled']"
+                    >
+                    </select-search>
                 </bk-form-item>
                 <bk-form-item label="负责人"
                     :required="true"
                     property="master"
                 >
-                    <bk-select multiple
-                        display-tag
-                        v-model="formData['master']"
+                    <select-search
                         placeholder="请选择申请人"
+                        :value.sync="secretaries"
                     >
-                        <bk-option v-for="user in groupUsers"
-                            :key="user.username"
-                            :id="user.username"
-                            :name="user.displayName">
-                        </bk-option>
-                    </bk-select>
-                </bk-form-item>
-                <bk-form-item label="级别"
-                    :required="true"
-                    property="level"
-                >
-                    <bk-select placeholder="请选择级别"
-                        v-model="formData['level']"
-                    >
-                        <bk-option v-for="option in awardLevels"
-                            :key="option.id"
-                            :id="option.id"
-                            :name="option.level">
-                        </bk-option>
-                    </bk-select>
+                    </select-search>
                 </bk-form-item>
             </bk-form>
+            {{ config[type] }}
         </bk-dialog>
     </div>
 </template>
 <script>
-    import { mapActions, mapGetters } from 'vuex'
+    import { GROUP_KEYNAME, GROUP_USERS_KEYNAME } from '@/constants'
 
     export default {
         name: 'group-dialog',
+        components: { SelectSearch: () => import('@/components/select-search') },
         props: {
             dialogType: {
                 type: String,
@@ -80,13 +69,21 @@
              * 静态规则
              * */
             return {
+                config: {
+                    'editor': {
+                        'title': '编辑组',
+                        'groupNameDisabled': true
+                    },
+                    'creator': {
+                        'title': '新增组'
+                    }
+                },
                 visible: false,
                 // 用于接收表单字段
                 formData: {
-                    level: '',
-                    master: [],
-                    organisation: '',
-                    name: ''
+                    secretaries: [],
+                    group_id: '',
+                    group_full_name: ''
                 },
                 /**
                  * 规则验证
@@ -98,21 +95,13 @@
                     level: [
                         { required: true, message: '请选择奖项等级', trigger: 'blur' }
                     ],
-                    master: [
+                    secretaries: [
                         { required: true, message: '请选择奖项负责人', trigger: 'blur' }
                     ],
                     organisation: [
                         { required: true, message: '请输入组织名', trigger: 'blur' }
                     ]
                 }),
-                dialogOptions: {
-                    editor: {
-                        title: '编辑组'
-                    },
-                    creator: {
-                        title: '新增组'
-                    }
-                },
                 // 用于结合字段配置表单字段
                 settings: [
                     {
@@ -131,28 +120,43 @@
                 /**
                  * 临时放置，后续转为 store 或者其他
                  * */
-                totalMaster: []
+                totalMaster: [],
+                totalDepartment: []
             }
         },
         computed: {
-            ...mapGetters('groupModule', ['groupUsers']),
-            ...mapGetters('awardModule', ['awardLevels'])
-
+            secretaries: {
+                get (self) {
+                    return self.formData.secretaries.map(item => item.username)
+                },
+                set (newValue) {
+                    this.formData.secretaries = this.$http.cache.get(GROUP_USERS_KEYNAME).filter(item => {
+                        return newValue.includes(item['username'])
+                    })
+                }
+            },
+            groupInfo: {
+                get (self) {
+                    return self.formData.group_id
+                },
+                set (newValue) {
+                    const formData = this.formData
+                    const totalDepartment = this.$http.cache.get(GROUP_KEYNAME)
+                    formData.group_id = newValue
+                    formData.group_full_name = totalDepartment.find(item => item.id === newValue)['full_name']
+                }
+            }
+        },
+        created () {
+            this.handleInit()
         },
         methods: {
-            ...mapActions('groupModule', [
-                'getUserManageListUsers'
-            ]),
-            ...mapActions('awardModule', [
-                'getAwardLevels'
-            ]),
             /**
              * 初始化信息
              * */
             handleInit () {
-                this.getUserManageListUsers()
-                this.getAwardLevels()
             },
+
             /**
              * 校验合法性
              * */
@@ -171,15 +175,13 @@
              * 弹框确认
              * */
             async handleDialogConfirm (self) {
-                if (await this.checkValid()) {
-                    this.$emit('confirm', self.formData)
-                }
+                if (!await this.checkValid()) return
+                this.$emit('confirm', this.formData)
             },
             /**
              * 弹框禁止
              * */
             handleDialogCancel (formData) {
-                // TODO: 如果信息有所改变，对关闭进行拦截
                 this.$emit('cancel', formData)
                 this.hidden()
             },
@@ -194,15 +196,19 @@
                 if (options.data) {
                     this.formData = { ...options.data }
                 }
-                this.handleInit()
                 this.visible = true
             },
             hidden () {
                 this.visible = false
+                this.formData = {
+                    secretaries: [],
+                    group_id: '',
+                    group_full_name: ''
+                }
             }
         }
     }
 </script>
 <style scoped>
-    @import "./index.css";
+@import "./index.css";
 </style>
