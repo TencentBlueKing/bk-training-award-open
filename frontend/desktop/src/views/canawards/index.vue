@@ -39,6 +39,7 @@
 <script>
     import { isDef } from '@/common/util'
     import { tableMixins } from '@/common/mixins'
+    import { getAvailableAwards } from '@/api/service/award-service'
 
     export default {
         name: 'canawards',
@@ -127,12 +128,7 @@
             handleGetPageData (current, size) {
                 this.isLoading = true
 
-                return this.$http.get('get_available_awards/', {
-                    params: {
-                        page: current,
-                        size: size
-                    }
-                }).then(res => {
+                return getAvailableAwards(current, size).then(res => {
                     this.remoteData = res.data['data']
                     this.pagination.count = res.data['count']
                 }).finally(_ => {

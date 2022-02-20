@@ -1,15 +1,18 @@
 <template>
     <div class="new-award-form-container">
+        <div :class="['title', config[formType]['title-clz']]">
+            {{ config[formType]['title']}}
+        </div>
         <bk-form :label-width="110"
             form-type="vertical"
             :rules="rules"
-            ref="NewAwardForm"
+            ref="Form"
             :model="awardForm"
         >
             <bk-container :col="12"
                 ext-cls="award-form-container"
                 :gutter="60"
-                flex
+                :flex="true"
             >
                 <!-- 奖项基本信息 -->
                 <bk-row>
@@ -20,6 +23,7 @@
                         >
                             <bk-input placeholder="请输入奖项名称"
                                 v-model="awardForm['award_name']"
+                                :disabled="config[formType]['disabled']"
                             ></bk-input>
                         </bk-form-item>
                     </bk-col>
@@ -27,20 +31,15 @@
                         <bk-form-item label="接口人"
                             :property="'award_consultant'"
                         >
-                            <bk-select :disabled="false"
-                                v-model="awardForm['award_consultant']"
-                                style="width: 100%;"
+                            <select-search
+                                :value.sync="awardForm['award_consultant']"
                                 ext-cls="select-custom"
-                                ext-popover-cls="select-popover-custom"
+                                style="width: 100%;"
                                 placeholder="请选择接口人"
-                                searchable
+                                :disabled="config[formType]['disabled']"
+                                :multiple="false"
                             >
-                                <bk-option v-for="user in groupUsers"
-                                    :key="user.id"
-                                    :id="user.username"
-                                    :name="user.displayName">
-                                </bk-option>
-                            </bk-select>
+                            </select-search>
                         </bk-form-item>
                     </bk-col>
                 </bk-row>
@@ -57,6 +56,7 @@
                                 style="width:100%"
                                 v-model="awardForm['start_time']"
                                 :placeholder="'请选择开始申请时间'"
+                                :disabled="config[formType]['disabled']"
                                 :ext-popover-cls="'custom-popover-cls'"
                                 type="datetime"
                             ></bk-date-picker>
@@ -73,6 +73,7 @@
                                 :placeholder="'请选择截止申请时间'"
                                 :ext-popover-cls="'custom-popover-cls'"
                                 type="datetime"
+                                :disabled="config[formType]['disabled']"
                             ></bk-date-picker>
                         </bk-form-item>
                     </bk-col>
@@ -90,21 +91,8 @@
                                 :rows="3"
                                 :maxlength="255"
                                 placeholder="请输入描述信息"
+                                :disabled="config[formType]['disabled']"
                             ></bk-input>
-                        </bk-form-item>
-                        <bk-form-item label="奖项级别"
-                            :required="true"
-                            :property="'award_level'"
-                        >
-                            <bk-select v-model="awardForm['award_level']"
-                                placeholder="请选择奖项级别"
-                            >
-                                <bk-option v-for="awardLevel in awardLevels"
-                                    :key="awardLevel.id"
-                                    :id="awardLevel.level"
-                                    :name="awardLevel.level">
-                                </bk-option>
-                            </bk-select>
                         </bk-form-item>
                     </bk-col>
 
@@ -114,9 +102,43 @@
                         >
                             <Uploader :limit="1"
                                 theme="picture"
-                                v-model="awardForm['award_attach_picture']"
+                                v-model="awardForm['award_attach_image']"
+                                :multiple="false"
                             >
                             </Uploader>
+                        </bk-form-item>
+                    </bk-col>
+                </bk-row>
+                <bk-row>
+                    <bk-col :span="6">
+                        <bk-form-item label="奖项级别"
+                            :required="true"
+                            :property="'award_level'"
+                        >
+                            <bk-select v-model="awardForm['award_level']"
+                                placeholder="请选择奖项级别"
+                                :disabled="config[formType]['disabled']"
+                            >
+                                <bk-option v-for="awardLevel in awardLevels"
+                                    :key="awardLevel"
+                                    :id="awardLevel"
+                                    :name="awardLevel">
+                                </bk-option>
+                            </bk-select>
+                        </bk-form-item>
+                    </bk-col>
+                    <bk-col :span="6">
+                        <bk-form-item label="所属组织"
+                            :required="true"
+                            :property="'award_level'"
+                        >
+                            <select-search
+                                :value.sync="groupInfo"
+                                placeholder="请选择奖项所属组织"
+                                :multiple="false"
+                                :disabled="config[formType]['disabled']"
+                                type="group"
+                            ></select-search>
                         </bk-form-item>
                     </bk-col>
                 </bk-row>
@@ -130,23 +152,17 @@
                             label="评审人(*同级审批为[或审批]，异级审批为[与审批])"
                             :required="true"
                         >
-                            <div class="form-group"
+                            <div class="form-group mt10"
                                 v-for="(item, index) in awardForm['reviewers']"
                                 :key="item.uuid"
                             >
-                                <bk-select style="width:80%"
-                                    multiple
-                                    display-tag
-                                    v-model="item.value"
+                                <select-search
+                                    :value.sync="item.value"
+                                    style="width:80%"
                                     placeholder="请选择评审人"
-                                    ext-cls="mt10"
+                                    :disabled="config[formType]['disabled']"
                                 >
-                                    <bk-option v-for="user in groupUsers"
-                                        :key="user.username"
-                                        :id="user.username"
-                                        :name="user.displayName">
-                                    </bk-option>
-                                </bk-select>
+                                </select-search>
                                 <div class="ml15">
                                     <bk-button theme="primary"
                                         title="添加同级评审人"
@@ -165,15 +181,29 @@
                         </bk-form-item>
                     </bk-col>
                 </bk-row>
-
             </bk-container>
         </bk-form>
+        <div class="center-content">
+            <bk-button :theme="'danger'"
+                @click="config[formType]['cancel-func']"
+                class="mr10"
+            >
+                取消
+            </bk-button>
+            <bk-button :theme="config[formType]['button-theme']"
+                @click="config[formType]['confirm-func']($event)"
+                class="ml10"
+                :loading="submitLoading"
+            >
+                {{config[formType]['button-title']}}
+            </bk-button>
+        </div>
     </div>
 </template>
 <script>
-    import { mapActions, mapGetters } from 'vuex'
     import { formatDate } from '@/common/util'
-
+    import { AWARD_LEVEL_MAP, GROUP_KEYNAME } from '@/constants'
+    import { postAwards, putAward } from '@/api/service/award-service'
     /**
      * 全局临时叠加的唯一值
      * */
@@ -182,6 +212,7 @@
     export default {
         name: 'new-award-form',
         components: {
+            SelectSearch: () => import('@/components/select-search'),
             Uploader: () => import('@/components/uploader')
         },
         data () {
@@ -205,9 +236,11 @@
                     start_time: new Date(),
                     end_time: new Date(),
                     award_description: '',
-                    award_level: '1',
-                    award_department_fullname: '总公司/高校联合开发组',
-                    award_attach_picture: [],
+                    award_level: '',
+                    award_department_fullname: '',
+                    award_department_id: '',
+                    award_attach_image: [],
+                    award_image: '',
                     reviewers: [{
                         uuid: uuid++,
                         value: []
@@ -232,58 +265,124 @@
                     award_level: [
                         checkToMustItem('请选择奖项等级信息')
                     ],
-                    reviewer: [
-                        {
-                            validator: (val) => {
-                                return val.length >= 1 && val[0].length
-                            },
-                            message: '评审人至少有一个'
-                        }
+                    award_image: [
+                        checkToMustItem('请传入图片')
                     ]
-                })
+                }),
+                awardLevels: AWARD_LEVEL_MAP,
 
+                submitLoading: false,
+                config: {
+                    'edit': {
+                        'title': '编辑奖项',
+                        'title-clz': 'edit',
+                        'button-title': '提交修改',
+                        'button-theme': 'warning',
+                        'confirm-func': this.handleConfirmModifyAward,
+                        'cancel-func': () => {
+                            this.$router.replace({
+                                name: 'award-manager'
+                            })
+                        }
+                    },
+                    'detail': {
+                        'title': '奖项详情',
+                        'title-clz': 'detail',
+                        'button-title': '前往修改',
+                        'button-theme': 'primary',
+                        'confirm-func': this.toModify,
+                        'disabled': true,
+                        'cancel-func': () => {
+                            this.$router.back()
+                        }
+                    },
+                    'new': {
+                        'title': '新增奖项',
+                        'title-clz': 'new',
+                        'button-title': '确认新增',
+                        'button-theme': 'success',
+                        'confirm-func': this.handleConfirmAddNewAward,
+                        'cancel-func': () => {
+                            this.$router.back()
+                        }
+                    }
+                }
             }
         },
         computed: {
-            ...mapGetters('groupModule', [
-                'groupUsers'
-            ]),
-            ...mapGetters('awardModule', [
-                'awardLevels'
-            ])
+            formType (self) {
+                console.log(self.$route.type)
+                return self.$route.params.type
+            },
+            groupInfo: {
+                get (self) {
+                    return self.awardForm.award_department_id
+                },
+                set (newValue) {
+                    const formData = this.awardForm
+                    const totalDepartment = this.$http.cache.get(GROUP_KEYNAME)
+                    formData.award_department_id = newValue
+                    formData.award_department_fullname = totalDepartment.find(item => item.id === newValue)['full_name']
+                }
+            }
         },
         created () {
             this.handleInit()
         },
         methods: {
-            ...mapActions('groupModule', [
-                'getUserManageListUsers'
-            ]),
-            ...mapActions('awardModule', [
-                'getAwardLevels'
-            ]),
             /**
              * 初始化信息
              * */
             handleInit () {
-                this.getUserManageListUsers()
-                this.getAwardLevels()
+                this.handleSetDefaultInfo()
+            },
+            /**
+             * 设置初始信息
+             * */
+            handleSetDefaultInfo () {
+                const defaultInfo = this.$route.params
+                if (defaultInfo.hasOwnProperty('id')) {
+                    defaultInfo['award_attach_image'] = [{
+                        name: defaultInfo['award_name'],
+                        url: defaultInfo['award_image']
+                    }]
+                    defaultInfo['reviewers'] = defaultInfo['award_reviewers'] && defaultInfo['award_reviewers'].map(item => {
+                        return {
+                            uuid: uuid++,
+                            value: item
+                        }
+                    })
+
+                    this.awardForm = defaultInfo
+                }
             },
             /**
              * 用于检查表单信息
              * */
             validator () {
                 return new Promise((resolve, reject) => {
-                    this.$refs['NewAwardForm'].validate().then(res => {
-                        const awardStartTime = this.awardForm['start_time'].getTime()
-                        const awardEndTime = this.awardForm['end_time'].getTime()
+                    const awardForm = this.awardForm
+                    let flag = true
+
+                    this.$refs['Form'].validate().then(res => {
+                        const awardStartTime = awardForm['start_time'].getTime()
+                        const awardEndTime = awardForm['end_time'].getTime()
                         if (awardStartTime >= awardEndTime) {
                             this.messageWarn('开始时间应该早于截止时间')
-                            return resolve(false)
+                            flag = false
                         }
-                        return resolve(true)
+                        if (!(awardForm['reviewers'] && awardForm['reviewers'][0].value.length)) {
+                            this.messageWarn('至少有一级评审人')
+                            flag = false
+                        }
+                        if (!(awardForm.award_attach_image || awardForm.award_attach_image.slice(-1)[0]['path'])) {
+                            this.messageWarn('请上传图片')
+                            flag = false
+                        }
+                        return resolve(flag)
                     }).catch(_ => {
-                        return resolve(false)
+                        flag = false
+                        return resolve(flag)
                     })
                 })
             },
@@ -297,7 +396,9 @@
                     awardForm.award_reviewers = awardForm.reviewers.map(item => item['value'])
                     awardForm.start_time = formatDate(awardForm.start_time).format('YYYY-MM-DD hh:mm:ss')
                     awardForm.end_time = formatDate(awardForm.end_time).format('YYYY-MM-DD hh:mm:ss')
-                    console.log(awardForm)
+                    console.log(awardForm.award_attach_image)
+
+                    awardForm.award_image = awardForm.award_attach_image && awardForm.award_attach_image.slice(-1)[0]['path']
                     return awardForm
                 }
                 return null
@@ -320,8 +421,43 @@
             removeReviewer (reviewerList, uuid) {
                 const clickIdx = reviewerList.findIndex(item => item.uuid === uuid)
                 reviewerList.splice(clickIdx, 1)
+            },
+            // S 确认按钮对应的事件
+            async handleConfirmAddNewAward () {
+                const form = await this.getFields()
+                if (!form) return null
+                if (this.submitLoading) return null
+                this.submitLoading = true
+                return postAwards(form).then(_ => {
+                    this.messageSuccess('创建成功')
+                }).catch(_ => {
+                    this.messageSuccess('创建失败')
+                    this.submitLoading = false
+                })
+            },
+            async handleConfirmModifyAward () {
+                const form = await this.getFields()
+                if (!form) return null
+                if (this.submitLoading) return null
+                this.submitLoading = true
+                console.log(form)
+                return putAward(this.$route.params['id'], form).then(_ => {
+                    this.messageSuccess('修改成功')
+                }).catch(_ => {
+                    this.messageSuccess('修改失败')
+                    this.submitLoading = false
+                })
+            },
+            toModify () {
+                return this.$router.push({
+                    name: 'award-form',
+                    path: `award-manager/award-form/edit`,
+                    params: {
+                        ...this.$route.params,
+                        type: 'edit'
+                    }
+                })
             }
-
         }
     }
 </script>

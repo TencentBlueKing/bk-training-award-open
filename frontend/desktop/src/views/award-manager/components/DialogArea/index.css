@@ -4,6 +4,8 @@
         justify-content: flex-start;
         align-items: center;
         .footer-button {
+            position: absolute;
+            bottom: 0;
             margin: 0 24px;
         }
     }

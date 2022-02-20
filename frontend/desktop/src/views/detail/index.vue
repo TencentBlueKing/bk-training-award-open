@@ -1,9 +1,6 @@
 <template>
-    <div class="detail-container">
-        <div v-if="true"
-            slot="content"
-        >
-
+    <div class="detail-container m20" :show-head="false">
+        <div>
             <Detail :award-form="applyForm"></Detail>
             <!-- /详情部分 -->
 
@@ -15,9 +12,8 @@
             <!-- /编辑部分 -->
 
         </div>
-
         <!-- 底部按钮组 -->
-        <div class="tc w100  mt15" slot="footer">
+        <div class="tc w100  mt15">
             <!-- 用于申请奖项的按钮 -->
             <div v-if="isShowApplyForm"
                 class="button-item"
@@ -54,16 +50,18 @@
                 class="tc mr15 mt15"
             >
                 <bk-button theme="primary"
+                    class="mr10"
                     @click="formType = 'apply'"
+                    icon-right="arrows-right-circle"
                 >
                     <span class="m5">前往申请</span>
-                    <bk-icon type="arrows-right-circle" />
                 </bk-button>
                 <bk-button theme="warning"
+                    class="ml10"
                     @click="$router.back()"
+                    icon-right="close-circle"
                 >
                     <span class="m5">取消</span>
-                    <bk-icon type="arrows-right-circle" />
                 </bk-button>
 
             </div>
@@ -74,6 +72,7 @@
 </template>
 <script>
     import { mapGetters } from 'vuex'
+    import { postRecord } from '@/api/service/award-service'
 
     export default {
         name: 'detail',
@@ -96,22 +95,22 @@
             }
         },
         computed: {
-          ...mapGetters(['user']),
-          /**
-           * 用于判断是否为编辑型表格
-           * */
-          isShowApplyForm () {
-            return ['apply', 'edit'].includes(this.formType)
-          },
-          /**
-           * 主要用于拼接一些比如 id 的信息 此类默认信息
-           * */
-          defaultInfo () {
-            return {
-              award_apply_record_id: this.applyForm.award_apply_record_id,
-              award_id: this.applyForm.id
-            }
-          }
+    ...mapGetters(['user']),
+    /**
+     * 用于判断是否为编辑型表格
+     * */
+    isShowApplyForm () {
+      return ['apply', 'edit'].includes(this.formType)
+    },
+    /**
+     * 主要用于拼接一些比如 id 的信息 此类默认信息
+     * */
+    defaultInfo () {
+      return {
+        award_apply_record_id: this.applyForm.award_apply_record_id,
+        award_id: this.applyForm.id
+      }
+    }
         },
         created () {
             console.log(this.$route.params)
@@ -146,8 +145,7 @@
                 if (!params) {
                     return
                 }
-                return this.$http.post('record/', {
-                    is_draft: isDraft,
+                return postRecord(isDraft, {
                     ...params,
                     ...defaultInfo
                 })
@@ -155,10 +153,10 @@
         }
     }
 </script>
-<style scoped>
-.button-item {
-  display: flex;
-  align-items: center;
-  justify-content: center;
+<style>
+@import "@/css/mixins/scroll.css";
+.monitor-navigation-content {
+  @mixin scroller;
+  overflow-y: scroll;
 }
 </style>
