@@ -2,6 +2,7 @@
  * @file 通用方法
  * @author wheel-w
  */
+import moment from 'moment'
 
 /**
  * 函数柯里化
@@ -370,8 +371,8 @@ export function checkRequired (message) {
  * 利用 UTC 的日期和时间是通过 Z 分割
  *
  * @param {date|object|string} date
- * @returns string
+ * @returns moment.Moment
  * */
-export function toYYYYMMDDTime (date) {
-    return new Date(date).toISOString().split('T')[0]
+export function formatDate (date) {
+    return moment(date)
 }
