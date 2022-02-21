@@ -12,9 +12,9 @@ class AwardsSerializers(serializers.Serializer):
     award_department_fullname = serializers.CharField()
     award_reviewers = serializers.ListField()
     award_consultant = serializers.CharField()
-    award_image = serializers.ImageField(required=False, read_only=True)
-    start_time = serializers.DateTimeField()
-    end_time = serializers.DateTimeField()
+    award_image = serializers.CharField(required=False, read_only=True)
+    start_time = serializers.DateTimeField(format='%Y-%m-%d %H:%M:%S')
+    end_time = serializers.DateTimeField(format='%Y-%m-%d %H:%M:%S')
     approval_state = serializers.IntegerField(default=0, required=False)
 
     def create(self, validated_data):  # 调用Serializer必须重写create方法
@@ -25,10 +25,12 @@ class AwardsSerializers(serializers.Serializer):
 class AwardsRecordSerializers(serializers.Serializer):
     id = serializers.IntegerField(default=None, required=False)
     award_id = serializers.IntegerField()
-    application_reason = serializers.CharField()
-    application_users = serializers.ListField()
-    application_attachments = serializers.ListField()
+    application_reason = serializers.CharField(required=False)
+    application_users = serializers.DictField()
+    application_attachments = serializers.ListField(required=False)
     approval_state = serializers.IntegerField(default=0, required=False)
+    application_time = serializers.DateTimeField(format='%Y-%m-%d %H:%M:%S', required=False)
+    award_name = serializers.SerializerMethodField()
 
     def create(self, validated_data):  # 调用Serializer必须重写create方法
         if self.initial_data["is_draft"]:
@@ -38,10 +40,17 @@ class AwardsRecordSerializers(serializers.Serializer):
             id=validated_data["id"],
             defaults={
                 "award_id": validated_data["award_id"],
-                "application_reason": validated_data["application_reason"],
+                "application_reason": (
+                    validated_data["application_reason"] if validated_data.__contains__('application_reason') else ""),
                 "application_users": validated_data["application_users"],
-                "application_attachments": validated_data["application_attachments"],
+                "application_attachments": (
+                    validated_data["application_attachments"] if validated_data.__contains__(
+                        'application_attachments') else []),
                 "approval_state": validated_data["approval_state"],
                 "application_time": timezone.now()
             })
         return record
+
+    def get_award_name(self, row):
+        res = Awards.objects.get(id=row.award_id)
+        return res.award_name
