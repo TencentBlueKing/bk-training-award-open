@@ -12,6 +12,8 @@ specific language governing permissions and limitations under the License.
 """
 
 from django.apps import AppConfig
+from django.contrib.auth import get_user_model
+from django.db.models.signals import post_migrate
 from django.utils.translation import ugettext_lazy as _
 from django.conf import settings
 from django.core.cache import caches
@@ -21,6 +23,18 @@ from blueapps.account.conf import APIGW_CACHE_KEY, APIGW_CACHE_EXPIRES
 cache = caches["login_db"]
 
 
+def init_super_user(sender, **kwargs):
+    from django.conf import settings
+
+    user_model = get_user_model()
+    super_users = settings.INIT_SUPERUSER
+    for u in super_users:
+        user, _ = user_model.objects.get_or_create(username=u)
+        user.is_staff = True
+        user.is_superuser = True
+        user.save()
+
+
 class AccountConfig(AppConfig):
 
     name = "blueapps.account"
@@ -28,6 +42,7 @@ class AccountConfig(AppConfig):
 
     def ready(self):
         self.get_api_public_key()
+        post_migrate.connect(init_super_user, self)
         return True
 
     @staticmethod
