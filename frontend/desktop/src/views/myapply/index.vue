@@ -43,7 +43,8 @@
 </template>
 
 <script>
-    import { deleteRecord, getAvailableAwards } from '@/api/service/award-service'
+    import { deleteRecord } from '@/api/service/award-service'
+    import { getRecord } from '@/api/service/apply-service'
 
     export default {
         components: { },
@@ -62,6 +63,7 @@
             }
         },
         created () {
+            this.handleGetPageData()
         },
         methods: {
             /**
@@ -69,10 +71,8 @@
              * */
             handleGetPageData (current, size) {
                 this.isLoading = true
-
-                return getAvailableAwards(current, size).then(res => {
-                    this.remoteData = res.data['data']
-                    this.pagination.count = res.data['count']
+                return getRecord(current, size).then(res => {
+                    console.log(res)
                 }).finally(_ => {
                     this.isLoading = false
                 })
