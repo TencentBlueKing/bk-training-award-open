@@ -1,28 +1,55 @@
 <template>
     <div class="">
+        <!--        <bk-form form-type="inline">-->
+        <!--            <bk-form-item-->
+        <!--                label="部门名称"-->
+        <!--                class="mt10"-->
+        <!--                label-width="auto"-->
+        <!--            >-->
+        <!--                <bk-input v-model="pagination.department_name"-->
+        <!--                    placeholder="请输入部门名称"-->
+        <!--                    class="inline-block"-->
+        <!--                    style="width: 200px;"-->
+        <!--                    :right-icon="'bk-icon icon-search'"-->
+        <!--                    :clearable="true"-->
+        <!--                >-->
+        <!--                </bk-input>-->
+        <!--            </bk-form-item>-->
+
+        <!--            <bk-form-item-->
+        <!--                label="奖项名称"-->
+        <!--                class="mt10"-->
+        <!--                label-width="auto"-->
+        <!--            >-->
+        <!--                <bk-input v-model="pagination.award_name"-->
+        <!--                    placeholder="请输入奖项名称"-->
+        <!--                    class="inline-block"-->
+        <!--                    :right-icon="'bk-icon icon-search'"-->
+        <!--                    :clearable="true"-->
+        <!--                    style="width: 200px;"-->
+        <!--                >-->
+        <!--                </bk-input>-->
+        <!--            </bk-form-item>-->
+        <!--        </bk-form>-->
         <div>
-            <span class="depart-name" style="margin-right: 10px">部门名称</span>
-            <bk-search-select clearable :show-popover-tag-change="true" placeholder="请输入部门名称" style="display: inline-block;width: 150px;" v-model="value"></bk-search-select>
-            <span class="depart-name" style="margin-left: 30px;margin-right: 10px">奖项名称</span>
-            <bk-search-select clearable :show-popover-tag-change="true" placeholder="请输入奖项名称" style="display: inline-block;width: 200px;" v-model="value"></bk-search-select>
-        </div>
-        <div>
-            <bk-table style="margin-top: 30px;"
-                :data="data"
-                :size="size"
+            <bk-table class="mt10"
                 :pagination="pagination"
-                @row-mouse-enter="handleRowMouseEnter"
-                @row-mouse-leave="handleRowMouseLeave"
-                @page-change="handlePageChange"
-                @page-limit-change="handlePageLimitChange">
-                <bk-table-column label="奖项名称" prop="award_name"></bk-table-column>
-                <bk-table-column label="评审周期" prop="period"></bk-table-column>
-                <bk-table-column label="奖项级别" prop="class"></bk-table-column>
-                <bk-table-column label="开始申请时间" prop="create_time"></bk-table-column>
-                <bk-table-column label="截止申请时间" prop="end_time"></bk-table-column>
-                <bk-table-column label="操作" width="150">
+                @page-change="handleChangePage($event)"
+                @page-limit-change="handleChangeLimit($event)"
+                :data="tableData"
+            >
+                <bk-table-column label="奖项id" prop="award_name"></bk-table-column>
+                <bk-table-column label="申请时间" prop="application_time"></bk-table-column>
+                <bk-table-column label="申请理由" prop="application_reason"></bk-table-column>
+                <bk-table-column label="申请人" prop="application_users"></bk-table-column>
+                <bk-table-column label="审批人" prop="end_time"></bk-table-column>
+                <bk-table-column label="审批状态" width="150">
                     <template slot-scope="props">
-                        <bk-button class="mr10" theme="primary" text @click="check(props.row)">评审</bk-button>
+                        <bk-button :class="['mr10',props.row['approval_state_en']]"
+                            theme="primary"
+                            text
+                            @click="check(props.row)">
+                        </bk-button>
                     </template>
                 </bk-table-column>
             </bk-table>
@@ -31,122 +58,59 @@
 </template>
 
 <script>
-    import { bkSearchSelect, bkTable, bkTableColumn, bkButton } from 'bk-magic-vue'
+    import { getApproval } from '@/api/service/apply-service'
+    import { AWARD_APPROVAL_STATE_EN_MAP, AWARD_APPROVAL_STATE_MAP, NOT_APPLY } from '@/constants'
     export default {
-        components: {
-            bkTable,
-            bkTableColumn,
-            bkButton,
-            bkSearchSelect
-        },
         data () {
             return {
                 userInfo: null,
                 size: 'small',
                 departValue: '',
-                data: [
-                    {
-                        award_name: '全国大学生数学建模竞赛',
-                        status: '待审核',
-                        period: '季度',
-                        class: '部门',
-                        create_time: '2018-05-25 15:02:24',
-                        end_time: '2018-05-25 15:02:24'
-                    },
-                    {
-                        award_name: '全国大学生数学建模竞赛',
-                        status: '已通过',
-                        period: '季度',
-                        class: '部门',
-                        create_time: '2018-05-25 15:02:24',
-                        end_time: '2018-05-25 15:02:24'
-                    },
-                    {
-                        award_name: '全国大学生数学建模竞赛',
-                        status: '不通过',
-                        class: '部门',
-                        period: '季度',
-                        create_time: '2018-05-25 15:02:24',
-                        end_time: '2018-05-25 15:02:24'
-                    },
-                    {
-                        award_name: '全国大学生数学建模竞赛',
-                        status: '草稿',
-                        period: '季度',
-                        class: '部门',
-                        create_time: '2018-05-25 15:02:24',
-                        end_time: '2018-05-25 15:02:24'
-                    }
-
-                ],
+                remoteData: [],
                 pagination: {
                     current: 1,
-                    count: 500,
-                    limit: 20
+                    count: 0,
+                    limit: 10,
+                    award_name: [],
+                    department_name: []
+                },
+                award_approval_state_controller: {
+                    [NOT_APPLY]: '待审批'
                 }
             }
         },
+        computed: {
+            tableData (self) {
+                return self.remoteData?.map(item => {
+                    return {
+                        ...item,
+                        approval_state_cn: AWARD_APPROVAL_STATE_MAP[item['approval_state']],
+                        approval_state_en: AWARD_APPROVAL_STATE_EN_MAP[item['approval_state']]
+                    }
+                }) ?? []
+            }
+        },
         created () {
+            this.handleInit()
         },
         methods: {
-            /**
-             * 获取页面数据
-             *
-             * @return {Promise} promise 对象
-             */
-            fetchPageData () {
+            handleInit () {
+                this.handleGetPageData()
             },
-
-            /**
-             * btn1
-             */
-            async btn1 () {
-                this.$http.get('/test_get_or_post/').then(res => {
-                    if (res.result) {
-                        this.btn1Msg = res
-                    }
-                })
+            handleChangePage (curren) {
+                this.pagination.current = curren
+                this.handleGetPageData()
             },
-
-            /**
-             * btn2
-             */
-            async btn2 () {
-                this.$http.post('/test_get_or_post/').then(res => {
-                    if (res.result) {
-                        this.btn2Msg = res
-                    }
-                })
+            handleChangeLimit (limit) {
+                this.pagination.current = 1
+                this.pagination.limit = limit
+                this.handleGetPageData()
             },
-            /**
-             * getUser
-             */
-            async getUser () {
-                try {
-                    const data = await this.$store.dispatch('userInfo', {}, { fromCache: true })
-                    this.userInfo = Object.assign({}, data)
-                } catch (e) {
-                    console.error(e)
-                }
-            },
-            handlePageLimitChange () {
-                console.log('handlePageLimitChange', arguments)
-            },
-            toggleTableSize () {
-                const size = ['small', 'medium', 'large']
-                const index = (size.indexOf(this.size) + 1) % 3
-                this.size = size[index]
-            },
-            handlePageChange (page) {
-                this.pagination.current = page
-            },
-            remove (item) {
-                console.log(item)
-            },
-            check (item) {
-                console.log(item)
-                this.$router.push({
-                    name: 'checkpage'
+            handleGetPageData (current = this.pagination.current, size = this.pagination.limit) {
+                return getApproval(current, size).then(res => {
+                    console.log(res)
+                    this.remoteData = res.data['results']
+                    this.pagination = res.data['count']
                 })
             }
         }
