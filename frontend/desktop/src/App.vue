@@ -24,32 +24,26 @@
                     </ol>
                     <bk-popover theme="light navigation-message" style="margin-left: auto;" placement="bottom" :arrow="false"
                         offset="0, 5" trigger="mouseenter" :tippy-options="{ 'hideOnClick': false }">
-                        <div class="header-mind" @click="toCheckview()">
+                        <div :class="['header-mind',{
+                            'active': $route.name === 'mycheck'
+                        }]" @click="toCheckview()">
                             <bk-icon type="pc" />
                             <div style="padding-left: 5px;font-size: 15px;color: #96A2B9;">我的审批</div>
                         </div>
                     </bk-popover>
                     <bk-popover theme="light navigation-message" placement="bottom" :arrow="false" offset="0, 5"
                         trigger="mouseenter" :tippy-options="{ 'hideOnClick': false }">
-                        <div class="header-mind" @click="toMyapply()">
+                        <div :class="['header-mind',{
+                            'active': $route.name === 'myapply'
+                        }]" @click="toMyapply()">
                             <bk-icon type="panel-permission" />
                             <div style="padding-left: 5px;font-size: 15px;color: #96A2B9;">我的申请</div>
                         </div>
                     </bk-popover>
-                    <bk-popover theme="light navigation-message" :arrow="false" offset="-20, 10" placement="bottom-start"
-                        :tippy-options="{ 'hideOnClick': false }">
-                        <div class="header-user">
-                            {{ user.username || 'admin' }}
-                            <i class="bk-icon icon-down-shape"></i>
-                        </div>
-                        <template slot="content">
-                            <ul class="monitor-navigation-admin">
-                                <li class="nav-item" v-for="userItem in userMenu.list" :key="userItem.label">
-                                    <span @click="userItem.func()">{{ userItem.label }}</span>
-                                </li>
-                            </ul>
-                        </template>
-                    </bk-popover>
+                    <div class="header-user">
+                        <i class="bk-icon icon-user text-huge"></i>
+                        {{ user.username || 'admin' }}
+                    </div>
                 </div>
             </template>
             <template slot="menu">
@@ -171,6 +165,7 @@
                         {
                             label: '退出',
                             func: () => {
+                                console.log(window.SITE_URL)
                             }
                         }
                     ]
@@ -193,6 +188,13 @@
                 handler (newValue) {
                     this.nav.id = newValue
                 }
+            },
+            '$route.meta': {
+                immediate: true,
+                handler (newValue) {
+                    this.header.list[0].name = newValue.title || ''
+                    document.title = '奖项申报系统-' + newValue.title
+                }
             }
         },
         created () {
@@ -200,7 +202,6 @@
             if (platform.indexOf('win') === 0) {
                 this.systemCls = 'win'
             }
-            console.log(this.user)
         },
         mounted () {
             const self = this
@@ -216,11 +217,8 @@
         },
         methods: {
             handleSelect (id, item) {
-                console.log(item)
                 this.changeColor()
-                this.header.list[0].name = item.name // 提示用户此时页面的位置
                 this.nav.id = id
-
                 this.$router.push({
                     name: item.pathName
                 })
@@ -230,16 +228,12 @@
             },
             toCheckview () {
                 this.tofirstColor()
-                this.header.list[0].name = '我的审核' // 提示用户此时页面的位置
-                console.log('去我的审核')
                 this.$router.push({
                     name: 'mycheck'
                 })
             },
             toMyapply () {
                 this.tofirstColor()
-                this.header.list[0].name = '我的申请' // 提示用户此时页面的位置
-                console.log('去我的申请页面')
                 this.$router.push({
                     name: 'myapply'
                 })
@@ -366,8 +360,9 @@
     -ms-flex-pack: center;
     justify-content: center;
     margin-right: 8px;
+    user-select: none;
 
-    &:hover {
+    &.active {
       background: -webkit-gradient(linear, right top, left top, from(rgba(37, 48, 71, 1)), to(rgba(38, 50, 71, 1)));
       background: linear-gradient(270deg, rgba(37, 48, 71, 1) 0%, rgba(38, 50, 71, 1) 100%);
       border-radius: 50%;
