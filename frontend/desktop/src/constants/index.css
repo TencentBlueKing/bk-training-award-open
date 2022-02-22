@@ -1,0 +1,12 @@
+@define-mixin APPROVAL_STATUS {
+      &.not_apply {
+        background: #7B61FF;
+      }
+      &.applied {
+        background: #00c873;
+      }
+
+      &.ended {
+        background: #e88b00;
+      }
+}
