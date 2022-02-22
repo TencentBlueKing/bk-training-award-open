@@ -254,18 +254,15 @@
         computed: {
             tableData () {
                 const remoteData = this.remoteData
-                if (!remoteData || !remoteData.map) {
-                    return []
-                }
-                return remoteData.map(rawData => {
+                return remoteData?.map?.(rawData => {
                     return {
-                    ...rawData,
-                    awardName: rawData['award_name'],
-                    awardStatus: AWARD_APPROVAL_STATE_MAP[rawData['approval_state']],
-                    startApplyTime: rawData['start_time'],
-                    endApplyTime: rawData['end_time']
+                        ...rawData,
+                        awardName: rawData['award_name'],
+                        awardStatus: AWARD_APPROVAL_STATE_MAP[rawData['approval_state']],
+                        startApplyTime: rawData['start_time'],
+                        endApplyTime: rawData['end_time']
                     }
-                })
+                }) ?? []
             }
         },
         created () {
@@ -275,7 +272,7 @@
         },
         methods: {
             handleInit () {
-                this.handlePageSizeChange(10)
+                this.handleGetPageData()
             },
             // S 弹框控制区域
             // 新增

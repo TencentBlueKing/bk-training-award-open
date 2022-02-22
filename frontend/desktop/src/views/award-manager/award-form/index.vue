@@ -375,7 +375,7 @@
                             this.messageWarn('至少有一级评审人')
                             flag = false
                         }
-                        if (!(awardForm.award_attach_image || awardForm.award_attach_image.slice(-1)[0]['path'])) {
+                        if (!(awardForm?.award_attach_image?.slice?.(-1)[0]?.['path'])) {
                             this.messageWarn('请上传图片')
                             flag = false
                         }
@@ -393,7 +393,7 @@
                 const valid = await this.validator()
                 if (valid) {
                     const awardForm = this.awardForm
-                    awardForm.award_reviewers = awardForm.reviewers.map(item => item['value'])
+                    awardForm.award_reviewers = awardForm.reviewers.map(item => item['value']).filter(item => item.length)
                     awardForm.start_time = formatDate(awardForm.start_time).format('YYYY-MM-DD hh:mm:ss')
                     awardForm.end_time = formatDate(awardForm.end_time).format('YYYY-MM-DD hh:mm:ss')
                     console.log(awardForm.award_attach_image)
@@ -431,7 +431,8 @@
                 return postAwards(form).then(_ => {
                     this.messageSuccess('创建成功')
                 }).catch(_ => {
-                    this.messageSuccess('创建失败')
+                    this.messageWarn('创建失败')
+                }).finally(_ => {
                     this.submitLoading = false
                 })
             },
@@ -440,11 +441,11 @@
                 if (!form) return null
                 if (this.submitLoading) return null
                 this.submitLoading = true
-                console.log(form)
                 return putAward(this.$route.params['id'], form).then(_ => {
                     this.messageSuccess('修改成功')
                 }).catch(_ => {
-                    this.messageSuccess('修改失败')
+                    this.messageWarn('修改失败')
+                }).finally(_ => {
                     this.submitLoading = false
                 })
             },
