@@ -5,11 +5,16 @@
             :limit="limit"
             :tip="$attrs['tip']"
             :with-credentials="true"
-            :custom-request="handleUploder"
+            :url="url"
             @on-exceed="handleUploadExceed(limit,attachFiles.length)"
             :ext-cls="$attrs['ext-cls']"
             :multiple="$attrs['multiple']"
             :disabled="$attrs['disabled']"
+            :header="[
+                { name: 'X-CSRFToken',value: cookie }
+            ]"
+            @on-success="handleSuccess"
+            :handle-res-code="handleUploadFileRes"
         ></bk-upload>
     </div>
 </template>
@@ -21,7 +26,7 @@
         name: 'uploader',
         model: {
             prop: 'attachFiles',
-            event: 'update'
+            event: 'change'
         },
         props: {
             theme: {
@@ -38,7 +43,7 @@
             },
             url: {
                 type: String,
-                default: () => '/upload/'
+                default: () => '/bk_api/upload/'
             }
         },
         data () {
@@ -50,13 +55,7 @@
             this.cookie = cookie.parse(document.cookie)['csrftoken']
         },
         methods: {
-            handleUploadFileRes (response, fileObj) {
-                if (response.result) {
-                    this.attachFiles.push({
-                        ...response.data,
-                        url: fileObj['url']
-                    })
-                }
+            handleUploadFileRes (response) {
                 return response.result
             },
             /**
@@ -73,6 +72,15 @@
                 }).catch(_ => {
                     this.messageError('上传失败')
                 })
+            },
+            handleSuccess (file, fileList) {
+                console.log(fileList)
+                this.$emit('change', fileList.map(item => {
+                    return {
+                        ...item['responseData']['data'],
+                        url: item['url']
+                    }
+                }))
             }
         }
     }
