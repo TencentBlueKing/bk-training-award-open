@@ -33,7 +33,9 @@ const Detail = () => import(/* webpackChunkName: 'myapply' */'@/views/detail')
 const Checkpage = () => import(/* webpackChunkName: 'myapply' */'@/views/checkpage')
 // 可申报奖项
 const Canawards = () => import(/* webpackChunkName: 'example1' */'@/views/canawards')
+// 登陆成功后重定向
 
+const LoginSucess = { path: 'home' }
 // 申请奖项表格
 const routes = [
     {
@@ -46,52 +48,82 @@ const routes = [
                 path: 'home',
                 name: 'home',
                 alias: '',
-                component: Home
+                component: Home,
+                meta: {
+                    title: '首页'
+                }
             },
             {
                 path: 'account/login_success/',
                 name: 'login_success',
-                redirect: { path: 'home' }
+                redirect: LoginSucess,
+                meta: {
+                    title: '首页'
+                }
             },
             {
                 path: 'group-manager',
                 name: 'group-manager',
-                component: GroupManager
+                component: GroupManager,
+                meta: {
+                    title: '组管理'
+                }
             },
             {
                 path: 'award-manager',
                 name: 'award-manager',
-                component: AwardManager
+                component: AwardManager,
+                meta: {
+                    title: '奖项管理'
+                }
             },
             {
                 path: 'award-manager/award-form/:type',
                 name: 'award-form',
-                component: AwardForm
+                component: AwardForm,
+                meta: {
+                    title: '奖项管理'
+                }
             },
             {
                 path: 'canawards',
                 name: 'canawards',
-                component: Canawards
+                component: Canawards,
+                meta: {
+                    title: '可申请奖项'
+                }
             },
             {
                 path: 'myapply',
                 name: 'myapply',
-                component: Myapply
+                component: Myapply,
+                meta: {
+                    title: '我的申请'
+                }
             },
             {
                 path: 'mycheck',
                 name: 'mycheck',
-                component: Mycheck
+                component: Mycheck,
+                meta: {
+                    title: '我的审批'
+                }
             },
             {
                 path: 'detail/:type',
                 name: 'detail',
-                component: Detail
+                component: Detail,
+                meta: {
+                    title: '奖项信息'
+                }
             },
             {
                 path: 'checkpage',
                 name: 'checkpage',
-                component: Checkpage
+                component: Checkpage,
+                meta: {
+                    title: '审核页面'
+                }
             }
         ]
     },
