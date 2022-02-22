@@ -55,12 +55,8 @@
             }
         },
         computed: {
-            tableData () {
-                const remoteData = this.remoteData
-                if (!remoteData.map) {
-                    return []
-                }
-                return remoteData.map((rowData) => {
+            tableData (self) {
+                return self.remoteData?.map?.((rowData) => {
                     return {
                         id: rowData['id'],
                         award_name: rowData['award_name'],
@@ -73,7 +69,7 @@
                         end_time: rowData['end_time'],
                         approval_state: rowData['approval_state']
                     }
-                })
+                }) ?? []
             }
         },
         created () {
@@ -82,11 +78,11 @@
 
         methods: {
             handleInit () {
-                this.handleGetPageData(this.pagination.current, this.pagination.limit)
+                this.handleGetPageData()
             },
-            toApply (awardInfo, applyDialog) {
+            toApply (awardInfo) {
                 if (!isDef(awardInfo.id)) {
-                    return this.messageError('出错啦')
+                    return this.messageWarn('系统错误')
                 }
                 this.$router.push({
                     name: 'detail',
@@ -125,9 +121,8 @@
             /**
              * 获取可申请奖项页面数据
              * */
-            handleGetPageData (current, size) {
+            handleGetPageData (current = this.pagination.current, size = this.pagination.limit) {
                 this.isLoading = true
-
                 return getAvailableAwards(current, size).then(res => {
                     this.remoteData = res.data['data']
                     this.pagination.count = res.data['count']
