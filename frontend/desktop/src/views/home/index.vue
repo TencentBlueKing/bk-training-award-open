@@ -38,21 +38,20 @@
         },
         computed: {
             historyAwardList (self) {
-                console.log(self.availableAwardList)
-                return self.historyAwardListRemoteData
+                return self.historyAwardListRemoteData?.map?.(item => {
+                    return {
+                        ...item
+                    }
+                }) ?? []
             },
             availableAwardList (self) {
-                if (!self.availableAwardListRemoteData || !self.availableAwardListRemoteData.map) {
-                    return []
-                }
-
-                return self.availableAwardListRemoteData.map(item => {
+                return self.availableAwardListRemoteData?.map?.(item => {
                     return {
                         ...item,
                         approval_state_en: AWARD_APPROVAL_STATE_EN_MAP[item['approval_state']],
                         approval_state: AWARD_APPROVAL_STATE_MAP[item['approval_state']]
                     }
-                })
+                }) ?? []
             }
         },
         created () {
@@ -89,6 +88,8 @@
             },
             handleGetApplyedAwards () {
                 return getAppliedAwards(1, 4).then(res => {
+                    console.log(res)
+                    this.historyAwardListRemoteData = res['data']['data']
                     return res
                 })
             }
