@@ -56,12 +56,11 @@
         },
         computed: {
             list (self) {
-                if (!self.groupUsers.filter) return []
                 const config = self['config']
                 const type = self['type']
-                return self.groupUsers.filter(item => {
+                return self.groupUsers?.filter?.(item => {
                     return item[config[type]['displayKey']]
-                })
+                }) ?? []
             }
         },
         created () {
@@ -81,6 +80,11 @@
                     return
                 }
                 return getListDepartments({ page: 1, page_size: 1 }).then(_ => {
+                    if (!_.data?.count) {
+                        this.messageWarn('出错啦')
+                        this.loading = false
+                        return
+                    }
                     return getListDepartments({ page: 1, page_size: _.data.count })
                 }).then(response => {
                     this.groupUsers = response.data.results
@@ -99,10 +103,19 @@
                 }
 
                 // 第一个请求是为了获取总量，避免盲猜
-                getListUsers({ page: 1, page_size: 1 }).then(_ => {
-                    console.log(_)
+                return getListUsers({ page: 1, page_size: 1 }).then(_ => {
+                    if (!_.data?.count) {
+                        this.messageWarn('出错啦')
+                        this.loading = false
+                        return
+                    }
                     return getListUsers({ page: 1, page_size: _.data.count })
                 }).then(response => {
+                    if (!response.data.results) {
+                        this.messageWarn('出错啦')
+                        this.loading = false
+                        return
+                    }
                     this.groupUsers = response.data.results.map(item => {
                         item['display_name'] = `${item['username']}(${item['display_name']})`
                         return item
