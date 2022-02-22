@@ -46,10 +46,10 @@ class AwardsRecordSerializers(serializers.Serializer):
             defaults={
                 "award_id": validated_data["award_id"],
                 "application_reason": (
-                    validated_data["application_reason"] if validated_data.__contains__('application_reason') else ""),
+                    validated_data["application_reason"] if validated_data.__contains__("application_reason") else ""),
                 "application_users": validated_data["application_users"],
                 "application_attachments": (validated_data["application_attachments"] if validated_data.__contains__(
-                    'application_attachments') else []),
+                    "application_attachments") else []),
                 "approval_state": validated_data["approval_state"],
                 "application_time": timezone.now()
             })
