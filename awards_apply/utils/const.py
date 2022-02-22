@@ -70,6 +70,7 @@ def serializer_errors(errors):
         "data": errors,
     }
 
+
 def false_code(message):
     """自定义失败返回信息"""
     return {
