@@ -69,28 +69,17 @@
              * 部分需要手动判断的参数
              * */
             checkEmptyForm (awardForm) {
-                console.log(awardForm.application_users.length)
-                console.log(awardForm.application_users)
-
-                if (!awardForm.application_users.length) {
-                    this.messageWarn('请选择申请人')
-                    return false
+                let message = ''
+                if (!awardForm['application_users']?.length) message = '请选择申请人'
+                if (!awardForm['application_reason']?.length) message = '请输入申请理由'
+                if (!awardForm['application_attachments']?.length) message = '请传入申请材料'
+                if (message) {
+                    this.messageWarn(message)
+                    return
                 }
-                if (!awardForm.application_reason.length) {
-                    this.messageWarn('请输入申请理由')
-                    return false
-                }
-                if (!awardForm.application_attachments.length) {
-                    this.messageWarn('请传入申请材料')
-                    return false
-                }
-
                 return true
             },
             handleCancel () {
-                /**
-                 * TODO: 取消前的确认
-                 * */
                 this.$emit('cancel')
             },
             handleSave (awardForm) {
