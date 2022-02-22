@@ -162,9 +162,8 @@
              * */
             checkValid () {
                 const form = this.$refs['form']
-                return new Promise((resolve, reject) => {
+                return new Promise((resolve) => {
                     form.validate().then(res => {
-                        console.log('res', res)
                         resolve(true)
                     }).catch(_ => {
                         resolve(false)
