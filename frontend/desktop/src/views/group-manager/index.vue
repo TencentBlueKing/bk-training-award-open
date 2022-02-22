@@ -30,7 +30,7 @@
             </bk-table-column>
             <bk-table-column
                 key="group_level"
-                label="组织名级别"
+                label="组织级别"
             >
                 <template slot-scope="prop">
                     <span>{{prop.row['group_full_name'] | groupLevel}}</span>
@@ -42,7 +42,7 @@
             >
                 <template slot-scope="prop">
                     <bk-tag v-for="master in prop.row['master'] || []" :key="master['username']">
-                        {{master['displayName']}}
+                        {{master['display_name']}}
                     </bk-tag>
                 </template>
             </bk-table-column>
@@ -59,14 +59,14 @@
         </bk-table>
         <GroupDialog ref="newGroupDialogForm"
             dialog-type="creator"
-            @confirm="handleConfirmAddNewGroup($event)"
+            @confirm="handleConfirmAddNewGroup($event,$refs['newGroupDialogForm'])"
             :loading="newGroupLoading"
         >
         </GroupDialog>
         <GroupDialog ref="EditorDialogForm"
             dialog-type="editor"
             :group-disabled="true"
-            @confirm="handleConfirmEditGroup($event)">
+            @confirm="handleConfirmEditGroup($event,$refs['EditorDialogForm'])">
         </GroupDialog>
     </div>
 </template>
@@ -105,16 +105,13 @@
         computed: {
             tableData (self) {
                 const remoteData = self.remoteData
-                if (!remoteData || !remoteData.map) {
-                    return []
-                }
-                return remoteData.map((rawData, index) => {
+                return remoteData?.map?.((rawData, index) => {
                     return {
                         ...rawData,
                         'group_level': rawData['group_full_name'],
                         master: rawData['secretaries']
                     }
-                })
+                }) ?? []
             }
         },
         created () {
@@ -171,7 +168,7 @@
                 })
             },
 
-            handleConfirmAddNewGroup (groupForm) {
+            handleConfirmAddNewGroup (groupForm, groupDialog) {
                 if (this.newGroupLoading) {
                     return
                 }
@@ -182,14 +179,16 @@
                      * 成功后需要更新一下
                      * */
                     this.handleInit()
+                    groupDialog.hidden()
                 }).finally(_ => {
                     this.newGroupLoading = false
                 })
             },
-            handleConfirmEditGroup (groupForm) {
+            handleConfirmEditGroup (groupForm, groupDialog) {
                 return putSecretary(groupForm.id, groupForm).then(_ => {
                     this.messageSuccess('修改成功')
                     this.handleInit()
+                    groupDialog.hidden()
                 }).catch(_ => {
                     this.messageError('修改失败')
                 })
