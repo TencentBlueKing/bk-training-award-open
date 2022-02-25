@@ -34,3 +34,9 @@ export function postSecretary ({ group_id, secretaries, group_full_name }) {
 export function putSecretary (id, { group_id, secretaries, group_full_name }) {
     return http.put(`/secretary/${id}/`, { group_id, secretaries, group_full_name })
 }
+/**
+ * API-获取用户是否为秘书, 是否为管理员
+ * */
+export function getUsermanageRetrieveUser () {
+    return http.get('/usermanage/retrieve_user/')
+}
