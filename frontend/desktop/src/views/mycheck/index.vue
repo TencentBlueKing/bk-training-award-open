@@ -1,5 +1,5 @@
 <template>
-    <div class="">
+    <div class="mycheck-container">
         <!--        <bk-form form-type="inline">-->
         <!--            <bk-form-item-->
         <!--                label="部门名称"-->
@@ -38,17 +38,33 @@
                 @page-limit-change="handleChangeLimit($event)"
                 :data="tableData"
             >
-                <bk-table-column label="奖项id" prop="award_name"></bk-table-column>
+                <bk-table-column label="序号" prop="award_name"></bk-table-column>
+                <bk-table-column label="奖项名称">
+                    <template slot-scope="props">
+                        <!-- 建议可跳转 但是这个依赖于获取详情后的页面信息接口，暂时没有 -->
+                        <span>{{ props.row['award_name'] }}</span>
+                    </template>
+                </bk-table-column>
                 <bk-table-column label="申请时间" prop="application_time"></bk-table-column>
                 <bk-table-column label="申请理由" prop="application_reason"></bk-table-column>
-                <bk-table-column label="申请人" prop="application_users"></bk-table-column>
-                <bk-table-column label="审批人" prop="end_time"></bk-table-column>
+                <bk-table-column label="申请人">
+                    <template slot-scope="props">
+                        <span>{{props.row['application_users']}}</span>
+                    </template>
+                </bk-table-column>
+                <bk-table-column label="当前审批轮次">
+                    <template slot-scope="props">
+                        第 {{props.row['approval_turn']}} 轮
+                    </template>
+                </bk-table-column>
+
                 <bk-table-column label="审批状态" width="150">
                     <template slot-scope="props">
                         <bk-button :class="['mr10',props.row['approval_state_en']]"
                             theme="primary"
                             text
-                            @click="check(props.row)">
+                            @click="toCheck(props.row)"
+                        >
                         </bk-button>
                     </template>
                 </bk-table-column>
@@ -74,8 +90,10 @@
                     award_name: [],
                     department_name: []
                 },
-                award_approval_state_controller: {
-                    [NOT_APPLY]: '待审批'
+                config: {
+                    award_approval_state_controller: {
+                        [NOT_APPLY]: '待审批'
+                    }
                 }
             }
         },
@@ -94,6 +112,9 @@
             this.handleInit()
         },
         methods: {
+            /**
+             * 初始化数据的接口
+             * */
             handleInit () {
                 this.handleGetPageData()
             },
@@ -106,6 +127,9 @@
                 this.pagination.limit = limit
                 this.handleGetPageData()
             },
+            /**
+             * 全局获取数据的接口
+             * */
             handleGetPageData (current = this.pagination.current, size = this.pagination.limit) {
                 return getApproval(current, size).then(res => {
                     console.log(res)

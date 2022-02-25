@@ -137,7 +137,7 @@
                                 placeholder="请选择奖项所属组织"
                                 :multiple="false"
                                 :disabled="config[formType]['disabled']"
-                                type="group"
+                                type="secretary"
                             ></select-search>
                         </bk-form-item>
                     </bk-col>
@@ -204,6 +204,8 @@
     import { formatDate } from '@/common/util'
     import { AWARD_LEVEL_MAP, GROUP_KEYNAME } from '@/constants'
     import { postAwards, putAward } from '@/api/service/award-service'
+    import { bus } from '@/common/bus'
+
     /**
      * 全局临时叠加的唯一值
      * */
@@ -312,7 +314,7 @@
         computed: {
             formType (self) {
                 console.log(self.$route.type)
-                return self.$route.params.type
+                return self.$route.query.type
             },
             groupInfo: {
                 get (self) {
@@ -327,6 +329,11 @@
             }
         },
         created () {
+            uuid = 0
+            this.$once('hook:beforeDestroy', () => {
+                // 清除全局临时叠加得变量
+                uuid = null
+            })
             this.handleInit()
         },
         methods: {
@@ -360,7 +367,7 @@
              * 用于检查表单信息
              * */
             validator () {
-                return new Promise((resolve, reject) => {
+                return new Promise((resolve) => {
                     const awardForm = this.awardForm
                     let flag = true
 
@@ -429,6 +436,7 @@
                 if (this.submitLoading) return null
                 this.submitLoading = true
                 return postAwards(form).then(_ => {
+                    bus.$emit('set-award-manager-init')
                     this.messageSuccess('创建成功')
                 }).catch(_ => {
                     this.messageWarn('创建失败')
@@ -442,6 +450,7 @@
                 if (this.submitLoading) return null
                 this.submitLoading = true
                 return putAward(this.$route.params['id'], form).then(_ => {
+                    bus.$emit('set-award-manager-init')
                     this.messageSuccess('修改成功')
                 }).catch(_ => {
                     this.messageWarn('修改失败')
@@ -452,16 +461,18 @@
             toModify () {
                 return this.$router.push({
                     name: 'award-form',
-                    path: `award-manager/award-form/edit`,
-                    params: {
-                        ...this.$route.params,
+                    path: `award-manager/award-form`,
+                    query: {
                         type: 'edit'
+                    },
+                    params: {
+                        ...this.$route.params
                     }
                 })
             }
         }
     }
 </script>
-<style>
+<style lang="postcss" scoped>
     @import "./index.css";
 </style>

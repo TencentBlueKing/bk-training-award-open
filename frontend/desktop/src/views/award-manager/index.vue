@@ -150,7 +150,8 @@
                         <bk-button theme="primary"
                             :text="true"
                             @click="toEditRow(props.row)"
-                        >编辑</bk-button>
+                        >编辑
+                        </bk-button>
                         <bk-popconfirm
                             :title="'确认删除该奖项（' + props.row.awardName + '）？'"
                             trigger="click"
@@ -196,6 +197,7 @@
     import { fixMixins, tableMixins } from '@/common/mixins'
     import { AWARD_APPROVAL_STATE_MAP } from '@/constants'
     import { deleteAward, getAwards } from '@/api/service/award-service'
+    import { bus } from '@/common/bus'
 
     export default {
         name: 'award-manager',
@@ -269,18 +271,22 @@
             this.handleInit()
         },
         mounted () {
+            bus.$on('set-award-manager-init', () => {
+                this.handleInit()
+            })
         },
         methods: {
             handleInit () {
                 this.handleGetPageData()
+                // 添加监听事件
             },
             // S 弹框控制区域
             // 新增
             toAddNewAward () {
                 this.$router.push({
                     name: 'award-form',
-                    path: `award-manager/award-form/new`,
-                    params: {
+                    path: `award-manager/award-form`,
+                    query: {
                         type: 'new'
                     }
                 })
@@ -319,10 +325,12 @@
             toEditRow (rowData) {
                 return this.$router.push({
                     name: 'award-form',
-                    path: `award-manager/award-form/edit`,
+                    path: `award-manager/award-form`,
+                    query: {
+                        type: 'edit'
+                    },
                     params: {
-                      ...rowData,
-                      type: 'edit'
+          ...rowData
                     }
                 })
             },
@@ -330,11 +338,12 @@
             toGetDetail (rowData) {
                 return this.$router.push({
                     name: 'award-form',
-                    path: `award-manager/award-form/detail`,
+                    path: `award-manager/award-form`,
+                    query: {
+                        type: 'detail'
+                    },
                     params: {
-                      ...rowData,
-                      type: 'detail'
-
+          ...rowData
                     }
                 })
             },
@@ -344,6 +353,7 @@
             },
             // E 弹框控制区域
             confirmDelAward (rawData) {
+                console.log(rawData)
                 return deleteAward({ awardId: rawData['id'] }).then(_ => {
                     this.messageSuccess('删除成功')
                 })
@@ -390,6 +400,6 @@
     }
 
 </script>
-<style scoped>
-@import "./index.css";
+<style lang="postcss" scoped>
+  @import "./index.css";
 </style>

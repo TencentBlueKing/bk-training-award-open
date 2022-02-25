@@ -97,21 +97,14 @@
 
     }
 </script>
-<style scoped>
+<style lang="postcss" scoped>
+@import "@/css/mixins/scroll.css";
+
 .home-container {
 
   overflow-y: scroll;
   height: inherit;
-
-  &::-webkit-scrollbar {
-    width: 4px;
-  }
-
-  &::-webkit-scrollbar-thumb {
-    height: 5px;
-    border-radius: 2px;
-    background-color: #e6e9ea;
-  }
+  @mixin scroller 4px #e6e9ea;
 
   .available-bar {
     display: flex;
@@ -119,16 +112,8 @@
     gap: 24px;
     width: inherit;
     overflow-x: scroll;
+    @mixin scroller 2px #e6e9ea;
 
-    &::-webkit-scrollbar {
-      width: 2px;
-    }
-
-    &::-webkit-scrollbar-thumb {
-      height: 1px;
-      border-radius: 2px;
-      background-color: #e6e9ea;
-    }
   }
 }
 

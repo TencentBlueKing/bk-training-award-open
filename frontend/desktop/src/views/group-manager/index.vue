@@ -3,6 +3,7 @@
         <bk-button theme="primary"
             icon="plus-circle-shape"
             @click="toAddNewGroup($refs['newGroupDialogForm'])"
+            v-if="$store.getters.powerConfig['add-new-group']"
         >
             新增组
         </bk-button>
@@ -25,7 +26,7 @@
                 label="组织名"
             >
                 <template slot-scope="prop">
-                    <span>{{prop.row['group_full_name']}}</span>
+                    <span>{{ prop.row['group_full_name'] }}</span>
                 </template>
             </bk-table-column>
             <bk-table-column
@@ -33,7 +34,7 @@
                 label="组织级别"
             >
                 <template slot-scope="prop">
-                    <span>{{prop.row['group_full_name'] | groupLevel}}</span>
+                    <span>{{ prop.row['group_full_name'] | groupLevel }}</span>
                 </template>
             </bk-table-column>
             <bk-table-column
@@ -42,18 +43,22 @@
             >
                 <template slot-scope="prop">
                     <bk-tag v-for="master in prop.row['master'] || []" :key="master['username']">
-                        {{master['display_name']}}
+                        {{ master['username'] }}（{{ master['display_name'] }}）
                     </bk-tag>
                 </template>
             </bk-table-column>
 
-            <bk-table-column label="操作" width="150">
+            <bk-table-column label="操作"
+                width="150"
+                v-if="$store.getters.powerConfig['table-controller']"
+            >
                 <template slot-scope="props">
                     <bk-button theme="primary"
                         @click="toEditRow($refs['EditorDialogForm'],props.row)"
                         :outline="true"
                         :text="true"
-                    >编辑</bk-button>
+                    >编辑
+                    </bk-button>
                 </template>
             </bk-table-column>
         </bk-table>
@@ -61,12 +66,15 @@
             dialog-type="creator"
             @confirm="handleConfirmAddNewGroup($event,$refs['newGroupDialogForm'])"
             :loading="newGroupLoading"
+            v-if="$store.getters.powerConfig['add-new-group']"
         >
         </GroupDialog>
         <GroupDialog ref="EditorDialogForm"
             dialog-type="editor"
             :group-disabled="true"
-            @confirm="handleConfirmEditGroup($event,$refs['EditorDialogForm'])">
+            @confirm="handleConfirmEditGroup($event,$refs['EditorDialogForm'])"
+            v-if="$store.getters.powerConfig['table-controller']"
+        >
         </GroupDialog>
     </div>
 </template>
@@ -116,6 +124,7 @@
         },
         created () {
             this.handleInit()
+            console.log(this.$store)
         },
         methods: {
             /**
@@ -197,6 +206,6 @@
     }
 </script>
 
-<style scoped>
-    @import "./index.css";
+<style lang="postcss" scoped>
+@import "./index.css";
 </style>

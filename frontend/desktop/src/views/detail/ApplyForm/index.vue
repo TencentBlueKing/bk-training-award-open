@@ -4,7 +4,7 @@
         <bk-form :label-width="140">
             <bk-form-item label="申请人">
                 <select-search
-                    :value.sync="applyForm['application_users']"
+                    :value.sync="applicationUsers"
                     placeholder="请选择申请人"
                     ext-cls="w-90"
                 ></select-search>
@@ -42,7 +42,7 @@
                     /**
                      * 申请人列表
                      * */
-                    application_users: [],
+                    application_users: {},
                     /**
                      * 申请附件列表
                      * */
@@ -54,7 +54,25 @@
         computed: {
             groupUsers (self) {
                 return self.$http.cache.get(GROUP_USERS_KEYNAME)
+            },
+            applicationUsers: {
+                get (self) {
+                    return Object.keys(self.applyForm.application_users)
+                },
+                set (newValue) {
+                    console.log(newValue)
+                    this.applyForm.application_users = this.groupUsers.filter(item => {
+                        return newValue.includes(item.username)
+                    }).reduce((memo, cur) => {
+                        console.log(cur)
+                        return {
+                        ...memo,
+                        [cur.username]: cur['display_name']
+                        }
+                    }, {})
+                }
             }
+          
         },
         mounted () {
             this.handleInit()
@@ -70,7 +88,8 @@
              * */
             checkEmptyForm (awardForm) {
                 let message = ''
-                if (!awardForm['application_users']?.length) message = '请选择申请人'
+                console.log(Object.keys(awardForm['application_users']))
+                if (!Object.keys(awardForm['application_users'])?.length) message = '请选择申请人'
                 if (!awardForm['application_reason']?.length) message = '请输入申请理由'
                 if (!awardForm['application_attachments']?.length) message = '请传入申请材料'
                 if (message) {
@@ -108,7 +127,7 @@
         }
     }
 </script>
-<style scoped>
+<style lang="postcss" scoped>
     /deep/ .w-90 {
         width: 90% !important;
     }

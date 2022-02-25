@@ -120,6 +120,6 @@
         }
     }
 </script>
-<style scoped>
+<style lang="postcss" scoped>
     @import "./index.css";
 </style>
