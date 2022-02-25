@@ -71,7 +71,3 @@
         }
     }
 </script>
-
-<style>
-
-</style>

@@ -28,6 +28,7 @@ BK_STATIC_URL = STATIC_URL + "dist/"
 # from blueapps.conf.log import set_log_level # noqa
 # LOG_LEVEL = "ERROR"
 # LOGGING = set_log_level(locals())
+MEDIA_URL = 'media/'
 
 # 预发布环境数据库可以在这里配置
 

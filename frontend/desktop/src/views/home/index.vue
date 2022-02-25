@@ -40,16 +40,20 @@
             historyAwardList (self) {
                 return self.historyAwardListRemoteData?.map?.(item => {
                     return {
-                        ...item
+                        ...item['award_info'],
+                        ...item,
+                        approval_state_en: AWARD_APPROVAL_STATE_EN_MAP[item['approval_state']],
+                        approval_state_cn: AWARD_APPROVAL_STATE_MAP[item['approval_state']]
                     }
                 }) ?? []
             },
             availableAwardList (self) {
                 return self.availableAwardListRemoteData?.map?.(item => {
                     return {
+                        ...item['award_info'],
                         ...item,
                         approval_state_en: AWARD_APPROVAL_STATE_EN_MAP[item['approval_state']],
-                        approval_state: AWARD_APPROVAL_STATE_MAP[item['approval_state']]
+                        approval_state_cn: AWARD_APPROVAL_STATE_MAP[item['approval_state']]
                     }
                 }) ?? []
             }
@@ -97,38 +101,22 @@
 
     }
 </script>
-<style scoped>
+<style lang="postcss" scoped>
+@import "@/css/mixins/scroll.css";
+
 .home-container {
 
   overflow-y: scroll;
   height: inherit;
-
-  &::-webkit-scrollbar {
-    width: 4px;
-  }
-
-  &::-webkit-scrollbar-thumb {
-    height: 5px;
-    border-radius: 2px;
-    background-color: #e6e9ea;
-  }
+  @mixin scroller 4px #e6e9ea;
 
   .available-bar {
+    @mixin scroller 2px #e6e9ea;
     display: flex;
     flex-wrap: wrap;
-    gap: 24px;
     width: inherit;
     overflow-x: scroll;
 
-    &::-webkit-scrollbar {
-      width: 2px;
-    }
-
-    &::-webkit-scrollbar-thumb {
-      height: 1px;
-      border-radius: 2px;
-      background-color: #e6e9ea;
-    }
   }
 }
 

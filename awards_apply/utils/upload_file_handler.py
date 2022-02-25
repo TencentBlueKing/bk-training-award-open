@@ -1,8 +1,9 @@
 import hashlib
 from functools import partial
 from pathlib import Path
+from django.conf import settings
 
-from config.default import MEDIA_URL
+# from config.default import MEDIA_URL
 from django.core.files.storage import default_storage
 
 
@@ -16,11 +17,11 @@ def upload_file_handler(file):
         return None
     file_md5 = file_md5_calculate(file)
     suffix = Path(file.name).suffix
-    path = MEDIA_URL + file_md5 + suffix
+    path = settings.MEDIA_ROOT + file_md5 + suffix
     if default_storage.exists(path):
         return {"path": path, "name": file.name, "size": file.size}
     else:
-        path = default_storage.save(file_md5 + suffix, file)
+        path = default_storage.save(path, file)
         return {"path": path, "name": file.name, "size": file.size}
 
 

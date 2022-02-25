@@ -21,6 +21,11 @@ export function getListDepartments ({ page, page_size, fuzzy_lookups }) {
  * @param { number } page
  * @param { number } page_size
  * @param { string? } fuzzy_lookups 模糊查找内容列表,
+ * *//**
+ * 获取蓝鲸平台下所有组织
+ * @param { number } page
+ * @param { number } page_size
+ * @param { string? } fuzzy_lookups 模糊查找内容列表,
  * */
 export function getListUsers ({ page, page_size, fuzzy_lookups }) {
     return http.get('/usermanage/list_users/', {
@@ -30,4 +35,13 @@ export function getListUsers ({ page, page_size, fuzzy_lookups }) {
             fuzzy_lookups
         }
     })
+}
+/**
+ * 获取秘书可管理的组
+ * @param { number } page
+ * @param { number } page_size
+ * @param { string? } fuzzy_lookups 模糊查找内容列表,
+ * */
+export function getSecretaryDepartment () {
+    return http.get('/secretary_department/')
 }

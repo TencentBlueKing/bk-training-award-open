@@ -1,4 +1,8 @@
+@import "@/css/mixins/scroll.css";
+
 .award-container {
+    @mixin scroller;
+    overflow-y: scroll;
     height: inherit;
 
     .f-center {

@@ -10,9 +10,11 @@ Unless required by applicable law or agreed to in writing, software distributed 
 an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the License for the
 specific language governing permissions and limitations under the License.
 """
-
+from django.conf import settings
 from django.conf.urls import include, url
 from django.contrib import admin
+from django.urls import re_path
+from django.views.static import serve
 
 urlpatterns = [
     url(r"^admin/", admin.site.urls),
@@ -25,5 +27,8 @@ urlpatterns = [
     url(r"^mako/", include("mako_application.urls")),
     url(r"^i18n/", include("django.conf.urls.i18n")),
     # 奖项申报系统
-    url(r"", include("awards_apply.urls"))
+    url(r"", include("awards_apply.urls")),
+
+    re_path(r'^media/(?P<path>.*)$', serve,
+            kwargs={"document_root": settings.MEDIA_ROOT}),
 ]

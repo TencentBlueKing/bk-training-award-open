@@ -4,9 +4,13 @@
         <bk-form :label-width="140">
             <bk-form-item label="申请人">
                 <select-search
-                    :value.sync="applyForm['application_users']"
+                    :value.sync="applicationUsers"
                     placeholder="请选择申请人"
                     ext-cls="w-90"
+                    :id-key="'id'"
+                    type="user"
+                    :multiple="true"
+                    :filter-fn="handleOnlyGroup"
                 ></select-search>
             </bk-form-item>
             <bk-form-item label="申请理由">
@@ -18,6 +22,7 @@
             <bk-form-item label="申请材料">
                 <Uploader v-model="applyForm['application_attachments']"
                     ext-cls="w-90"
+                    :limit="3"
                 ></Uploader>
             </bk-form-item>
         </bk-form>
@@ -42,7 +47,7 @@
                     /**
                      * 申请人列表
                      * */
-                    application_users: [],
+                    application_users: {},
                     /**
                      * 申请附件列表
                      * */
@@ -53,10 +58,26 @@
         },
         computed: {
             groupUsers (self) {
-                return self.$http.cache.get(GROUP_USERS_KEYNAME)
+                return self.$http.cache.get(GROUP_USERS_KEYNAME) ?? []
+            },
+            applicationUsers: {
+                get (self) {
+                    return Object.keys(self.applyForm.application_users || {})?.map(item => ~~item) ?? []
+                },
+                set (newValue) {
+                    this.applyForm.application_users = this.groupUsers.filter(item => {
+                        return newValue.includes(item.id)
+                    }).reduce((memo, cur) => {
+                        return {
+                          ...memo,
+                          [cur.id]: cur['display_name']
+                        }
+                    }, {})
+                }
             }
+
         },
-        mounted () {
+        created () {
             this.handleInit()
         },
         methods: {
@@ -64,13 +85,21 @@
              * 初始化函数
              * */
             handleInit () {
+                this.handleSetDefaultInfo()
+            },
+            handleSetDefaultInfo () {
+                console.log(this.$route.params)
+                if (this.$route.params) {
+                    this.applyForm = this.$route.params
+                }
             },
             /**
              * 部分需要手动判断的参数
              * */
             checkEmptyForm (awardForm) {
                 let message = ''
-                if (!awardForm['application_users']?.length) message = '请选择申请人'
+                console.log(Object.keys(awardForm['application_users']))
+                if (!Object.keys(awardForm['application_users'])?.length) message = '请选择申请人'
                 if (!awardForm['application_reason']?.length) message = '请输入申请理由'
                 if (!awardForm['application_attachments']?.length) message = '请传入申请材料'
                 if (message) {
@@ -104,12 +133,17 @@
                     return JSON.parse(JSON.stringify(awardForm))
                 }
                 return null
+            },
+            handleOnlyGroup (value) {
+                const department = value['departments'].map(item => item['full_name'])
+                const awardDepartmentFullname = this.$route.params['award_department_fullname']
+                return department.includes(awardDepartmentFullname)
             }
         }
     }
 </script>
-<style scoped>
-    /deep/ .w-90 {
-        width: 90% !important;
-    }
+<style lang="postcss" scoped>
+/deep/ .w-90 {
+  width: 90% !important;
+}
 </style>
