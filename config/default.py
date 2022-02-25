@@ -111,7 +111,7 @@ LOGGING = get_logging_config_dict(locals())
 
 # 初始化管理员列表，列表中的人员将拥有预发布环境和正式环境的管理员权限
 # 注意：请在首次提测和上线前修改，之后的修改将不会生效
-INIT_SUPERUSER = ["kaisheng", "wheellong"]
+INIT_SUPERUSER = []
 
 # 使用mako模板时，默认打开的过滤器：h(过滤html)
 MAKO_DEFAULT_FILTERS = ["h"]
@@ -171,8 +171,7 @@ if locals().get("DISABLED_APPS"):
             [_item for _item in locals()[_key] if not _item.startswith(_app + ".")]
         )
 # 上传文件相对路径文件夹
-MEDIA_URL = "media/"
-
+MEDIA_ROOT = os.path.join(BASE_DIR, "USERRES")
 # rest_framework配置
 REST_FRAMEWORK = {
     # 自定义rest_framework异常处理,一般为rest_framework.exceptions.APIException

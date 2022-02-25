@@ -40,13 +40,13 @@
                     property="master"
                 >
                     <select-search
-                        placeholder="请选择申请人"
+                        placeholder="请选择负责人"
                         :value.sync="secretaries"
+                        :id-key="'username'"
                     >
                     </select-search>
                 </bk-form-item>
             </bk-form>
-            {{ config[type] }}
         </bk-dialog>
     </div>
 </template>
@@ -71,11 +71,11 @@
             return {
                 config: {
                     'editor': {
-                        'title': '编辑组',
+                        'title': '编辑组秘书信息',
                         'groupNameDisabled': true
                     },
                     'creator': {
-                        'title': '新增组'
+                        'title': '指派秘书'
                     }
                 },
                 visible: false,
@@ -92,11 +92,12 @@
                     name: [
                         { required: true, message: '请输入组织名', trigger: 'blur' }
                     ],
-                    level: [
-                        { required: true, message: '请选择奖项等级', trigger: 'blur' }
-                    ],
                     secretaries: [
-                        { required: true, message: '请选择奖项负责人', trigger: 'blur' }
+                        { required: true,
+                          message: '请选择奖项负责人',
+                          trigger: 'blur',
+                          type: Array
+                        }
                     ],
                     organisation: [
                         { required: true, message: '请输入组织名', trigger: 'blur' }
@@ -130,7 +131,7 @@
                     return self.formData.secretaries.map(item => item.username)
                 },
                 set (newValue) {
-                    this.formData.secretaries = this.$http.cache.get(GROUP_USERS_KEYNAME).filter(item => {
+                    this.formData.secretaries = this.$http.cache.get(GROUP_USERS_KEYNAME)?.filter(item => {
                         return newValue.includes(item['username'])
                     })
                 }
@@ -208,6 +209,5 @@
         }
     }
 </script>
-<style scoped>
-@import "./index.css";
+<style lang="postcss" scoped>
 </style>

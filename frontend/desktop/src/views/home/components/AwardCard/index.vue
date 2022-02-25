@@ -3,7 +3,7 @@
         <div class="header">
             <div class="title-badge">
                 <div class="info-box">
-                    <span :class="['status','apply',award['approval_state_en']]">{{ award['approval_state'] }}</span>
+                    <span :class="['status','apply',award['approval_state_en']]">{{ award['approval_state_cn'] }}</span>
                     <span class="enterprise" :title="award['award_level'] ">
                         {{ award['award_level'] }}
                     </span>
@@ -45,6 +45,7 @@
                     award_level: '',
                     award_name: '',
                     approval_state_en: '',
+                    approval_state_cn: '',
                     approval_state: '',
                     award_description: '',
                     award_image: ''
@@ -68,6 +69,6 @@
     }
 </script>
 
-<style scoped>
+<style lang="postcss" scoped>
   @import './index.css';
 </style>

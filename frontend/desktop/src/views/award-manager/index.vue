@@ -128,14 +128,17 @@
         <!-- 表格按钮区域 -->
         <bk-table class="mt15"
             :data="tableData"
-            :size="size"
+            :size="'small'"
             :pagination="pagination"
             @page-change="handleCurrentChange($event)"
             @page-limit-change="handlePageSizeChange($event)"
             @selection-change="handleSetSelectData"
-            :virtual-render="true"
         >
             <bk-table-column type="selection" width="60"></bk-table-column>
+            <bk-table-column type="index"
+                label="序号"
+                width="60"
+            ></bk-table-column>
             <bk-table-column v-for="(rowLabel,rowProp) in tableSettings"
                 :key="rowProp"
                 :label="rowLabel"
@@ -146,11 +149,12 @@
             </bk-table-column>
             <bk-table-column label="操作">
                 <template slot-scope="props">
-                    <div v-show="!props.row.isProcess">
+                    <div v-show="props.row['approval_state'] !== config['award_status']['not_apply']">
                         <bk-button theme="primary"
                             :text="true"
                             @click="toEditRow(props.row)"
-                        >编辑</bk-button>
+                        >编辑
+                        </bk-button>
                         <bk-popconfirm
                             :title="'确认删除该奖项（' + props.row.awardName + '）？'"
                             trigger="click"
@@ -161,7 +165,7 @@
                         </bk-popconfirm>
                         <bk-button theme="primary" text @click="toGetDetail(props.row,$refs['GetDetailDialog'])">详情</bk-button>
                     </div>
-                    <div v-show="props.row.isProcess">
+                    <div v-show="props.row['approval_state'] === config['award_status']['not_apply']">
                         <bk-button theme="primary" text @click="toEndAward(props.row,$refs['EndAwardForm'])">结束</bk-button>
                     </div>
                 </template>
@@ -186,7 +190,7 @@
                 :select-data="selectData"
             ></NotificationForm>
         </DialogArea>
-        <DialogArea ref="EndAwardForm" title="删除奖项">
+        <DialogArea ref="EndAwardForm" title="结束奖项">
             <EndAwardForm slot="custom"></EndAwardForm>
         </DialogArea>
     <!-- /弹出区域 -->
@@ -194,8 +198,10 @@
 </template>
 <script>
     import { fixMixins, tableMixins } from '@/common/mixins'
-    import { AWARD_APPROVAL_STATE_MAP } from '@/constants'
+    import { APPLYED, AWARD_APPROVAL_STATE_MAP, ENDED, NOT_APPLY } from '@/constants'
     import { deleteAward, getAwards } from '@/api/service/award-service'
+    import { bus } from '@/common/bus'
+    import moment from 'moment'
 
     export default {
         name: 'award-manager',
@@ -220,11 +226,17 @@
         data () {
             return {
                 // S 控制信息区
-                // 表格尺寸
-                size: 'small',
                 // loading 状态
                 loading: {
                     newAwardFormLoading: false
+                },
+                config: {
+                    award_status: {
+                        'ended': ENDED,
+                        'not_apply': NOT_APPLY,
+                        'applied': APPLYED
+
+                    }
                 },
 
                 // 是否展示高级筛选区域
@@ -252,13 +264,24 @@
             }
         },
         computed: {
-            tableData () {
-                const remoteData = this.remoteData
-                return remoteData?.map?.(rawData => {
+            tableData (self) {
+                return self.remoteData?.map?.(rawData => {
+                    let timeApproval
+                    const startTime = moment(rawData['start_time'])
+                    const endTime = moment(rawData['end_time'])
+                    const curTime = moment()
+                    if (startTime.diff(curTime) >= 0) {
+                        timeApproval = NOT_APPLY
+                    } else if (endTime.diff(curTime) <= 0) {
+                        timeApproval = ENDED
+                    } else {
+                        timeApproval = APPLYED
+                    }
                     return {
                         ...rawData,
                         awardName: rawData['award_name'],
-                        awardStatus: AWARD_APPROVAL_STATE_MAP[rawData['approval_state']],
+                        approval_state: timeApproval,
+                        awardStatus: AWARD_APPROVAL_STATE_MAP[timeApproval],
                         startApplyTime: rawData['start_time'],
                         endApplyTime: rawData['end_time']
                     }
@@ -269,18 +292,21 @@
             this.handleInit()
         },
         mounted () {
+            bus.$on('set-award-manager-init', () => {
+                this.handleInit()
+            })
         },
         methods: {
             handleInit () {
                 this.handleGetPageData()
+                // 添加监听事件
             },
             // S 弹框控制区域
             // 新增
             toAddNewAward () {
                 this.$router.push({
                     name: 'award-form',
-                    path: `award-manager/award-form/new`,
-                    params: {
+                    query: {
                         type: 'new'
                     }
                 })
@@ -312,17 +338,18 @@
                 this.notImplemented('获取成员信息')
             },
             // 展示高级筛选
-            toShowFilterPanel () {
-                this.isFilter = this.isFilter ? '' : 'filter-panel'
-            },
+            // toShowFilterPanel () {
+            //     this.isFilter = this.isFilter ? '' : 'filter-panel'
+            // },
             // 编辑当前行
             toEditRow (rowData) {
                 return this.$router.push({
                     name: 'award-form',
-                    path: `award-manager/award-form/edit`,
+                    query: {
+                        type: 'edit'
+                    },
                     params: {
-                      ...rowData,
-                      type: 'edit'
+                      ...rowData
                     }
                 })
             },
@@ -330,11 +357,11 @@
             toGetDetail (rowData) {
                 return this.$router.push({
                     name: 'award-form',
-                    path: `award-manager/award-form/detail`,
+                    query: {
+                        type: 'detail'
+                    },
                     params: {
-                      ...rowData,
-                      type: 'detail'
-
+                        ...rowData
                     }
                 })
             },
@@ -344,7 +371,9 @@
             },
             // E 弹框控制区域
             confirmDelAward (rawData) {
+                console.log(rawData)
                 return deleteAward({ awardId: rawData['id'] }).then(_ => {
+                    this.handleInit()
                     this.messageSuccess('删除成功')
                 })
             },
@@ -390,6 +419,6 @@
     }
 
 </script>
-<style scoped>
-@import "./index.css";
+<style lang="postcss" scoped>
+  @import "./index.css";
 </style>

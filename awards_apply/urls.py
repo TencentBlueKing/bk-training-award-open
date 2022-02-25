@@ -1,3 +1,5 @@
+from django.urls import path
+
 from awards_apply import views
 from django.conf.urls import url
 
@@ -19,12 +21,15 @@ urlpatterns = [
         r"^secretary/(?P<id>\d+)/$",
         views.SecretaryViewSet.as_view({"put": "update"}),
     ),
-    url(r"^upload/$", views.upload),
-    url(r"^media/(?P<filename>.*)/$", views.download),
+    # url(r"^upload/$", views.upload),
+    # url(r"^media/(?P<filename>.*)/$", views.download),
     url(r"^$", views.home),
     url(r"^awards/", views.AwardView.as_view()),
     url(r"^record/$", views.RecordView.as_view()),
     url(r"^get_available_awards/", views.AvailableAwardsView.as_view()),
     url(r"^get_applyed_awards/", views.ApplyedRecordView.as_view()),
     url(r"^approval/$", views.ApprovalView.as_view()),
+    url(r"^secretary_department/$", views.secretary.secretary_department),
+    url(r"^download/(?P<id>\d+)/", views.download, name="download"),
+    url(r"^upload/", views.upload, name="upload")
 ]

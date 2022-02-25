@@ -32,7 +32,8 @@ BK_STATIC_URL = STATIC_URL + "dist/"
 
 # APP本地静态资源目录
 STATIC_URL = "/static/"
-
+# 媒体配置
+MEDIA_URL = "/media/"
 # APP静态资源目录url
 # REMOTE_STATIC_URL = '%sremote/' % STATIC_URL
 

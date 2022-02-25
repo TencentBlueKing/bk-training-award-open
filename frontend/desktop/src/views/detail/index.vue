@@ -71,7 +71,6 @@
     </div>
 </template>
 <script>
-    import { mapGetters } from 'vuex'
     import { postRecord } from '@/api/service/award-service'
 
     export default {
@@ -95,25 +94,23 @@
             }
         },
         computed: {
-    ...mapGetters(['user']),
-    /**
-     * 用于判断是否为编辑型表格
-     * */
-    isShowApplyForm () {
-      return ['apply', 'edit'].includes(this.formType)
-    },
-    /**
-     * 主要用于拼接一些比如 id 的信息 此类默认信息
-     * */
-    defaultInfo () {
-      return {
-        award_apply_record_id: this.applyForm.award_apply_record_id,
-        award_id: this.applyForm.id
-      }
-    }
+            /**
+             * 用于判断是否为编辑型表格
+             * */
+            isShowApplyForm () {
+                return ['apply', 'edit'].includes(this.formType)
+            },
+            /**
+             * 主要用于拼接一些比如 id 的信息 此类默认信息
+             * */
+            defaultInfo () {
+                return {
+                    award_apply_record_id: this.applyForm.award_apply_record_id,
+                    award_id: this.applyForm.id
+                }
+            }
         },
         created () {
-            console.log(this.$route.params)
             this.applyForm = this.$route.params
             this.formType = this.$route.params['type']
         },
@@ -123,7 +120,7 @@
              * */
             handleToSaveApplyForm (applyForm) {
                 this.handleToDealWidthApply(true, applyForm).then(res => {
-                    console.log('res', res)
+                    this.messageSuccess('保存草稿成功')
                 })
             },
             /**
@@ -131,7 +128,8 @@
              * */
             handleToSendApplyForm (applyForm) {
                 this.handleToDealWidthApply(false, applyForm).then(res => {
-                    console.log('res', res)
+                    this.messageSuccess('申请成功')
+                    return this.$router.back()
                 })
             },
             /**
@@ -153,10 +151,10 @@
         }
     }
 </script>
-<style>
-@import "@/css/mixins/scroll.css";
-.monitor-navigation-content {
-  @mixin scroller;
-  overflow-y: scroll;
-}
+<style lang="postcss" scoped>
+  @import "@/css/mixins/scroll.css";
+  .monitor-navigation-content {
+    @mixin scroller;
+    overflow-y: scroll;
+  }
 </style>

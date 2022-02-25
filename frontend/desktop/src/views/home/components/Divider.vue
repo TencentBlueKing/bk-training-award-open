@@ -21,7 +21,7 @@
     }
 </script>
 
-<style scoped>
+<style lang="postcss" scoped>
 
 .divider {
   display: flex;

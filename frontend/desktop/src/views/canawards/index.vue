@@ -10,6 +10,10 @@
                 ext-cls="mt15"
                 v-show="isTableShow"
             >
+                <bk-table-column type="index"
+                    label="序号"
+                    width="60"
+                ></bk-table-column>
                 <bk-table-column label="奖项名称" prop="award_name"></bk-table-column>
                 <bk-table-column label="奖项级别" prop="award_level"></bk-table-column>
                 <bk-table-column label="接口人(可咨询奖项相关信息)" prop="award_description"></bk-table-column>
@@ -18,7 +22,6 @@
                 <bk-table-column label="操作" width="150">
                     <template slot-scope="props">
                         <bk-button class="mr10" theme="primary"
-                            :disabled="['创建中'].includes(props.row.approval_state)"
                             @click="toApply(props.row,$refs['applyDialog'])"
                             text
                         >申请
@@ -58,16 +61,7 @@
             tableData (self) {
                 return self.remoteData?.map?.((rowData) => {
                     return {
-                        id: rowData['id'],
-                        award_name: rowData['award_name'],
-                        award_level: rowData['award_level'],
-                        award_description: rowData['award_description'],
-                        award_consultant: rowData['award_consultant'],
-                        award_image: rowData['award_image'],
-                        create_time: rowData['create_time'],
-                        start_time: rowData['start_time'],
-                        end_time: rowData['end_time'],
-                        approval_state: rowData['approval_state']
+                        ...rowData
                     }
                 }) ?? []
             }

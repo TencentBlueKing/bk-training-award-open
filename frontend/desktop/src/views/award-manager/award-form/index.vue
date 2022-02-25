@@ -38,6 +38,7 @@
                                 placeholder="请选择接口人"
                                 :disabled="config[formType]['disabled']"
                                 :multiple="false"
+                                :id-key="'username'"
                             >
                             </select-search>
                         </bk-form-item>
@@ -137,7 +138,8 @@
                                 placeholder="请选择奖项所属组织"
                                 :multiple="false"
                                 :disabled="config[formType]['disabled']"
-                                type="group"
+                                type="secretary"
+                                :id-key="'full_name'"
                             ></select-search>
                         </bk-form-item>
                     </bk-col>
@@ -149,32 +151,34 @@
                     <bk-col :span="12">
                         <bk-form-item
                             label-width="auto"
-                            label="评审人(*同级审批为[或审批]，异级审批为[与审批])"
+                            label="审批步骤: 1.xxx 2.xxx"
                             :required="true"
                         >
                             <div class="form-group mt10"
                                 v-for="(item, index) in awardForm['reviewers']"
                                 :key="item.uuid"
                             >
+                                <span class="mr10">第 {{index + 1}} 批：</span>
                                 <select-search
                                     :value.sync="item.value"
                                     style="width:80%"
                                     placeholder="请选择评审人"
                                     :disabled="config[formType]['disabled']"
+                                    :id-key="'username'"
                                 >
                                 </select-search>
                                 <div class="ml15">
+                                    <bk-button theme="danger"
+                                        title="移除同级评审人"
+                                        icon="minus-circle-shape"
+                                        v-show="awardForm['reviewers'].length > 1"
+                                        @click="removeReviewer(awardForm['reviewers'],item.uuid)"
+                                    ></bk-button>
                                     <bk-button theme="primary"
                                         title="添加同级评审人"
                                         icon="plus-circle-shape"
                                         v-show="index === awardForm['reviewers'].length - 1"
                                         @click="addReviewer(awardForm['reviewers'])"
-                                    ></bk-button>
-                                    <bk-button theme="danger"
-                                        title="移除同级评审人"
-                                        icon="minus-circle-shape"
-                                        v-show="index !== awardForm['reviewers'].length - 1"
-                                        @click="removeReviewer(awardForm['reviewers'],item.uuid)"
                                     ></bk-button>
                                 </div>
                             </div>
@@ -202,8 +206,10 @@
 </template>
 <script>
     import { formatDate } from '@/common/util'
-    import { AWARD_LEVEL_MAP, GROUP_KEYNAME } from '@/constants'
+    import { AWARD_LEVEL_MAP } from '@/constants'
     import { postAwards, putAward } from '@/api/service/award-service'
+    import { bus } from '@/common/bus'
+
     /**
      * 全局临时叠加的唯一值
      * */
@@ -311,22 +317,24 @@
         },
         computed: {
             formType (self) {
-                console.log(self.$route.type)
-                return self.$route.params.type
+                return self.$route.query.type
             },
             groupInfo: {
                 get (self) {
-                    return self.awardForm.award_department_id
+                    return self.awardForm.award_department_fullname
                 },
                 set (newValue) {
                     const formData = this.awardForm
-                    const totalDepartment = this.$http.cache.get(GROUP_KEYNAME)
-                    formData.award_department_id = newValue
-                    formData.award_department_fullname = totalDepartment.find(item => item.id === newValue)['full_name']
+                    formData.award_department_fullname = newValue
                 }
             }
         },
         created () {
+            uuid = 0
+            this.$once('hook:beforeDestroy', () => {
+                // 清除全局临时叠加得变量
+                uuid = null
+            })
             this.handleInit()
         },
         methods: {
@@ -352,7 +360,6 @@
                             value: item
                         }
                     })
-
                     this.awardForm = defaultInfo
                 }
             },
@@ -360,7 +367,7 @@
              * 用于检查表单信息
              * */
             validator () {
-                return new Promise((resolve, reject) => {
+                return new Promise((resolve) => {
                     const awardForm = this.awardForm
                     let flag = true
 
@@ -396,7 +403,6 @@
                     awardForm.award_reviewers = awardForm.reviewers.map(item => item['value']).filter(item => item.length)
                     awardForm.start_time = formatDate(awardForm.start_time).format('YYYY-MM-DD hh:mm:ss')
                     awardForm.end_time = formatDate(awardForm.end_time).format('YYYY-MM-DD hh:mm:ss')
-                    console.log(awardForm.award_attach_image)
 
                     awardForm.award_image = awardForm.award_attach_image && awardForm.award_attach_image.slice(-1)[0]['path']
                     return awardForm
@@ -429,7 +435,11 @@
                 if (this.submitLoading) return null
                 this.submitLoading = true
                 return postAwards(form).then(_ => {
+                    bus.$emit('set-award-manager-init')
                     this.messageSuccess('创建成功')
+                    this.$router.replace({
+                        name: 'award-manager'
+                    })
                 }).catch(_ => {
                     this.messageWarn('创建失败')
                 }).finally(_ => {
@@ -442,6 +452,7 @@
                 if (this.submitLoading) return null
                 this.submitLoading = true
                 return putAward(this.$route.params['id'], form).then(_ => {
+                    bus.$emit('set-award-manager-init')
                     this.messageSuccess('修改成功')
                 }).catch(_ => {
                     this.messageWarn('修改失败')
@@ -452,16 +463,17 @@
             toModify () {
                 return this.$router.push({
                     name: 'award-form',
-                    path: `award-manager/award-form/edit`,
-                    params: {
-                        ...this.$route.params,
+                    query: {
                         type: 'edit'
+                    },
+                    params: {
+                        ...this.$route.params
                     }
                 })
             }
         }
     }
 </script>
-<style>
+<style lang="postcss" scoped>
     @import "./index.css";
 </style>

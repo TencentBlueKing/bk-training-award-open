@@ -24,7 +24,8 @@ RUN_MODE = "PRODUCT"
 STATIC_URL = "static/"
 # 前端静态url
 BK_STATIC_URL = STATIC_URL + "dist/"
-
+# 媒体资源配置
+MEDIA_URL = '%smedia/' % SITE_URL
 # 只对正式环境日志级别进行配置，可以在这里修改
 # from blueapps.conf.log import set_log_level # noqa
 # LOG_LEVEL = "ERROR"

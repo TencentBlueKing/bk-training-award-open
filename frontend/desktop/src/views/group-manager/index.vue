@@ -3,8 +3,9 @@
         <bk-button theme="primary"
             icon="plus-circle-shape"
             @click="toAddNewGroup($refs['newGroupDialogForm'])"
+            v-if="$store.getters.groupPowerConfig['add-new-group']"
         >
-            新增组
+            指派秘书
         </bk-button>
         <bk-table size="small"
             ext-cls="mt15"
@@ -25,7 +26,7 @@
                 label="组织名"
             >
                 <template slot-scope="prop">
-                    <span>{{prop.row['group_full_name']}}</span>
+                    <span>{{ prop.row['group_full_name'] }}</span>
                 </template>
             </bk-table-column>
             <bk-table-column
@@ -33,27 +34,31 @@
                 label="组织级别"
             >
                 <template slot-scope="prop">
-                    <span>{{prop.row['group_full_name'] | groupLevel}}</span>
+                    <span>{{ prop.row['group_full_name'] | groupLevel }}</span>
                 </template>
             </bk-table-column>
             <bk-table-column
                 key="group_full_name"
-                label="负责人"
+                label="秘书"
             >
                 <template slot-scope="prop">
                     <bk-tag v-for="master in prop.row['master'] || []" :key="master['username']">
-                        {{master['display_name']}}
+                        {{ master['username'] }}（{{ master['display_name'] }}）
                     </bk-tag>
                 </template>
             </bk-table-column>
 
-            <bk-table-column label="操作" width="150">
+            <bk-table-column label="操作"
+                width="150"
+                v-if="$store.getters.groupPowerConfig['table-controller']"
+            >
                 <template slot-scope="props">
                     <bk-button theme="primary"
                         @click="toEditRow($refs['EditorDialogForm'],props.row)"
                         :outline="true"
                         :text="true"
-                    >编辑</bk-button>
+                    >编辑
+                    </bk-button>
                 </template>
             </bk-table-column>
         </bk-table>
@@ -61,22 +66,25 @@
             dialog-type="creator"
             @confirm="handleConfirmAddNewGroup($event,$refs['newGroupDialogForm'])"
             :loading="newGroupLoading"
+            v-if="$store.getters.groupPowerConfig['add-new-group']"
         >
         </GroupDialog>
         <GroupDialog ref="EditorDialogForm"
             dialog-type="editor"
             :group-disabled="true"
-            @confirm="handleConfirmEditGroup($event,$refs['EditorDialogForm'])">
+            @confirm="handleConfirmEditGroup($event,$refs['EditorDialogForm'])"
+            v-if="$store.getters.groupPowerConfig['table-controller']"
+        >
         </GroupDialog>
     </div>
 </template>
 <script>
     import { fixMixins, tableMixins } from '@/common/mixins'
     import { getSecretary, postSecretary, putSecretary } from '@/api/service/group-service'
+    import { GROUP_MANAGER_ROUTE_PATH } from '@/constants'
 
     export default {
-        name: 'group-manager',
-
+        name: GROUP_MANAGER_ROUTE_PATH,
         components: {
             GroupDialog: () => import('./components/DialogArea/GroupDialog')
         },
@@ -161,7 +169,6 @@
                 this.tableDataIsLoading = true
                 return getSecretary(page, size).then(res => {
                     this.pagination.count = res.data['count']
-                    console.log(res)
                     this.remoteData = res.data['results']
                 }).finally(_ => {
                     this.tableDataIsLoading = false
@@ -197,6 +204,6 @@
     }
 </script>
 
-<style scoped>
-    @import "./index.css";
+<style lang="postcss" scoped>
+  @import "./index.css";
 </style>

@@ -1,22 +1,20 @@
 <template>
-    <div class="uploader-container">
-        <bk-upload :files="attachFiles"
-            :theme="theme"
-            :limit="limit"
-            :tip="$attrs['tip']"
-            :with-credentials="true"
-            :url="url"
-            @on-exceed="handleUploadExceed(limit,attachFiles.length)"
-            :ext-cls="$attrs['ext-cls']"
-            :multiple="$attrs['multiple']"
-            :disabled="$attrs['disabled']"
-            :header="[
-                { name: 'X-CSRFToken',value: cookie }
-            ]"
-            @on-success="handleSuccess"
-            :handle-res-code="handleUploadFileRes"
-        ></bk-upload>
-    </div>
+    <bk-upload :theme="theme"
+        :files="attachFiles"
+        :limit="limit"
+        :tip="$attrs['tip']"
+        :with-credentials="true"
+        :url="url"
+        @on-exceed="handleUploadExceed(limit,attachFiles.length)"
+        :ext-cls="$attrs['ext-cls']"
+        :multiple="$attrs['multiple']"
+        :disabled="$attrs['disabled']"
+        @on-success="handleSuccess"
+        :handle-res-code="handleUploadFileRes"
+        :header="[
+            { name: 'X-CSRFToken',value: cookie }
+        ]"
+    ></bk-upload>
 </template>
 <script>
     import cookie from 'cookie'
@@ -43,12 +41,18 @@
             },
             url: {
                 type: String,
-                default: () => '/bk_api/upload/'
+                default: () => {
+                    if (process.env.NODE_ENV === 'development') {
+                        return '/bk_api/upload/'
+                    }
+                    return 'upload/'
+                }
             }
         },
         data () {
             return {
-                cookie: ''
+                cookie: '',
+                files: []
             }
         },
         mounted () {
@@ -74,13 +78,14 @@
                 })
             },
             handleSuccess (file, fileList) {
-                console.log(fileList)
-                this.$emit('change', fileList.map(item => {
+                const attachFileList = fileList.map(item => {
+                    const responseData = item['responseData']['data']
                     return {
-                        ...item['responseData']['data'],
-                        url: item['url']
+                        ...responseData,
+                        url: responseData['path']
                     }
-                }))
+                })
+                this.$emit('change', attachFileList)
             }
         }
     }
