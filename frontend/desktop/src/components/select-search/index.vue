@@ -19,7 +19,7 @@
 </template>
 
 <script>
-    import { getListDepartments, getListUsers } from '@/api/service/bk-service'
+    import { getListDepartments, getListUsers, getSecretaryDepartment } from '@/api/service/bk-service'
     import { GROUP_KEYNAME, GROUP_USERS_KEYNAME } from '@/constants'
     export default {
         name: 'select-search',
@@ -32,7 +32,7 @@
                 default: () => true
             },
             type: {
-                type: 'user' || 'group',
+                type: 'user' || 'group' || 'secretary',
                 default: () => 'user'
             }
         },
@@ -42,10 +42,15 @@
                     'user': {
                         func: this.handleGetUserManageListUsers,
                         idKey: 'username',
-                        displayKey: 'display_name'
+                        displayKey: 'display_name_for_display'
                     },
                     'group': {
                         func: this.handleGetDepartment,
+                        idKey: 'id',
+                        displayKey: 'full_name'
+                    },
+                    'secretary': {
+                        func: this.handleGetSecretaryDepartment,
                         idKey: 'id',
                         displayKey: 'full_name'
                     }
@@ -93,6 +98,7 @@
                     this.loading = false
                 })
             },
+            // 获取用户列表信息
             handleGetUserManageListUsers () {
                 this.loading = true
                 const groupUsers = this.$http.cache.get(GROUP_USERS_KEYNAME)
@@ -117,12 +123,18 @@
                         return
                     }
                     this.groupUsers = response.data.results.map(item => {
-                        item['display_name'] = `${item['username']}(${item['display_name']})`
+                        item['display_name_for_display'] = `${item['username']}(${item['display_name']})`
                         return item
                     })
                     this.$http.cache.set(GROUP_USERS_KEYNAME, response.data.results)
                 }).finally(_ => {
                     this.loading = false
+                })
+            },
+            // 获取秘书可管理的组
+            handleGetSecretaryDepartment () {
+                return getSecretaryDepartment().then(res => {
+                    console.log(res)
                 })
             }
         }

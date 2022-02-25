@@ -65,3 +65,29 @@ export const AWARD_LEVEL_EN_MAP = {
 
 export const GROUP_USERS_KEYNAME = 'groupUser'
 export const GROUP_KEYNAME = 'group'
+
+/**
+ * 权限控制表
+ * */
+
+export const POWER_CONTROLLER = {
+    'award-manager': {
+        'is_admin': {},
+        'is_secretary': {},
+        'common': {}
+    },
+    'group-manager': {
+        'is_admin': {
+            'add-new-group': true,
+            'table-controller': true
+        },
+        'is_secretary': {
+            'add-new-group': false,
+            'table-controller': false
+        },
+        'common': {
+            'add-new-group': false,
+            'table-controller': false
+        }
+    }
+}

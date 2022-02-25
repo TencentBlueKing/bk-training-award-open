@@ -66,7 +66,8 @@ export function postRecord (isDraft, applyForm) {
  *
  * */
 export function deleteRecord (applyId) {
-    return http.post('record/', {
+    console.log(applyId)
+    return http.put('record/', {
         id: applyId
     })
 }
@@ -76,7 +77,7 @@ export function deleteRecord (applyId) {
  * */
 export function deleteAward ({ awardId }) {
     return http.delete('awards/', {
-        params: {
+        data: {
             award_id: awardId
         }
     })
