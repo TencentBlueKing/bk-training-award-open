@@ -40,13 +40,12 @@
                     property="master"
                 >
                     <select-search
-                        placeholder="请选择申请人"
+                        placeholder="请选择负责人"
                         :value.sync="secretaries"
                     >
                     </select-search>
                 </bk-form-item>
             </bk-form>
-            {{ config[type] }}
         </bk-dialog>
     </div>
 </template>
@@ -208,6 +207,5 @@
         }
     }
 </script>
-<style scoped>
-@import "./index.css";
+<style lang="postcss" scoped>
 </style>

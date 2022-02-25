@@ -113,7 +113,6 @@
     }
         },
         created () {
-            console.log(this.$route.params)
             this.applyForm = this.$route.params
             this.formType = this.$route.params['type']
         },
@@ -123,7 +122,7 @@
              * */
             handleToSaveApplyForm (applyForm) {
                 this.handleToDealWidthApply(true, applyForm).then(res => {
-                    console.log('res', res)
+                    this.messageSuccess('保存草稿成功')
                 })
             },
             /**
@@ -131,7 +130,7 @@
              * */
             handleToSendApplyForm (applyForm) {
                 this.handleToDealWidthApply(false, applyForm).then(res => {
-                    console.log('res', res)
+                    this.messageSuccess('申请成功')
                 })
             },
             /**
@@ -153,10 +152,10 @@
         }
     }
 </script>
-<style>
-@import "@/css/mixins/scroll.css";
-.monitor-navigation-content {
-  @mixin scroller;
-  overflow-y: scroll;
-}
+<style lang="postcss" scoped>
+  @import "@/css/mixins/scroll.css";
+  .monitor-navigation-content {
+    @mixin scroller;
+    overflow-y: scroll;
+  }
 </style>

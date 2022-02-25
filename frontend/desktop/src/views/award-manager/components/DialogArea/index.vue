@@ -90,9 +90,9 @@
                 return confirmStatus
             }
         }
-    
+
     }
 </script>
-<style>
-    @import "./index.css";
+<style lang="postcss" scoped>
+  @import "./index.css";
 </style>

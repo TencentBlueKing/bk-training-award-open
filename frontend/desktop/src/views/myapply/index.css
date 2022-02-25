@@ -1,4 +1,4 @@
-.status{
+.status {
     background-color: #363636;
     color: white;
     display: inline-block;
@@ -7,11 +7,25 @@
     line-height: 20px;
     text-align: center;
     border-radius: 60px/60px;
+    &.review_pending {
+        background: rgb(86, 137, 203);
+    }
+    &.review_passed {
+        background: rgb(80, 176, 122);
+    }
+    &.review_not_passed {
+        background: rgb(234, 81, 81);
+    }
+    &.draft {
+        background: rgb(255, 149, 181);
+    }
 }
+
 .input-demo {
     width: 60px;
 }
-.depart-name{
+
+.depart-name {
     display: inline-block;
     vertical-align: -webkit-baseline-middle;
     margin: 0%;

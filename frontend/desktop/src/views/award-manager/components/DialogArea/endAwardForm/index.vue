@@ -74,6 +74,6 @@
         }
     }
 </script>
-<style>
+<style lang="postcss" scoped>
     @import "./index.css";
 </style>
