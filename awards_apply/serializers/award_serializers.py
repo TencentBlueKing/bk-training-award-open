@@ -1,7 +1,6 @@
+from awards_apply.models import AwardApplicationRecord, Awards
 from django.utils import timezone
 from rest_framework import serializers
-
-from awards_apply.models import Awards, AwardApplicationRecord
 
 # 时间格式
 TIME_FORMAT = '%Y-%m-%d %H:%M:%S'
@@ -35,11 +34,12 @@ class AwardsRecordSerializers(serializers.Serializer):
     application_attachments = serializers.ListField(required=False)
     approval_state = serializers.IntegerField(default=0, required=False)
     application_time = serializers.DateTimeField(format=TIME_FORMAT, required=False)
-    award_name = serializers.SerializerMethodField()
+    award_info = serializers.SerializerMethodField()
 
     def create(self, validated_data):  # 调用Serializer必须重写create方法
         if self.initial_data["is_draft"]:
             validated_data["approval_state"] = RecordStatus["draft"]
+        approval_users = Awards.objects.filter(pk=validated_data["award_id"]).values_list("award_reviewers")
         # 对奖项表进行update_or_create，提供id则更新，否则创建
         record, result = AwardApplicationRecord.objects.update_or_create(
             id=validated_data["id"],
@@ -49,10 +49,11 @@ class AwardsRecordSerializers(serializers.Serializer):
                 "application_users": validated_data["application_users"],
                 "application_attachments": validated_data.get("application_attachments", []),
                 "approval_state": validated_data["approval_state"],
-                "application_time": timezone.now()
+                "application_time": timezone.now(),
+                "approval_users": approval_users[0][0]
             })
         return record
 
-    def get_award_name(self, row):
-        res = Awards.objects.get(id=row.award_id)
-        return res.award_name
+    def get_award_info(self, row):
+        res = Awards.objects.filter(id=row.award_id).values().first()
+        return res if res else None
