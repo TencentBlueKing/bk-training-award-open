@@ -1,35 +1,25 @@
+@import "@/css/variable.css";
 .status {
-    background-color: #363636;
-    color: white;
     display: inline-block;
-    width: 60px;
+    min-width: 60px;
     height: 20px;
-    line-height: 20px;
+
+    color: white;
+    background-color: #363636;
+
     text-align: center;
-    border-radius: 60px/60px;
+    border-radius: 2px;
+    padding: 2px;
     &.review_pending {
-        background: rgb(86, 137, 203);
+        background: $primaryColor;
     }
     &.review_passed {
-        background: rgb(80, 176, 122);
+        background: $successColor;
     }
     &.review_not_passed {
-        background: rgb(234, 81, 81);
+        background: $dangerColor;
     }
     &.draft {
-        background: rgb(255, 149, 181);
+        background: $warningColor;
     }
-}
-
-.input-demo {
-    width: 60px;
-}
-
-.depart-name {
-    display: inline-block;
-    vertical-align: -webkit-baseline-middle;
-    margin: 0%;
-    padding: 0%;
-    height: 39.2px;
-    line-height: 39.2px;
 }

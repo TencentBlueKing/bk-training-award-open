@@ -20,7 +20,8 @@
 
 <script>
     import { getListDepartments, getListUsers, getSecretaryDepartment } from '@/api/service/bk-service'
-    import { GROUP_KEYNAME, GROUP_USERS_KEYNAME } from '@/constants'
+    import { GROUP_KEYNAME, GROUP_SECRETARY_KEYNAME, GROUP_USERS_KEYNAME } from '@/constants'
+
     export default {
         name: 'select-search',
         props: {
@@ -34,24 +35,30 @@
             type: {
                 type: 'user' || 'group' || 'secretary',
                 default: () => 'user'
+            },
+            idKey: {
+                type: String,
+                default: () => 'id'
             }
         },
-        data () {
+        data (self) {
+            console.log(self)
+            console.log(this.idKey)
             return {
                 config: {
                     'user': {
                         func: this.handleGetUserManageListUsers,
-                        idKey: 'username',
+                        idKey: this.idKey || 'id',
                         displayKey: 'display_name_for_display'
                     },
                     'group': {
                         func: this.handleGetDepartment,
-                        idKey: 'id',
+                        idKey: this.idKey || 'id',
                         displayKey: 'full_name'
                     },
                     'secretary': {
                         func: this.handleGetSecretaryDepartment,
-                        idKey: 'id',
+                        idKey: this.idKey || 'id',
                         displayKey: 'full_name'
                     }
                 },
@@ -69,6 +76,7 @@
             }
         },
         created () {
+            console.log(this.idKey)
             this.handleInit()
         },
         methods: {
@@ -133,8 +141,13 @@
             },
             // 获取秘书可管理的组
             handleGetSecretaryDepartment () {
-                return getSecretaryDepartment().then(res => {
-                    console.log(res)
+                return getSecretaryDepartment().then(response => {
+                    if (!response.data) {
+                        this.messageWarn('出错啦')
+                        this.loading = false
+                    }
+                    this.groupUsers = response.data
+                    this.$http.cache.set(GROUP_SECRETARY_KEYNAME, response.data)
                 })
             }
         }

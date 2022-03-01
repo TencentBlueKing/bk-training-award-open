@@ -71,7 +71,6 @@
     </div>
 </template>
 <script>
-    import { mapGetters } from 'vuex'
     import { postRecord } from '@/api/service/award-service'
 
     export default {
@@ -95,22 +94,21 @@
             }
         },
         computed: {
-    ...mapGetters(['user']),
-    /**
-     * 用于判断是否为编辑型表格
-     * */
-    isShowApplyForm () {
-      return ['apply', 'edit'].includes(this.formType)
-    },
-    /**
-     * 主要用于拼接一些比如 id 的信息 此类默认信息
-     * */
-    defaultInfo () {
-      return {
-        award_apply_record_id: this.applyForm.award_apply_record_id,
-        award_id: this.applyForm.id
-      }
-    }
+            /**
+             * 用于判断是否为编辑型表格
+             * */
+            isShowApplyForm () {
+                return ['apply', 'edit'].includes(this.formType)
+            },
+            /**
+             * 主要用于拼接一些比如 id 的信息 此类默认信息
+             * */
+            defaultInfo () {
+                return {
+                    award_apply_record_id: this.applyForm.award_apply_record_id,
+                    award_id: this.applyForm.id
+                }
+            }
         },
         created () {
             this.applyForm = this.$route.params
@@ -131,6 +129,9 @@
             handleToSendApplyForm (applyForm) {
                 this.handleToDealWidthApply(false, applyForm).then(res => {
                     this.messageSuccess('申请成功')
+                    return this.$router.replace({
+                        name: 'canawards'
+                    })
                 })
             },
             /**

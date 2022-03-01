@@ -1,7 +1,6 @@
 <template>
     <div class="uploader-container">
-        <bk-upload :files="attachFiles"
-            :theme="theme"
+        <bk-upload :theme="theme"
             :limit="limit"
             :tip="$attrs['tip']"
             :with-credentials="true"
@@ -43,12 +42,13 @@
             },
             url: {
                 type: String,
-                default: () => '/bk_api/upload/'
+                default: () => '/upload/'
             }
         },
         data () {
             return {
-                cookie: ''
+                cookie: '',
+                files: []
             }
         },
         mounted () {
@@ -74,13 +74,12 @@
                 })
             },
             handleSuccess (file, fileList) {
-                console.log(fileList)
-                this.$emit('change', fileList.map(item => {
+                const attachFileList = fileList.map(item => {
                     return {
-                        ...item['responseData']['data'],
-                        url: item['url']
+                        ...item['responseData']['data']
                     }
-                }))
+                })
+                this.$emit('change', attachFileList)
             }
         }
     }

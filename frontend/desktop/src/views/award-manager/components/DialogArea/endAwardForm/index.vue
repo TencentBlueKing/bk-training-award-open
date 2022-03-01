@@ -17,17 +17,12 @@
         <bk-dialog v-model="visible">
             <bk-form label-width="80">
                 <bk-form-item label="获奖人">
-                    <bk-select :disabled="false" v-model="value" style="width: 100%;"
-                        ext-cls="select-custom"
-                        ext-popover-cls="select-popover-custom"
+                    <select-search
                         placeholder="请选择获奖人"
-                        searchable>
-                        <bk-option v-for="option in list"
-                            :key="option.id"
-                            :id="option.id"
-                            :name="option.name">
-                        </bk-option>
-                    </bk-select>
+                        style="width: 100%;"
+                        :value.sync="value"
+                    >
+                    </select-search>
                 </bk-form-item>
                 <bk-form-item label="评语">
                     <bk-input placeholder="请输入评语"></bk-input>
@@ -40,23 +35,25 @@
 
     export default {
         name: 'end-award-form',
+        components: {
+            SelectSearch: () => import('@/components/select-search')
+        },
         data () {
             return {
                 // S 控制区
                 visible: false,
                 // E 控制区
-                remoteData: new Array(10).fill({})
+                remoteData: []
             }
         },
         computed: {
             tableData () {
-                const tableData = this.remoteData.map(item => {
+                return this.remoteData?.map?.(item => {
                     return {
                         prizewinner: '记得将转表格为虚拟或者其他',
                         committer: '测试评语会很长'
                     }
-                })
-                return tableData
+                }) ?? []
             }
 
         },

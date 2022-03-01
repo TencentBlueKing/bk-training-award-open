@@ -10,6 +10,10 @@
                 ext-cls="mt15"
                 v-show="isTableShow"
             >
+                <bk-table-column type="index"
+                    label="序号"
+                    width="60"
+                ></bk-table-column>
                 <bk-table-column label="奖项名称" prop="award_name"></bk-table-column>
                 <bk-table-column label="奖项级别" prop="award_level"></bk-table-column>
                 <bk-table-column label="接口人(可咨询奖项相关信息)" prop="award_description"></bk-table-column>

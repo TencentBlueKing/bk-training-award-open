@@ -39,17 +39,22 @@
         computed: {
             historyAwardList (self) {
                 return self.historyAwardListRemoteData?.map?.(item => {
+                    console.log(item)
                     return {
-                        ...item
+                        ...item['award_info'],
+                        ...item,
+                        approval_state_en: AWARD_APPROVAL_STATE_EN_MAP[item['approval_state']],
+                        approval_state_cn: AWARD_APPROVAL_STATE_MAP[item['approval_state']]
                     }
                 }) ?? []
             },
             availableAwardList (self) {
                 return self.availableAwardListRemoteData?.map?.(item => {
                     return {
+                        ...item['award_info'],
                         ...item,
                         approval_state_en: AWARD_APPROVAL_STATE_EN_MAP[item['approval_state']],
-                        approval_state: AWARD_APPROVAL_STATE_MAP[item['approval_state']]
+                        approval_state_cn: AWARD_APPROVAL_STATE_MAP[item['approval_state']]
                     }
                 }) ?? []
             }
@@ -107,12 +112,11 @@
   @mixin scroller 4px #e6e9ea;
 
   .available-bar {
+    @mixin scroller 2px #e6e9ea;
     display: flex;
     flex-wrap: wrap;
-    gap: 24px;
     width: inherit;
     overflow-x: scroll;
-    @mixin scroller 2px #e6e9ea;
 
   }
 }
