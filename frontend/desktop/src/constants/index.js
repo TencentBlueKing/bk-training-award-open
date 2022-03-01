@@ -65,6 +65,7 @@ export const AWARD_LEVEL_EN_MAP = {
 
 export const GROUP_USERS_KEYNAME = 'groupUser'
 export const GROUP_KEYNAME = 'group'
+export const GROUP_SECRETARY_KEYNAME = 'secretary'
 
 /**
  * 权限控制表

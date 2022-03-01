@@ -129,7 +129,7 @@
                     return self.formData.secretaries.map(item => item.username)
                 },
                 set (newValue) {
-                    this.formData.secretaries = this.$http.cache.get(GROUP_USERS_KEYNAME).filter(item => {
+                    this.formData.secretaries = this.$http.cache.get(GROUP_USERS_KEYNAME)?.filter(item => {
                         return newValue.includes(item['username'])
                     })
                 }

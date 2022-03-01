@@ -38,6 +38,7 @@
                                 placeholder="请选择接口人"
                                 :disabled="config[formType]['disabled']"
                                 :multiple="false"
+                                :id-key="'username'"
                             >
                             </select-search>
                         </bk-form-item>
@@ -161,6 +162,7 @@
                                     style="width:80%"
                                     placeholder="请选择评审人"
                                     :disabled="config[formType]['disabled']"
+                                    :id-key="'username'"
                                 >
                                 </select-search>
                                 <div class="ml15">
@@ -202,7 +204,7 @@
 </template>
 <script>
     import { formatDate } from '@/common/util'
-    import { AWARD_LEVEL_MAP, GROUP_KEYNAME } from '@/constants'
+    import { AWARD_LEVEL_MAP, GROUP_SECRETARY_KEYNAME } from '@/constants'
     import { postAwards, putAward } from '@/api/service/award-service'
     import { bus } from '@/common/bus'
 
@@ -322,7 +324,7 @@
                 },
                 set (newValue) {
                     const formData = this.awardForm
-                    const totalDepartment = this.$http.cache.get(GROUP_KEYNAME)
+                    const totalDepartment = this.$http.cache.get(GROUP_SECRETARY_KEYNAME)
                     formData.award_department_id = newValue
                     formData.award_department_fullname = totalDepartment.find(item => item.id === newValue)['full_name']
                 }
@@ -438,6 +440,9 @@
                 return postAwards(form).then(_ => {
                     bus.$emit('set-award-manager-init')
                     this.messageSuccess('创建成功')
+                    this.$router.replace({
+                        name: 'award-manager'
+                    })
                 }).catch(_ => {
                     this.messageWarn('创建失败')
                 }).finally(_ => {

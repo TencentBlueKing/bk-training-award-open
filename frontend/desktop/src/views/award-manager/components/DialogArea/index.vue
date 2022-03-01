@@ -14,10 +14,13 @@
                 </div>
             </template>
 
-            <div slot="footer" class="footer-panel">
-                <div v-if="!$slots.footer">
-                    <bk-button @click="$emit('confirm')" class="footer-button ok-button" theme="primary">确认</bk-button>
-                    <bk-button @click="$emit('cancel')" class="footer-button cancel-button" theme="danger">取消</bk-button>
+            <div slot="footer" class="mb15 mr20 center-content">
+                <div v-if="!$slots.footer"
+                    style="width: 100%"
+                    class="footer-panel"
+                >
+                    <bk-button @click="$emit('confirm')" class="footer-button ok-button mr20 ml20" theme="primary">确认</bk-button>
+                    <bk-button @click="$emit('cancel')" class="footer-button cancel-button ml20" theme="danger">取消</bk-button>
                 </div>
                 <div v-else>
                     <slot name="footer"></slot>
