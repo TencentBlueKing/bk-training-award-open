@@ -16,7 +16,7 @@ class AwardsSerializers(serializers.Serializer):
     award_department_fullname = serializers.CharField()
     award_reviewers = serializers.ListField()
     award_consultant = serializers.CharField()
-    award_image = serializers.CharField(required=False, read_only=True)
+    award_image = serializers.CharField()
     start_time = serializers.DateTimeField(format=TIME_FORMAT)
     end_time = serializers.DateTimeField(format=TIME_FORMAT)
     approval_state = serializers.IntegerField(default=0, required=False)
