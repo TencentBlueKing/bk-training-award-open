@@ -31,7 +31,7 @@ class ApplicationSerializer(serializers.Serializer):
                 instance.approval_text += validated_data.get("approval_text")
             instance.save()
             return instance
-        else:  # 不通过, 置轮次为0, 状态置为草稿, 写入审批时间,要求审批评语
+        else:  # 不通过, 置轮次为0, 状态置为不通过, 写入审批时间,要求审批评语
             instance.approval_turn = 0
             instance.approval_state = ApprovalState.review_not_passed.value[0]
             instance.approval_time = timezone.now()

@@ -20,7 +20,7 @@ def upload_file_handler(file):
     if default_storage.exists(path):
         return {"path": path, "name": file.name, "size": file.size}
     else:
-        path = default_storage.save(file_md5 + suffix, file)
+        path = default_storage.save(path, file)
         return {"path": path, "name": file.name, "size": file.size}
 
 
