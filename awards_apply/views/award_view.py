@@ -36,7 +36,7 @@ class AwardView(APIView):
             "award_id")
         # valid_awards表示：符合规定时间内的，用户没申请过的奖项
         valid_awards = Awards.objects.exclude(id__in=ids).filter(start_time__lt=now).filter(end_time__gt=now).order_by(
-            "id")
+            "-create_time")
         pagination = PagePagination()
         try:
             pager_roles = pagination.paginate_queryset(queryset=valid_awards, request=request, view=self)
@@ -172,7 +172,8 @@ class ApplyedRecordView(APIView):
         if user_info['result'] is False:
             return JsonResponse(false_code(object_not_exist_error('user')))
         record = AwardApplicationRecord.objects.filter(Q(approval_state=RecordStatus["pass"]) & Q(
-            application_users__contains={user_info['data']['id']: user_info['data']['display_name']})).order_by('id')
+            application_users__contains={user_info['data']['id']: user_info['data']['display_name']})).order_by(
+            '-application_time')
         pagination = PagePagination()
         try:
             pager_roles = pagination.paginate_queryset(queryset=record, request=request, view=self)
