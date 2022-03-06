@@ -29,3 +29,8 @@ class SecretarySerializer(serializers.ModelSerializer):
     class Meta:
         model = Secretary
         fields = "__all__"
+
+    def validate_secretaries(self, value):
+        if len(value) == 0:
+            raise serializers.ValidationError("秘书不能为空")
+        return value

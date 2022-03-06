@@ -11,6 +11,8 @@ class AssignSecretaryPermission(permissions.BasePermission):
     message = permission_denied()
 
     def has_permission(self, request, view):
+        if request.method in permissions.SAFE_METHODS:
+            return True
         has_permission = Admin.objects.filter(
             admin_username=request.user.username
         ).exists()

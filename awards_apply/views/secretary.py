@@ -1,4 +1,4 @@
-from awards_apply.models import Secretary
+from awards_apply.models import Admin, Secretary
 from awards_apply.serializers import SecretarySerializer
 from awards_apply.utils.const import object_not_exist_error, success_code
 from awards_apply.utils.pagination import CommonPaginaation
@@ -12,9 +12,15 @@ from rest_framework.viewsets import ModelViewSet
 class SecretaryViewSet(ModelViewSet):
     serializer_class = SecretarySerializer
     permission_classes = [AssignSecretaryPermission]
-    queryset = Secretary.objects.all().order_by('id')
     lookup_field = "id"
     pagination_class = CommonPaginaation
+
+    def get_queryset(self):
+        if Admin.objects.filter(admin_username=self.request.user.username).exists():
+            return Secretary.objects.all().order_by("id")
+        return Secretary.objects.filter(
+            secretaries__contains={"username": self.request.user.username}
+        ).order_by("id")
 
     def list(self, request, *args, **kwargs):
         response = super(SecretaryViewSet, self).list(request, *args, **kwargs)
@@ -36,10 +42,11 @@ def secretary_department(request, *args, **kwargs):
         secretaries__contains={"username": request.user.username}).values_list("group_id")
     if not id_list:
         return Response(object_not_exist_error("group"))
+    id_list = [i[0] for i in id_list]
     client = get_client_by_request(request)
     department_list = client.usermanage.list_departments()
     for item in department_list["data"]["results"][::-1]:
-        if item["id"] not in id_list[0]:
+        if item["id"] not in id_list:
             department_list["data"]["results"].remove(item)
     department_list["data"] = department_list["data"]["results"]
     return Response(department_list)
