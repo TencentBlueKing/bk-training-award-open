@@ -10,6 +10,19 @@ import store from '@/store'
 import http from '@/api'
 import preload from '@/common/preload'
 import { bus } from '@/common/bus'
+import {
+    AWARD_FORM_ROUTE_PATH,
+    AWARD_MANAGER_ROUTE_PATH,
+    BAD_404_ROUTE_PATH,
+    CANAWARDS_ROUTE_PATH,
+    CHECKPAGE_ROUTE_PATH,
+    DETAIL_ROUTE_PATH,
+    GROUP_MANAGER_ROUTE_PATH,
+    HOME_ROUTE_PATH, LOGIN_SUCCESS_ROUTE_PATH,
+    MYAPPLY_ROUTE_PATH,
+    MYCHECK_ROUTE_PATH,
+    POWER_CONTROLLER
+} from '@/constants'
 
 Vue.use(VueRouter)
 const MainEntry = () => import(/* webpackChunkName: 'entry' */'@/views')
@@ -35,7 +48,7 @@ const Checkpage = () => import(/* webpackChunkName: 'checkpage' */'@/views/check
 // 可申报奖项
 const Canawards = () => import(/* webpackChunkName: 'canawards' */'@/views/canawards')
 // 登陆成功后重定向
-const LoginSucess = { path: 'home' }
+const LoginSucess = { path: HOME_ROUTE_PATH }
 
 // E 自定义页面组件
 
@@ -45,7 +58,7 @@ function setBaseRoutes (otherRoutes) {
             path: window.PROJECT_CONFIG.SITE_URL,
             name: 'appMain',
             component: MainEntry,
-            alias: 'home',
+            alias: HOME_ROUTE_PATH,
             children: [
                 ...otherRoutes
             ]
@@ -53,7 +66,7 @@ function setBaseRoutes (otherRoutes) {
         // 404
         {
             path: '*',
-            name: '404',
+            name: BAD_404_ROUTE_PATH,
             component: NotFound
         }
     ]
@@ -61,8 +74,8 @@ function setBaseRoutes (otherRoutes) {
 
 bus['routes'] = setBaseRoutes([
     {
-        path: 'home',
-        name: 'home',
+        path: HOME_ROUTE_PATH,
+        name: HOME_ROUTE_PATH,
         alias: '',
         component: Home,
         meta: {
@@ -72,16 +85,16 @@ bus['routes'] = setBaseRoutes([
         }
     },
     {
-        path: 'account/login_success',
-        name: 'login_success',
+        path: LOGIN_SUCCESS_ROUTE_PATH,
+        name: LOGIN_SUCCESS_ROUTE_PATH,
         redirect: LoginSucess,
         meta: {
             title: '首页'
         }
     },
     {
-        path: 'canawards',
-        name: 'canawards',
+        path: CANAWARDS_ROUTE_PATH,
+        name: CANAWARDS_ROUTE_PATH,
         component: Canawards,
         meta: {
             parent_id: '奖项中心',
@@ -90,16 +103,16 @@ bus['routes'] = setBaseRoutes([
         }
     },
     {
-        path: 'myapply',
-        name: 'myapply',
+        path: MYAPPLY_ROUTE_PATH,
+        name: MYAPPLY_ROUTE_PATH,
         component: Myapply,
         meta: {
             title: '我的申请'
         }
     },
     {
-        path: 'group-manager',
-        name: 'group-manager',
+        path: GROUP_MANAGER_ROUTE_PATH,
+        name: GROUP_MANAGER_ROUTE_PATH,
         component: GroupManager,
         meta: {
             parent_id: '管理中心',
@@ -108,8 +121,8 @@ bus['routes'] = setBaseRoutes([
         }
     },
     {
-        path: 'award-manager',
-        name: 'award-manager',
+        path: AWARD_MANAGER_ROUTE_PATH,
+        name: AWARD_MANAGER_ROUTE_PATH,
         component: AwardManager,
         meta: {
             parent_id: '管理中心',
@@ -119,8 +132,8 @@ bus['routes'] = setBaseRoutes([
         }
     },
     {
-        path: 'award-manager/award-form',
-        name: 'award-form',
+        path: AWARD_FORM_ROUTE_PATH,
+        name: AWARD_FORM_ROUTE_PATH,
         component: AwardForm,
         meta: {
             title: '奖项表单',
@@ -128,25 +141,24 @@ bus['routes'] = setBaseRoutes([
         }
     },
     {
-        path: 'mycheck',
-        name: 'mycheck',
+        path: MYCHECK_ROUTE_PATH,
+        name: MYCHECK_ROUTE_PATH,
         component: Mycheck,
         meta: {
             title: '我的审批'
         }
     },
     {
-        path: 'detail/:type',
-        name: 'detail',
+        path: DETAIL_ROUTE_PATH,
+        name: DETAIL_ROUTE_PATH,
         component: Detail,
         meta: {
-
             title: '奖项信息'
         }
     },
     {
-        path: 'checkpage',
-        name: 'checkpage',
+        path: CHECKPAGE_ROUTE_PATH,
+        name: CHECKPAGE_ROUTE_PATH,
         component: Checkpage,
         meta: {
             title: '审核页面'
@@ -155,7 +167,7 @@ bus['routes'] = setBaseRoutes([
 ])
 
 const router = new VueRouter({
-    mode: 'hash',
+    mode: 'history',
     routes: bus['routes']
 })
 
@@ -173,7 +185,12 @@ router.beforeEach(async (to, from, next) => {
     canceling = true
     await cancelRequest()
     canceling = false
-    next()
+    const ident = store.getters.ident
+    if (to.name !== BAD_404_ROUTE_PATH && POWER_CONTROLLER[to.name][ident]['is_forbidden']) {
+        next({ name: '404' })
+    } else {
+        next()
+    }
 })
 
 router.afterEach(async (to, from) => {
@@ -206,63 +223,40 @@ router.afterEach(async (to, from) => {
 })
 
 export default router
-/**
- * 调整 router
- *
- * */
-const IDENTIFY_MAP = {
-    'is_admin': [],
-    'is_secretary': [
-        {
-            path: 'group-manager',
-            name: 'group-manager',
-            component: GroupManager,
-            meta: {
-                parent_id: '管理中心',
-                title: '组管理',
-                icon: 'icon-sitemap'
-            }
-        }
-
-    ]
-}
-
-function generatorRouter (identifyInfo) {
-    const resRouter = []
-    if (identifyInfo?.['is_admin']) {
-        resRouter.push(IDENTIFY_MAP['is_admin'])
-    }
-    if (identifyInfo?.['is_secretary']) {
-        resRouter.push(IDENTIFY_MAP['is_secretary'])
-    }
-    bus['routes'] = setBaseRoutes(resRouter)
-}
-
-bus.$on('user-router', generatorRouter)
 
 /**
  * 动态生成侧边栏
  * */
 export function generatorNav () {
     const RouteNav = bus['routes'][0].children
-    return RouteNav.map(item => {
-        const meta = item.meta
-        meta._children = RouteNav.filter(_ => {
-            if (_['meta']['parent_id']
-                && _['meta']['title'] !== _['meta']['parent_id']
-                && _['meta']['parent_id'] === item['meta']['title']
-            ) {
-                return true
-            }
-        })
-        if (meta['parent_id']) {
-            return {
-                id: item['name'],
-                icon: meta['icon'],
-                pathName: item['path'],
-                children: meta['_children'],
-                name: meta['title']
-            }
+    const handler = {
+        get () {
+            return RouteNav.map(item => {
+                const meta = item.meta
+                // 获取子节点
+                meta._children = RouteNav.filter(_ => {
+                    if (_['meta']['parent_id']
+                        && _['meta']['title'] !== _['meta']['parent_id']
+                        && _['meta']['parent_id'] === item['meta']['title']
+                    ) {
+                        return true
+                    }
+                })
+                if (meta['parent_id']) {
+                    const { ident } = store.getters
+                    const itemIsHidden = POWER_CONTROLLER[item['path']][ident]['nav-is-hidden']
+                    return {
+                        id: item['name'],
+                        icon: meta['icon'],
+                        pathName: item['path'],
+                        name: meta['title'],
+                        hidden: !itemIsHidden,
+                        children: meta['_children']
+                    }
+                }
+            }).filter(_ => _ && _['hidden'])
         }
-    }).filter(_ => _)
+    }
+    Object.defineProperty(handler, 'nav', handler)
+    return handler['nav']
 }

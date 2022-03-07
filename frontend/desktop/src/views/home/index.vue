@@ -39,7 +39,6 @@
         computed: {
             historyAwardList (self) {
                 return self.historyAwardListRemoteData?.map?.(item => {
-                    console.log(item)
                     return {
                         ...item['award_info'],
                         ...item,
