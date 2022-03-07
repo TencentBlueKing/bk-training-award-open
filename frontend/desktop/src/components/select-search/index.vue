@@ -13,6 +13,7 @@
         :multiple="multiple"
         :display-tag="true"
         :value="value"
+        :is-tag-width-limit="false"
         @change="$emit('update:value', $event)"
     >
     </bk-select>
@@ -39,26 +40,28 @@
             idKey: {
                 type: String,
                 default: () => 'id'
+            },
+            filterFn: {
+                type: Function,
+                default: () => true
             }
         },
         data (self) {
-            console.log(self)
-            console.log(this.idKey)
             return {
                 config: {
                     'user': {
-                        func: this.handleGetUserManageListUsers,
-                        idKey: this.idKey || 'id',
+                        func: self.handleGetUserManageListUsers,
+                        idKey: self.idKey || 'id',
                         displayKey: 'display_name_for_display'
                     },
                     'group': {
-                        func: this.handleGetDepartment,
-                        idKey: this.idKey || 'id',
+                        func: self.handleGetDepartment,
+                        idKey: self.idKey || 'id',
                         displayKey: 'full_name'
                     },
                     'secretary': {
-                        func: this.handleGetSecretaryDepartment,
-                        idKey: this.idKey || 'id',
+                        func: self.handleGetSecretaryDepartment,
+                        idKey: self.idKey || 'id',
                         displayKey: 'full_name'
                     }
                 },
@@ -72,11 +75,10 @@
                 const type = self['type']
                 return self.groupUsers?.filter?.(item => {
                     return item[config[type]['displayKey']]
-                }) ?? []
+                }).filter(self.filterFn) ?? []
             }
         },
         created () {
-            console.log(this.idKey)
             this.handleInit()
         },
         methods: {
