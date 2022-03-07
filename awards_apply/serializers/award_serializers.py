@@ -39,6 +39,8 @@ class AwardsRecordSerializers(serializers.Serializer):
     def create(self, validated_data):  # 调用Serializer必须重写create方法
         if self.initial_data["is_draft"]:
             validated_data["approval_state"] = RecordStatus["draft"]
+        else:
+            validated_data["approval_state"] = RecordStatus["wait"]
         approval_users = Awards.objects.filter(pk=validated_data["award_id"]).values_list("award_reviewers")
         # 对奖项表进行update_or_create，提供id则更新，否则创建
         record, result = AwardApplicationRecord.objects.update_or_create(

@@ -124,7 +124,8 @@ class RecordView(APIView):
             return JsonResponse(false_code(award_record.errors))
         record = award_record.validated_data
         application_users = AwardApplicationRecord.objects.filter(award_id=record["award_id"]).filter(
-            ~Q(approval_state=RecordStatus['draft'])).values_list("application_users")
+            ~Q(approval_state=RecordStatus['draft']) & ~Q(approval_state=RecordStatus['not_pass'])).values_list(
+            "application_users")
         # 判断用户是否已经申请过该奖项
         for item in application_users:
             for key in item[0]:
