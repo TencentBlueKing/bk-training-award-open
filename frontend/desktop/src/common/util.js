@@ -376,3 +376,17 @@ export function checkRequired (message) {
 export function formatDate (date) {
     return moment(date)
 }
+/**
+ * 清除 cookie
+ *
+ * */
+export function clearAllCookie () {
+    const keys = document.cookie.match(/[^ =;]+(?=\=)/g)
+    console.log(keys)
+    if (keys) {
+        for (let i = keys.length; i--;) {
+            document.cookie = keys[i] + '=0;path=/;expires=' + new Date(0).toUTCString()// 清除当前域名下的,例如：m.kevis.com
+        }
+    }
+    console.log(document.cookie)
+}

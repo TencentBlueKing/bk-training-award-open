@@ -8,7 +8,14 @@ import Vuex from 'vuex'
 
 import http from '@/api'
 import { unifyObjectStyle } from '@/common/util'
-import { POWER_CONTROLLER } from '@/constants'
+import {
+    GROUP_MANAGER_ROUTE_PATH,
+    IDENT_ADMIN,
+    IDENT_COMMON,
+    IDENT_SECRETARY,
+    MYCHECK_ROUTE_PATH,
+    POWER_CONTROLLER
+} from '@/constants'
 
 Vue.use(Vuex)
 
@@ -28,16 +35,22 @@ const store = new Vuex.Store({
         user_ident: {
             is_admin: false,
             is_secretary: false,
-            ident: 'common'
+            ident: IDENT_COMMON
         }
     },
     // 公共 getters
     getters: {
         mainContentLoading: state => state.mainContentLoading,
         user: state => state.user,
-        powerConfig: state => {
+        ident: state => state.user_ident.ident,
+        // 将权限转移到对应的页面，这样会更合适一些
+        groupPowerConfig: state => {
             const ident = state.user_ident['ident']
-            return state['powerConfig']['group-manager'][ident]
+            return POWER_CONTROLLER[GROUP_MANAGER_ROUTE_PATH][ident]
+        },
+        checkpagePowerConfig: state => {
+            const ident = state.user_ident['ident']
+            return POWER_CONTROLLER[MYCHECK_ROUTE_PATH][ident]
         }
     },
     // 公共 mutations
@@ -63,14 +76,11 @@ const store = new Vuex.Store({
         },
         updateUserIdent (state, userIdent) {
             const { is_admin: isAdmin, is_secretary: isSecretary } = userIdent
-            let ident = ''
-            console.log(isAdmin, isSecretary)
+            let ident = IDENT_COMMON
             if (isAdmin) {
-                ident = 'is_admin'
+                ident = IDENT_ADMIN
             } else if (isSecretary) {
-                ident = 'is_admin'
-            } else {
-                ident = 'common'
+                ident = IDENT_SECRETARY
             }
             state.user_ident = {
                 is_admin: isAdmin,
