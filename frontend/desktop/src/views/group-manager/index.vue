@@ -3,9 +3,9 @@
         <bk-button theme="primary"
             icon="plus-circle-shape"
             @click="toAddNewGroup($refs['newGroupDialogForm'])"
-            v-if="$store.getters.powerConfig['add-new-group']"
+            v-if="$store.getters.groupPowerConfig['add-new-group']"
         >
-            新增组
+            指派秘书
         </bk-button>
         <bk-table size="small"
             ext-cls="mt15"
@@ -39,7 +39,7 @@
             </bk-table-column>
             <bk-table-column
                 key="group_full_name"
-                label="负责人"
+                label="秘书"
             >
                 <template slot-scope="prop">
                     <bk-tag v-for="master in prop.row['master'] || []" :key="master['username']">
@@ -50,7 +50,7 @@
 
             <bk-table-column label="操作"
                 width="150"
-                v-if="$store.getters.powerConfig['table-controller']"
+                v-if="$store.getters.groupPowerConfig['table-controller']"
             >
                 <template slot-scope="props">
                     <bk-button theme="primary"
@@ -66,14 +66,14 @@
             dialog-type="creator"
             @confirm="handleConfirmAddNewGroup($event,$refs['newGroupDialogForm'])"
             :loading="newGroupLoading"
-            v-if="$store.getters.powerConfig['add-new-group']"
+            v-if="$store.getters.groupPowerConfig['add-new-group']"
         >
         </GroupDialog>
         <GroupDialog ref="EditorDialogForm"
             dialog-type="editor"
             :group-disabled="true"
             @confirm="handleConfirmEditGroup($event,$refs['EditorDialogForm'])"
-            v-if="$store.getters.powerConfig['table-controller']"
+            v-if="$store.getters.groupPowerConfig['table-controller']"
         >
         </GroupDialog>
     </div>
@@ -81,10 +81,10 @@
 <script>
     import { fixMixins, tableMixins } from '@/common/mixins'
     import { getSecretary, postSecretary, putSecretary } from '@/api/service/group-service'
+    import { GROUP_MANAGER_ROUTE_PATH } from '@/constants'
 
     export default {
-        name: 'group-manager',
-
+        name: GROUP_MANAGER_ROUTE_PATH,
         components: {
             GroupDialog: () => import('./components/DialogArea/GroupDialog')
         },
@@ -124,7 +124,6 @@
         },
         created () {
             this.handleInit()
-            console.log(this.$store)
         },
         methods: {
             /**
@@ -170,7 +169,6 @@
                 this.tableDataIsLoading = true
                 return getSecretary(page, size).then(res => {
                     this.pagination.count = res.data['count']
-                    console.log(res)
                     this.remoteData = res.data['results']
                 }).finally(_ => {
                     this.tableDataIsLoading = false
@@ -207,5 +205,5 @@
 </script>
 
 <style lang="postcss" scoped>
-@import "./index.css";
+  @import "./index.css";
 </style>

@@ -139,6 +139,7 @@
                                 :multiple="false"
                                 :disabled="config[formType]['disabled']"
                                 type="secretary"
+                                :id-key="'full_name'"
                             ></select-search>
                         </bk-form-item>
                     </bk-col>
@@ -150,13 +151,14 @@
                     <bk-col :span="12">
                         <bk-form-item
                             label-width="auto"
-                            label="评审人(*同级审批为[或审批]，异级审批为[与审批])"
+                            label="审批步骤: 1.xxx 2.xxx"
                             :required="true"
                         >
                             <div class="form-group mt10"
                                 v-for="(item, index) in awardForm['reviewers']"
                                 :key="item.uuid"
                             >
+                                <span class="mr10">第 {{index + 1}} 批：</span>
                                 <select-search
                                     :value.sync="item.value"
                                     style="width:80%"
@@ -166,17 +168,17 @@
                                 >
                                 </select-search>
                                 <div class="ml15">
+                                    <bk-button theme="danger"
+                                        title="移除同级评审人"
+                                        icon="minus-circle-shape"
+                                        v-show="awardForm['reviewers'].length > 1"
+                                        @click="removeReviewer(awardForm['reviewers'],item.uuid)"
+                                    ></bk-button>
                                     <bk-button theme="primary"
                                         title="添加同级评审人"
                                         icon="plus-circle-shape"
                                         v-show="index === awardForm['reviewers'].length - 1"
                                         @click="addReviewer(awardForm['reviewers'])"
-                                    ></bk-button>
-                                    <bk-button theme="danger"
-                                        title="移除同级评审人"
-                                        icon="minus-circle-shape"
-                                        v-show="index !== awardForm['reviewers'].length - 1"
-                                        @click="removeReviewer(awardForm['reviewers'],item.uuid)"
                                     ></bk-button>
                                 </div>
                             </div>
@@ -204,7 +206,7 @@
 </template>
 <script>
     import { formatDate } from '@/common/util'
-    import { AWARD_LEVEL_MAP, GROUP_SECRETARY_KEYNAME } from '@/constants'
+    import { AWARD_LEVEL_MAP } from '@/constants'
     import { postAwards, putAward } from '@/api/service/award-service'
     import { bus } from '@/common/bus'
 
@@ -315,18 +317,15 @@
         },
         computed: {
             formType (self) {
-                console.log(self.$route.type)
                 return self.$route.query.type
             },
             groupInfo: {
                 get (self) {
-                    return self.awardForm.award_department_id
+                    return self.awardForm.award_department_fullname
                 },
                 set (newValue) {
                     const formData = this.awardForm
-                    const totalDepartment = this.$http.cache.get(GROUP_SECRETARY_KEYNAME)
-                    formData.award_department_id = newValue
-                    formData.award_department_fullname = totalDepartment.find(item => item.id === newValue)['full_name']
+                    formData.award_department_fullname = newValue
                 }
             }
         },

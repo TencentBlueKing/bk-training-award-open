@@ -12,12 +12,24 @@
                     ext-cls="detail-input"
                 ></bk-input>
             </bk-form-item>
-            <bk-form-item label="接口人">
-                <bk-input v-model="awardForm['award_consultant']"
+            <bk-form-item label="所属公司">
+                <bk-input v-model="awardForm['award_department_fullname']"
                     :disabled="true"
-                    placeholder="接口人"
+                    placeholder="所属组织"
                     ext-cls="detail-input"
                 ></bk-input>
+            </bk-form-item>
+            <bk-form-item label="接口人">
+                <select-search :value="awardForm['award_consultant']"
+                    ext-cls="detail-input"
+                    placeholder="接口人"
+                    id-key="username"
+                    :disabled="true"
+                    :multiple="false"
+                >
+                </select-search>
+                <!--                <bk-input v-model="awardForm['award_consultant']"-->
+                <!--                ></bk-input>-->
             </bk-form-item>
             <bk-form-item label="奖项级别">
                 <bk-input v-model="awardForm['award_level']"
@@ -56,8 +68,10 @@
 
 <script>
 
+    import SelectSearch from '@/components/select-search'
     export default {
         name: 'detail-info',
+        components: { SelectSearch },
         props: {
             awardForm: {
                 type: Object,

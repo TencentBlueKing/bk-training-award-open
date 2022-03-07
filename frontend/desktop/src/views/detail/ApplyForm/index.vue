@@ -9,6 +9,7 @@
                     ext-cls="w-90"
                     :id-key="'id'"
                     type="user"
+                    :filter-fn="handleOnlyGroup"
                 ></select-search>
             </bk-form-item>
             <bk-form-item label="申请理由">
@@ -131,6 +132,12 @@
                     return JSON.parse(JSON.stringify(awardForm))
                 }
                 return null
+            },
+            handleOnlyGroup (value) {
+                const department = value['departments'].map(item => item['full_name'])
+                const awardDepartmentFullname = this.$route.params['award_department_fullname']
+                console.log(department.includes(awardDepartmentFullname))
+                return department.includes(awardDepartmentFullname)
             }
         }
     }

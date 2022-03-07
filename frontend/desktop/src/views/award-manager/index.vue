@@ -149,7 +149,7 @@
             </bk-table-column>
             <bk-table-column label="操作">
                 <template slot-scope="props">
-                    <div v-show="props.row['approval_state'] !== config['award_status']['applied']">
+                    <div v-show="props.row['approval_state'] !== config['award_status']['not_apply']">
                         <bk-button theme="primary"
                             :text="true"
                             @click="toEditRow(props.row)"
@@ -165,7 +165,7 @@
                         </bk-popconfirm>
                         <bk-button theme="primary" text @click="toGetDetail(props.row,$refs['GetDetailDialog'])">详情</bk-button>
                     </div>
-                    <div v-show="props.row['approval_state'] === config['award_status']['applied']">
+                    <div v-show="props.row['approval_state'] === config['award_status']['not_apply']">
                         <bk-button theme="primary" text @click="toEndAward(props.row,$refs['EndAwardForm'])">结束</bk-button>
                     </div>
                 </template>
