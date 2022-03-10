@@ -5,6 +5,7 @@
             :side-title="nav.title"
             :default-open="true"
             :need-menu="true"
+            :navigation-type="'top-bottom'"
             @toggle="handleToggle"
         >
             <template slot="header">
@@ -16,16 +17,16 @@
                         </bk-breadcrumb>
                     </ol>
 
-                    <div class="top-menu">
-                        <div v-for="topMenu in userTopMenu"
-                            :key="topMenu.label"
-                            :class="['header-mind',{
-                                'active': $route.name === topMenu.path
-                            }]" @click="topMenu.func"
-                        >
-                            <div class="pl5 f15">{{ topMenu.label }}</div>
-                        </div>
-                    </div>
+                    <!--                    <div class="top-menu">-->
+                    <!--                        <div v-for="topMenu in userTopMenu"-->
+                    <!--                            :key="topMenu.label"-->
+                    <!--                            :class="['header-mind',{-->
+                    <!--                                'active': $route.name === topMenu.path-->
+                    <!--                            }]" @click="topMenu.func"-->
+                    <!--                        >-->
+                    <!--                            <div class="pl5 f15">{{ topMenu.label }}</div>-->
+                    <!--                        </div>-->
+                    <!--                    </div>-->
 
                 </div>
             </template>
@@ -105,13 +106,6 @@
                             path: MYAPPLY_ROUTE_PATH,
                             func: this.toRoute(MYAPPLY_ROUTE_PATH)
                         }
-                        // {
-                        //     label: '注销',
-                        //     func: () => {
-                        //         clearAllCookie()
-                        //         window.location.href = ''
-                        //     }
-                        // }
                     ]
                 },
                 lang: {
@@ -148,20 +142,10 @@
             }
 
             bus.$on('main-loading', (value) => {
-                this.mainContentLoading = value
+                this.$store.commit('setMainContentLoading', value)
             })
         },
         mounted () {
-            const self = this
-            bus.$on('show-login-modal', data => {
-                self.$refs.bkAuth.showLoginModal(data)
-            })
-            bus.$on('close-login-modal', () => {
-                self.$refs.bkAuth.hideLoginModal()
-                setTimeout(() => {
-                    window.location.reload()
-                }, 0)
-            })
             this.handleGetUserManageRetrieveUser()
         },
         methods: {
@@ -176,7 +160,7 @@
                     // 完成权限获取，生成对应路由
                     this.nav.list = generatorNav()
                 }).finally(_ => {
-                    bus.$emit('main-loading', true)
+                    bus.$emit('main-loading', false)
                 })
             },
             handleSelect (id, item) {

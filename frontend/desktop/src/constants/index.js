@@ -103,7 +103,12 @@ export const POWER_CONTROLLER = {
         [IDENT_COMMON]: {}
     },
     [MYAPPLY_ROUTE_PATH]: {
-        [IDENT_ADMIN]: {},
+        [IDENT_ADMIN]: {
+            // 侧边栏是否隐藏
+            'nav-is-hidden': true,
+            // 是否禁止进入该页面
+            'is_forbidden': true
+        },
         [IDENT_SECRETARY]: {},
         [IDENT_COMMON]: {}
     },
@@ -115,11 +120,22 @@ export const POWER_CONTROLLER = {
             'table-controller': true
         },
         [IDENT_SECRETARY]: {},
-        [IDENT_COMMON]: {}
+        [IDENT_COMMON]: {
+            // 侧边栏是否隐藏
+            'nav-is-hidden': true,
+            // 是否禁止进入该页面
+            'is_forbidden': true
+        }
     },
     [AWARD_MANAGER_ROUTE_PATH]: {
-        [IDENT_ADMIN]: { },
-        [IDENT_SECRETARY]: {},
+        [IDENT_ADMIN]: {
+            // 侧边栏是否隐藏
+            'nav-is-hidden': true,
+            // 是否禁止进入该页面
+            'is_forbidden': true
+        },
+        [IDENT_SECRETARY]: {
+        },
         [IDENT_COMMON]: {
             // 侧边栏是否隐藏
             'nav-is-hidden': true,
@@ -128,11 +144,18 @@ export const POWER_CONTROLLER = {
         }
     },
     [MYCHECK_ROUTE_PATH]: {
-        [IDENT_ADMIN]: {},
+        [IDENT_ADMIN]: {
+            // 侧边栏是否隐藏
+            'nav-is-hidden': true,
+            // 是否禁止进入该页面
+            'is_forbidden': true
+        },
         [IDENT_SECRETARY]: {},
         [IDENT_COMMON]: {
-            // 首页是否展示我的审批跳转
-            'header-button-hidden': true
+            // 侧边栏是否隐藏
+            'nav-is-hidden': true,
+            // 是否禁止进入该页面
+            'is_forbidden': true
         }
     },
     [DETAIL_ROUTE_PATH]: {

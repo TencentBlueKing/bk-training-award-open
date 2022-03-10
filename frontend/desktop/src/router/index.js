@@ -9,7 +9,7 @@ import VueRouter from 'vue-router'
 import store from '@/store'
 import http from '@/api'
 import preload from '@/common/preload'
-import { bus } from '@/common/bus'
+
 import {
     AWARD_FORM_ROUTE_PATH,
     AWARD_MANAGER_ROUTE_PATH,
@@ -72,7 +72,7 @@ function setBaseRoutes (otherRoutes) {
     ]
 }
 
-bus['routes'] = setBaseRoutes([
+const routes = setBaseRoutes([
     {
         path: HOME_ROUTE_PATH,
         name: HOME_ROUTE_PATH,
@@ -81,7 +81,8 @@ bus['routes'] = setBaseRoutes([
         meta: {
             parent_id: '首页',
             title: '首页',
-            icon: 'icon-home'
+            icon: 'icon-home',
+            order: 1
         }
     },
     {
@@ -99,15 +100,8 @@ bus['routes'] = setBaseRoutes([
         meta: {
             parent_id: '奖项中心',
             title: '可申请奖项',
-            icon: 'icon-star'
-        }
-    },
-    {
-        path: MYAPPLY_ROUTE_PATH,
-        name: MYAPPLY_ROUTE_PATH,
-        component: Myapply,
-        meta: {
-            title: '我的申请'
+            icon: 'icon-star',
+            order: 2
         }
     },
     {
@@ -117,7 +111,20 @@ bus['routes'] = setBaseRoutes([
         meta: {
             parent_id: '管理中心',
             title: '组管理',
-            icon: 'icon-sitemap'
+            icon: 'icon-sitemap',
+            order: 3
+
+        }
+    },
+    {
+        path: MYAPPLY_ROUTE_PATH,
+        name: MYAPPLY_ROUTE_PATH,
+        component: Myapply,
+        meta: {
+            parent_id: '我的申请',
+            title: '我的申请',
+            icon: 'icon-data',
+            order: 4
         }
     },
     {
@@ -128,7 +135,7 @@ bus['routes'] = setBaseRoutes([
             parent_id: '管理中心',
             title: '奖项管理',
             icon: 'icon-data',
-            weight: 1000
+            order: 4
         }
     },
     {
@@ -145,7 +152,10 @@ bus['routes'] = setBaseRoutes([
         name: MYCHECK_ROUTE_PATH,
         component: Mycheck,
         meta: {
-            title: '我的审批'
+            parent_id: '我的审批',
+            title: '我的审批',
+            icon: 'icon-data',
+            order: 4
         }
     },
     {
@@ -161,14 +171,13 @@ bus['routes'] = setBaseRoutes([
         name: CHECKPAGE_ROUTE_PATH,
         component: Checkpage,
         meta: {
-            title: '审核页面'
         }
     }
 ])
 
 const router = new VueRouter({
     mode: 'history',
-    routes: bus['routes']
+    routes: routes
 })
 
 const cancelRequest = async () => {
@@ -228,7 +237,7 @@ export default router
  * 动态生成侧边栏
  * */
 export function generatorNav () {
-    const RouteNav = bus['routes'][0].children
+    const RouteNav = routes[0].children
     const handler = {
         get () {
             return RouteNav.map(item => {
@@ -245,16 +254,18 @@ export function generatorNav () {
                 if (meta['parent_id']) {
                     const { ident } = store.getters
                     const itemIsHidden = POWER_CONTROLLER[item['path']][ident]['nav-is-hidden']
+
                     return {
                         id: item['name'],
                         icon: meta['icon'],
                         pathName: item['path'],
                         name: meta['title'],
                         hidden: !itemIsHidden,
-                        children: meta['_children']
+                        children: meta['_children'],
+                        order: meta['order']
                     }
                 }
-            }).filter(_ => _ && _['hidden'])
+            }).filter(_ => _ && _['hidden']).sort((a, b) => a.order - b.order)
         }
     }
     Object.defineProperty(handler, 'nav', handler)

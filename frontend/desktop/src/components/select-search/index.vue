@@ -13,6 +13,7 @@
         :multiple="multiple"
         :display-tag="true"
         :value="value"
+        :z-index="100000"
         :is-tag-width-limit="false"
         @change="$emit('update:value', $event)"
     >

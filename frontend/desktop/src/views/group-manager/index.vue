@@ -30,7 +30,6 @@
                 </template>
             </bk-table-column>
             <bk-table-column
-                key="group_level"
                 label="组织级别"
             >
                 <template slot-scope="prop">
@@ -38,7 +37,6 @@
                 </template>
             </bk-table-column>
             <bk-table-column
-                key="group_full_name"
                 label="秘书"
             >
                 <template slot-scope="prop">
@@ -49,7 +47,7 @@
             </bk-table-column>
 
             <bk-table-column label="操作"
-                width="150"
+                fix="right"
                 v-if="$store.getters.groupPowerConfig['table-controller']"
             >
                 <template slot-scope="props">

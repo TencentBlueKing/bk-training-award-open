@@ -6,7 +6,7 @@
 
 export default {
     data () {},
-    computed () {},
+    computed: {},
     mounted () {
         this.adjustTable()
     },
