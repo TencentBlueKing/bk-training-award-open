@@ -15,6 +15,7 @@
             <bk-table-column label="申请时间" prop="application_time"></bk-table-column>
             <bk-table-column label="申请原因"
                 prop="application_reason"
+                :min-width="150"
             >
                 <template slot-scope="props">
                     <span v-bk-overflow-tips="{ content: props.row['application_reason'] }">
@@ -23,8 +24,6 @@
                 </template>
             </bk-table-column>
             <bk-table-column label="状态"
-                :align="'center'"
-                :header-align="'center'"
             >
                 <template slot-scope="props">
                     <span :class="['status',props.row.approval_state_en]">
@@ -33,7 +32,6 @@
                 </template>
             </bk-table-column>
             <bk-table-column label="操作"
-                fixed="right"
             >
                 <template slot-scope="props">
                     <template
