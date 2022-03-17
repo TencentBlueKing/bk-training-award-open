@@ -1,90 +1,90 @@
 <template>
     <div class="group-manager-container">
-        <bk-button theme="primary"
-            icon="plus-circle-shape"
-            @click="toAddNewGroup($refs['newGroupDialogForm'])"
-            v-if="$store.getters.groupPowerConfig['add-new-group']"
-        >
-            指派秘书
-        </bk-button>
-        <bk-table size="small"
-            ext-cls="mt15"
-            :data="tableData"
-            :pagination="pagination"
-            :highlight-current-row="true"
-            @page-change="handlePageChange($event)"
-            @page-limit-change="handlePageLimitChange($event)"
-            v-bkloading="{ isLoading: tableDataIsLoading ,title: '加载中' }"
-            max-height="80%"
-        >
-            <bk-table-column type="index"
-                label="序号"
-                :width="80"
-            ></bk-table-column>
-            <bk-table-column
-                key="group_full_name"
-                label="组织名"
+        <top-back></top-back>
+        <div class="controller-panel mt20 mb15">
+            <select-search behavior="simplicity"
+                style="width: calc(2*118px + 1*8px);font-size: 15px;"
+                type="group"
+                value=""
+                :multiple="false"
+                placeholder="请选择需要查看的小组"
+            ></select-search>
+            <div class="button-panel">
+                <bk-button theme="success">加入小组</bk-button>
+                <bk-button theme="primary">创建小组</bk-button>
+                <bk-button theme="danger">移交小组</bk-button>
+            </div>
+        </div>
+        <tabs>
+            <bk-table size="small"
+                ext-cls="mt15"
+                :data="tableData"
+                :pagination="pagination"
+                :highlight-current-row="true"
+                @page-change="handlePageChange($event)"
+                @page-limit-change="handlePageLimitChange($event)"
+                v-bkloading="{ isLoading: tableDataIsLoading ,title: '加载中' }"
+                max-height="80%"
             >
-                <template slot-scope="prop">
-                    <span>{{ prop.row['group_full_name'] }}</span>
-                </template>
-            </bk-table-column>
-            <bk-table-column
-                label="组织级别"
-            >
-                <template slot-scope="prop">
-                    <span>{{ prop.row['group_full_name'] | groupLevel }}</span>
-                </template>
-            </bk-table-column>
-            <bk-table-column
-                label="秘书"
-            >
-                <template slot-scope="prop">
-                    <bk-tag v-for="master in prop.row['master'] || []" :key="master['username']">
-                        {{ master['username'] }}（{{ master['display_name'] }}）
-                    </bk-tag>
-                </template>
-            </bk-table-column>
+                <bk-table-column type="index"
+                    label="序号"
+                    :width="80"
+                ></bk-table-column>
+                <bk-table-column
+                    key="group_full_name"
+                    label="组织名"
+                >
+                    <template slot-scope="prop">
+                        <span>{{ prop.row['group_full_name'] }}</span>
+                    </template>
+                </bk-table-column>
+                <bk-table-column
+                    label="组织级别"
+                >
+                    <template slot-scope="prop">
+                        <span>{{ prop.row['group_full_name'] | groupLevel }}</span>
+                    </template>
+                </bk-table-column>
+                <bk-table-column
+                    label="秘书"
+                >
+                    <template slot-scope="prop">
+                        <bk-tag v-for="master in prop.row['master'] || []" :key="master['username']">
+                            {{ master['username'] }}（{{ master['display_name'] }}）
+                        </bk-tag>
+                    </template>
+                </bk-table-column>
 
-            <bk-table-column label="操作"
-                fix="right"
-                v-if="$store.getters.groupPowerConfig['table-controller']"
-            >
-                <template slot-scope="props">
-                    <bk-button theme="primary"
-                        @click="toEditRow($refs['EditorDialogForm'],props.row)"
-                        :outline="true"
-                        :text="true"
-                    >编辑
-                    </bk-button>
-                </template>
-            </bk-table-column>
-        </bk-table>
-        <GroupDialog ref="newGroupDialogForm"
-            dialog-type="creator"
-            @confirm="handleConfirmAddNewGroup($event,$refs['newGroupDialogForm'])"
-            :loading="newGroupLoading"
-            v-if="$store.getters.groupPowerConfig['add-new-group']"
-        >
-        </GroupDialog>
-        <GroupDialog ref="EditorDialogForm"
-            dialog-type="editor"
-            :group-disabled="true"
-            @confirm="handleConfirmEditGroup($event,$refs['EditorDialogForm'])"
-            v-if="$store.getters.groupPowerConfig['table-controller']"
-        >
-        </GroupDialog>
+                <bk-table-column label="操作"
+                    fix="right"
+                    v-if="$store.getters.groupPowerConfig['table-controller']"
+                >
+                    <template slot-scope="props">
+                        <bk-button theme="primary"
+                            @click="toEditRow($refs['EditorDialogForm'],props.row)"
+                            :outline="true"
+                            :text="true"
+                        >编辑
+                        </bk-button>
+                    </template>
+                </bk-table-column>
+            </bk-table>
+        </tabs>
+
     </div>
 </template>
 <script>
-    import { fixMixins, tableMixins } from '@/common/mixins'
+    import { tableMixins } from '@/common/mixins'
     import { getSecretary, postSecretary, putSecretary } from '@/api/service/group-service'
     import { GROUP_MANAGER_ROUTE_PATH } from '@/constants'
+    import SelectSearch from '@/components/select-search'
+    import Tabs from '@/components/Tabs'
 
     export default {
         name: GROUP_MANAGER_ROUTE_PATH,
         components: {
-            GroupDialog: () => import('./components/DialogArea/GroupDialog')
+            Tabs,
+            SelectSearch
         },
         filters: {
             groupLevel (value) {
@@ -92,7 +92,7 @@
                 return groupLevel || value
             }
         },
-        mixins: [fixMixins, tableMixins],
+        mixins: [tableMixins],
         data () {
             return {
                 // S 状态控制区
@@ -105,7 +105,10 @@
                 },
 
                 // E 信息控制区
-                remoteData: []
+                remoteData: [],
+                groupTabItems: [
+                ],
+                groupCurIndexStatus: ''
             }
         },
         computed: {
@@ -203,5 +206,11 @@
 </script>
 
 <style lang="postcss" scoped>
-  @import "./index.css";
+  .group-manager-container {
+    margin: 0 auto;
+    .controller-panel {
+      display: flex;
+      justify-content: space-between;
+    }
+  }
 </style>

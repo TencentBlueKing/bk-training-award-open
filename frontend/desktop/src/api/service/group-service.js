@@ -40,3 +40,7 @@ export function putSecretary (id, { group_id, secretaries, group_full_name }) {
 export function getUsermanageRetrieveUser () {
     return http.get('/usermanage/retrieve_user/')
 }
+
+export function getGroup () {
+    return http.get('/group/')
+}

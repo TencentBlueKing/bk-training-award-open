@@ -6,7 +6,6 @@
 import Vue from 'vue'
 import Vuex from 'vuex'
 
-import http from '@/api'
 import { unifyObjectStyle } from '@/common/util'
 import {
     GROUP_MANAGER_ROUTE_PATH,
@@ -14,8 +13,10 @@ import {
     IDENT_COMMON,
     IDENT_SECRETARY,
     MYCHECK_ROUTE_PATH,
-    POWER_CONTROLLER
+    POWER_CONTROLLER, ROUTE_TABLE
 } from '@/constants'
+import { getUserInfo } from '@/api/service/user-service'
+import { getGroup } from '@/api/service/group-service'
 
 Vue.use(Vuex)
 
@@ -27,6 +28,8 @@ const store = new Vuex.Store({
         mainContentLoading: false,
         // 系统当前登录用户
         user: {},
+        groupList: [],
+        ROUTE_TABLE: Object.freeze(ROUTE_TABLE),
         /**
          * 根据用户细节调整部分系统部分控件的
          * */
@@ -42,6 +45,7 @@ const store = new Vuex.Store({
     getters: {
         mainContentLoading: state => state.mainContentLoading,
         user: state => state.user,
+        groupList: state => state.groupList,
         ident: state => state.user_ident.ident,
         // 将权限转移到对应的页面，这样会更合适一些
         groupPowerConfig: state => {
@@ -72,7 +76,11 @@ const store = new Vuex.Store({
          * @param {Object} user user 对象
          */
         updateUser (state, user) {
-            state.user = Object.assign({}, user)
+            state.user = { ...user }
+        },
+
+        updateGroupList (state, groupList) {
+            state.groupList = [...groupList]
         },
         updateUserIdent (state, userIdent) {
             const { is_admin: isAdmin, is_secretary: isSecretary } = userIdent
@@ -103,13 +111,19 @@ const store = new Vuex.Store({
             // 例如本例子里，ajax 地址为 USER_INFO_URL，mock 地址为 USER_INFO_URL?AJAX_MOCK_PARAM=index&invoke=getUserInfo
 
             // 后端提供的地址
-            const url = USER_INFO_URL
             // mock 的地址，示例先使用 mock 地址
             // const mockUrl = USER_INFO_URL + (USER_INFO_URL.indexOf('?') === -1 ? '?' : '&') + AJAX_MOCK_PARAM + '=index&invoke=getUserInfo'
-            return http.get(url, {}, config).then(response => {
+            return getUserInfo(config).then(response => {
                 const userData = response.data || {}
                 context.commit('updateUser', userData)
                 return userData
+            })
+        },
+        group (context, config = {}) {
+            return getGroup(config).then(response => {
+                const groupList = response.data || {}
+                context.commit('updateGroupList', groupList)
+                return groupList
             })
         }
     }

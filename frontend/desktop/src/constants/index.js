@@ -63,7 +63,7 @@ export const AWARD_LEVEL_EN_MAP = {
  * 组人员缓存键值
  * */
 
-export const GROUP_USERS_KEYNAME = 'groupUser'
+export const GROUP_USERS_KEYNAME = 'user'
 export const GROUP_KEYNAME = 'group'
 export const GROUP_SECRETARY_KEYNAME = 'secretary'
 
@@ -87,7 +87,6 @@ export const AWARD_MANAGER_ROUTE_PATH = 'award-manager'
 export const AWARD_FORM_ROUTE_PATH = 'award-form'
 export const MYCHECK_ROUTE_PATH = 'mycheck'
 export const DETAIL_ROUTE_PATH = 'detail'
-export const CHECKPAGE_ROUTE_PATH = 'checkpage'
 export const BAD_404_ROUTE_PATH = '404'
 export const LOGIN_SUCCESS_ROUTE_PATH = '/account/login_success'
 
@@ -104,10 +103,6 @@ export const POWER_CONTROLLER = {
     },
     [MYAPPLY_ROUTE_PATH]: {
         [IDENT_ADMIN]: {
-            // 侧边栏是否隐藏
-            'nav-is-hidden': true,
-            // 是否禁止进入该页面
-            'is_forbidden': true
         },
         [IDENT_SECRETARY]: {},
         [IDENT_COMMON]: {}
@@ -121,41 +116,21 @@ export const POWER_CONTROLLER = {
         },
         [IDENT_SECRETARY]: {},
         [IDENT_COMMON]: {
-            // 侧边栏是否隐藏
-            'nav-is-hidden': true,
-            // 是否禁止进入该页面
-            'is_forbidden': true
         }
     },
     [AWARD_MANAGER_ROUTE_PATH]: {
         [IDENT_ADMIN]: {
-            // 侧边栏是否隐藏
-            'nav-is-hidden': true,
-            // 是否禁止进入该页面
-            'is_forbidden': true
         },
         [IDENT_SECRETARY]: {
         },
         [IDENT_COMMON]: {
-            // 侧边栏是否隐藏
-            'nav-is-hidden': true,
-            // 是否禁止进入该页面
-            'is_forbidden': true
         }
     },
     [MYCHECK_ROUTE_PATH]: {
         [IDENT_ADMIN]: {
-            // 侧边栏是否隐藏
-            'nav-is-hidden': true,
-            // 是否禁止进入该页面
-            'is_forbidden': true
         },
         [IDENT_SECRETARY]: {},
         [IDENT_COMMON]: {
-            // 侧边栏是否隐藏
-            'nav-is-hidden': true,
-            // 是否禁止进入该页面
-            'is_forbidden': true
         }
     },
     [DETAIL_ROUTE_PATH]: {
@@ -164,20 +139,10 @@ export const POWER_CONTROLLER = {
         [IDENT_SECRETARY]: {},
         [IDENT_COMMON]: {}
     },
-    [CHECKPAGE_ROUTE_PATH]: {
-        [IDENT_ADMIN]: {},
-        [IDENT_SECRETARY]: {},
-        [IDENT_COMMON]: {
-            // 是否禁止进入该页面
-            'is_forbidden': true
-        }
-    },
     [AWARD_FORM_ROUTE_PATH]: {
         [IDENT_ADMIN]: {},
         [IDENT_SECRETARY]: {},
         [IDENT_COMMON]: {
-            // 是否禁止进入该页面
-            'is_forbidden': true
         }
     },
     [BAD_404_ROUTE_PATH]: {
@@ -190,4 +155,16 @@ export const POWER_CONTROLLER = {
         [IDENT_SECRETARY]: {},
         [IDENT_COMMON]: {}
     }
+}
+export const ROUTE_TABLE = {
+    HOME_ROUTE_PATH,
+    CANAWARDS_ROUTE_PATH,
+    MYAPPLY_ROUTE_PATH,
+    GROUP_MANAGER_ROUTE_PATH,
+    AWARD_MANAGER_ROUTE_PATH,
+    AWARD_FORM_ROUTE_PATH,
+    MYCHECK_ROUTE_PATH,
+    DETAIL_ROUTE_PATH,
+    BAD_404_ROUTE_PATH,
+    LOGIN_SUCCESS_ROUTE_PATH
 }

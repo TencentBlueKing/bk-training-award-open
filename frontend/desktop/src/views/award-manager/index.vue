@@ -1,176 +1,57 @@
 <template>
     <div class="award-container">
-        <!-- 头部按钮区域 -->
-        <div class="header-container f-c-space-arround">
-            <div class="filter-panel">
-                <bk-collapse v-model="isFilter">
-                    <bk-collapse-item name="filter-panel"
-                        :hide-arrow="true"
-                        :custom-trigger-area="true">
-                        <div class="button-panel" slot="no-trigger">
-                            <!-- 左边按钮盘 -->
-                            <div class="left-panel">
-                                <bk-button theme="primary"
-                                    icon="plus-circle-shape"
-                                    @click="toAddNewAward()">
-                                    新增
-                                </bk-button>
-                                <bk-button theme="default"
-                                    @click="toBatchClone($refs['BatchCloneForm'],selectData)">
-                                    批量克隆
-                                </bk-button>
-                                <bk-button theme="default"
-                                    @click="toSendEmail($refs['BatchSendEmailForm'],selectData)">
-                                    邮件通知
-                                </bk-button>
-                                <bk-button theme="default"
-                                    @click="toBatchExport($refs['BatchExportForm'])">
-                                    批量导出
-                                </bk-button>
-                                <bk-button theme="default"
-                                    @click="toSendNotification($refs['NotificationForm'])">
-                                    获奖公示
-                                </bk-button>
-                            </div>
-                            <!-- /左边按钮盘 -->
-                            <!-- 右边按钮区域 -->
-                            <!--                            <div class="right-panel">-->
-                            <!--                                <bk-button ext-cls="filter-button f-center"-->
-                            <!--                                    type="default"-->
-                            <!--                                    @click="toShowFilterPanel($event)">-->
-                            <!--                                    &lt;!&ndash; TODO: 替换图标 &ndash;&gt;-->
-                            <!--                                    <FilterSvg></FilterSvg>-->
-                            <!--                                </bk-button>-->
-                            <!--                            </div>-->
-                            <!-- /右边按钮区域 -->
-                        </div>
-                        <!-- 高级筛选区域按钮开始 -->
-                        <!--                        <bk-form slot="content"-->
-                        <!--                            form-type="inline"-->
-                        <!--                            :label-width="20"-->
-                        <!--                            ext-cls="filter-form"-->
-                        <!--                        >-->
-                        <!--                            <bk-container :col="24" :gutter="1" flex>-->
-                        <!--                                <bk-row>-->
-                        <!--                                    <bk-col :span="8">-->
-                        <!--                                        <bk-form-item label="部门名称">-->
-                        <!--                                            <bk-input placeholder="请输入部门名称"-->
-                        <!--                                                v-model="formData.name"-->
-                        <!--                                                :clearable="true"-->
-                        <!--                                            >-->
-                        <!--                                            </bk-input>-->
-                        <!--                                        </bk-form-item>-->
-                        <!--                                    </bk-col>-->
-                        <!--                                    <bk-col :span="8">-->
-                        <!--                                        <bk-form-item label="开始申请时间">-->
-                        <!--                                            <bk-date-picker ext-cls="w-99"-->
-                        <!--                                                v-model="initDateTime"-->
-                        <!--                                                :placeholder="'选择开始申请时间'"-->
-                        <!--                                                :type="'datetime'"-->
-                        <!--                                            >-->
-                        <!--                                            </bk-date-picker>-->
-                        <!--                                        </bk-form-item>-->
-                        <!--                                    </bk-col>-->
-                        <!--                                    <bk-col :span="8">-->
-                        <!--                                        <bk-form-item label="奖项名称">-->
-                        <!--                                            <bk-input placeholder="请输入奖项名称"-->
-                        <!--                                                v-model="formData.name"-->
-                        <!--                                                :clearable="true"-->
-                        <!--                                            >-->
-                        <!--                                            </bk-input>-->
-                        <!--                                        </bk-form-item>-->
-                        <!--                                    </bk-col>-->
-                        <!--                                </bk-row>-->
-                        <!--                                <div style="height:12px;"></div>-->
-                        <!--                                <bk-row>-->
-                        <!--                                    <bk-col :span="8">-->
-                        <!--                                        <bk-form-item ext-cls="w-100" label="流程状态">-->
-                        <!--                                            <bk-select :disabled="false" v-model="value"-->
-                        <!--                                                ext-cls="form-item w-99"-->
-                        <!--                                                ext-popover-cls="select-popover-custom"-->
-                        <!--                                                placeholder="请选择奖项状态"-->
-                        <!--                                                searchable-->
-                        <!--                                                :clearable="true"-->
-                        <!--                                            >-->
-                        <!--                                                <bk-option v-for="option in list"-->
-                        <!--                                                    :key="option.id"-->
-                        <!--                                                    :id="option.id"-->
-                        <!--                                                    :name="option.name"-->
-                        <!--                                                >-->
-                        <!--                                                </bk-option>-->
-                        <!--                                            </bk-select>-->
-                        <!--                                        </bk-form-item>-->
-                        <!--                                    </bk-col>-->
-                        <!--                                    <bk-col :span="8">-->
-                        <!--                                        <bk-form-item label="截止申请时间">-->
-                        <!--                                            <bk-date-picker ext-cls="w-99"-->
-                        <!--                                                v-model="initDateTime"-->
-                        <!--                                                :placeholder="'选择截止申请时间'"-->
-                        <!--                                                :type="'datetime'"-->
-                        <!--                                            >-->
-                        <!--                                            </bk-date-picker>-->
-                        <!--                                        </bk-form-item>-->
-                        <!--                                    </bk-col>-->
-                        <!--                                    <bk-col :span="8">-->
-                        <!--                                        <div class="f-space-between w-80">-->
-                        <!--                                            <bk-button theme="primary">筛选过滤</bk-button>-->
-                        <!--                                            <bk-button theme="danger">清空查询</bk-button>-->
-                        <!--                                        </div>-->
-                        <!--                                    </bk-col>-->
-                        <!--                                </bk-row>-->
-                        <!--                            </bk-container>-->
-                        <!--                        </bk-form>-->
-                    </bk-collapse-item>
-                </bk-collapse>
-            </div>
-        </div>
-        <!-- /头部按钮区域 -->
+        <top-back></top-back>
         <!-- 表格按钮区域 -->
-        <bk-table class="mt15"
-            :data="tableData"
-            :size="'small'"
-            :pagination="pagination"
-            @page-change="handleCurrentChange($event)"
-            @page-limit-change="handlePageSizeChange($event)"
-            @selection-change="handleSetSelectData"
-        >
-            <bk-table-column type="selection" width="60"></bk-table-column>
-            <bk-table-column type="index"
-                label="序号"
-                width="60"
-            ></bk-table-column>
-            <bk-table-column v-for="(rowLabel,rowProp) in tableSettings"
-                :key="rowProp"
-                :label="rowLabel"
+
+        <div class="header-controller-panel"></div>
+        <tabs class="mt15">
+            <bk-table class="mt15"
+                :data="tableData"
+                :size="'small'"
+                :pagination="pagination"
+                @page-change="handleCurrentChange($event)"
+                @page-limit-change="handlePageSizeChange($event)"
+                @selection-change="handleSetSelectData"
             >
-                <template slot-scope="prop">
-                    <span>{{ prop.row[rowProp] }}</span>
-                </template>
-            </bk-table-column>
-            <bk-table-column label="操作">
-                <template slot-scope="props">
-                    <div v-show="props.row['approval_state'] !== config['award_status']['not_apply']">
-                        <bk-button theme="primary"
-                            :text="true"
-                            @click="toEditRow(props.row)"
-                        >编辑
-                        </bk-button>
-                        <bk-popconfirm
-                            :title="'确认删除该奖项（' + props.row.awardName + '）？'"
-                            trigger="click"
-                            content="删除操作无法撤回，请谨慎操作！"
-                            @confirm="confirmDelAward(props.row)"
-                        >
-                            <bk-button theme="primary" text>删除</bk-button>
-                        </bk-popconfirm>
-                        <bk-button theme="primary" text @click="toGetDetail(props.row,$refs['GetDetailDialog'])">详情</bk-button>
-                    </div>
-                    <div v-show="props.row['approval_state'] === config['award_status']['not_apply']">
-                        <bk-button theme="primary" text @click="toEndAward(props.row,$refs['EndAwardForm'])">结束</bk-button>
-                    </div>
-                </template>
-            </bk-table-column>
-        </bk-table>
+                <bk-table-column type="selection" width="60"></bk-table-column>
+                <bk-table-column type="index"
+                    label="序号"
+                    width="60"
+                ></bk-table-column>
+                <bk-table-column v-for="(rowLabel,rowProp) in tableSettings"
+                    :key="rowProp"
+                    :label="rowLabel"
+                >
+                    <template slot-scope="prop">
+                        <span>{{ prop.row[rowProp] }}</span>
+                    </template>
+                </bk-table-column>
+                <bk-table-column label="操作">
+                    <template slot-scope="props">
+                        <div v-show="props.row['approval_state'] !== config['award_status']['not_apply']">
+                            <bk-button theme="primary"
+                                :text="true"
+                                @click="toEditRow(props.row)"
+                            >编辑
+                            </bk-button>
+                            <bk-popconfirm
+                                :title="'确认删除该奖项（' + props.row.awardName + '）？'"
+                                trigger="click"
+                                content="删除操作无法撤回，请谨慎操作！"
+                                @confirm="confirmDelAward(props.row)"
+                            >
+                                <bk-button theme="primary" text>删除</bk-button>
+                            </bk-popconfirm>
+                            <bk-button theme="primary" text @click="toGetDetail(props.row,$refs['GetDetailDialog'])">详情</bk-button>
+                        </div>
+                        <div v-show="props.row['approval_state'] === config['award_status']['not_apply']">
+                            <bk-button theme="primary" text @click="toEndAward(props.row,$refs['EndAwardForm'])">结束</bk-button>
+                        </div>
+                    </template>
+                </bk-table-column>
+            </bk-table>
+
+        </tabs>
         <!-- /表格按钮区域 -->
 
         <!-- 弹出区域 -->
@@ -197,7 +78,7 @@
     </div>
 </template>
 <script>
-    import { fixMixins, tableMixins } from '@/common/mixins'
+    import { tableMixins } from '@/common/mixins'
     import { APPLYED, AWARD_APPROVAL_STATE_MAP, ENDED, NOT_APPLY } from '@/constants'
     import { deleteAward, getAwards } from '@/api/service/award-service'
     import { bus } from '@/common/bus'
@@ -214,10 +95,6 @@
             // FilterSvg: () => import('./components/Svg/FilterSvg')
         },
         mixins: [
-            /**
-             * 修复 bug 的混入
-             * */
-            fixMixins,
             /**
              * 分页器的混入
              * */
@@ -326,16 +203,13 @@
                     return null
                 }
                 sendEmailDialog.show()
-                this.notImplemented('数据接口对接')
             },
             // 批量导出
             toBatchExport (batchExportDialog) {
-                this.notImplemented('导出数据')
             },
             // 展示公告弹框
             toSendNotification (sendNotificationDialog) {
                 sendNotificationDialog.show()
-                this.notImplemented('获取成员信息')
             },
             // 展示高级筛选
             // toShowFilterPanel () {

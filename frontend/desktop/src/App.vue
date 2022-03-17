@@ -4,7 +4,7 @@
             :header-title="nav.title"
             :side-title="nav.title"
             :default-open="true"
-            :need-menu="true"
+            :need-menu="false"
             :navigation-type="'top-bottom'"
             @toggle="handleToggle"
         >
@@ -13,49 +13,10 @@
                 <div class="monitor-navigation-header">
                     <ol class="header-nav">
                         <bk-breadcrumb>
-                            <bk-breadcrumb-item>{{ header.name }}</bk-breadcrumb-item>
+                            <bk-breadcrumb-item style="color: white;">{{ header.name }}</bk-breadcrumb-item>
                         </bk-breadcrumb>
                     </ol>
-
-                    <!--                    <div class="top-menu">-->
-                    <!--                        <div v-for="topMenu in userTopMenu"-->
-                    <!--                            :key="topMenu.label"-->
-                    <!--                            :class="['header-mind',{-->
-                    <!--                                'active': $route.name === topMenu.path-->
-                    <!--                            }]" @click="topMenu.func"-->
-                    <!--                        >-->
-                    <!--                            <div class="pl5 f15">{{ topMenu.label }}</div>-->
-                    <!--                        </div>-->
-                    <!--                    </div>-->
-
                 </div>
-            </template>
-            <template slot="menu">
-                <bk-navigation-menu
-                    ref="menu"
-                    @select="handleSelect"
-                    :default-active="nav.id"
-                    :toggle-active="nav.toggle"
-                >
-                    <bk-navigation-menu-item
-                        v-for="item in nav.list"
-                        :has-child="item.children && !!item.children.length"
-                        :key="item.id"
-                        v-bind="item"
-                    >
-                        <span>{{ item.name }}</span>
-                        <div slot="child">
-                            <bk-navigation-menu-item
-                                v-for="child in item.children"
-                                :key="child.id"
-                                :default-active="child.active"
-                                v-bind="child"
-                            >
-                                <span>{{ child.name }}</span>
-                            </bk-navigation-menu-item>
-                        </div>
-                    </bk-navigation-menu-item>
-                </bk-navigation-menu>
             </template>
             <div class="monitor-navigation-content">
                 <main class="main-content" v-bkloading="{ isLoading: mainContentLoading, opacity: 1 }">
@@ -76,7 +37,6 @@
     import { mapGetters } from 'vuex'
     import { bus } from '@/common/bus'
     import { getUsermanageRetrieveUser } from '@/api/service/group-service'
-    import { generatorNav } from '@/router'
     import { MYAPPLY_ROUTE_PATH, MYCHECK_ROUTE_PATH, POWER_CONTROLLER } from '@/constants'
 
     export default {
@@ -158,7 +118,6 @@
                     }
                     this.$store.commit('updateUserIdent', userStatus)
                     // 完成权限获取，生成对应路由
-                    this.nav.list = generatorNav()
                 }).finally(_ => {
                     bus.$emit('main-loading', false)
                 })
@@ -185,7 +144,9 @@
 @import './css/reset.css';
 @import './css/app.css';
 @import "@/css/mixins/scroll.css";
-
+* {
+  @mixin scroller #e6e9ea 2px;
+}
 .bk-navigation-title .title-desc {
   user-select: none;
 }
@@ -212,6 +173,7 @@
     display: flex;
     padding: 0;
     margin: 0;
+
   }
 
   .top-menu {
@@ -244,20 +206,14 @@
 }
 
 .monitor-navigation-content {
-  @mixin scroller;
-  overflow: scroll;
-  padding: 5px 15px 15px 15px;
   font-size: 14px;
   color: #737987;
   height: calc(100% - 84px);
-  background: #FFFFFF;
-  -webkit-box-shadow: 0 2px 4px 0 rgba(25, 25, 41, 0.05);
-  box-shadow: 0 2px 4px 0 rgba(25, 25, 41, 0.05);
-  border-radius: 3px;
-  border: 1px solid rgba(220, 222, 229, 1);
-
+  background: transparent;
+  width: 100%;
   .main-content {
-    min-height: 600px;
+    height: calc(100%);
+    width: 100%;
   }
 }
 
@@ -278,5 +234,7 @@
   color: #63656e;
   font-size: 12px;
 }
-
+.w-80 {
+  width: 80% !important;
+}
 </style>

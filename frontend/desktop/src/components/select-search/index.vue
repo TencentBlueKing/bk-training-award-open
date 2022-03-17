@@ -13,9 +13,10 @@
         :multiple="multiple"
         :display-tag="true"
         :value="value"
-        :z-index="100000"
+        :z-index="9999999999"
         :is-tag-width-limit="false"
         @change="$emit('update:value', $event)"
+        :behavior="$attrs['behavior']"
     >
     </bk-select>
 </template>
