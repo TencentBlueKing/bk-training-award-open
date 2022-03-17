@@ -1,6 +1,0 @@
-.group-manager-container {
-  /deep/ .bk-table-empty-block {
-    height: inherit !important;
-    overflow: hidden;
-  }
-}

@@ -1,37 +1,9 @@
 <template>
     <div class="mycheck-container">
-        <!--        <bk-form form-type="inline">-->
-        <!--            <bk-form-item-->
-        <!--                label="部门名称"-->
-        <!--                class="mt10"-->
-        <!--                label-width="auto"-->
-        <!--            >-->
-        <!--                <bk-input v-model="pagination.department_name"-->
-        <!--                    placeholder="请输入部门名称"-->
-        <!--                    class="inline-block"-->
-        <!--                    style="width: 200px;"-->
-        <!--                    :right-icon="'bk-icon icon-search'"-->
-        <!--                    :clearable="true"-->
-        <!--                >-->
-        <!--                </bk-input>-->
-        <!--            </bk-form-item>-->
+        <top-back></top-back>
 
-        <!--            <bk-form-item-->
-        <!--                label="奖项名称"-->
-        <!--                class="mt10"-->
-        <!--                label-width="auto"-->
-        <!--            >-->
-        <!--                <bk-input v-model="pagination.award_name"-->
-        <!--                    placeholder="请输入奖项名称"-->
-        <!--                    class="inline-block"-->
-        <!--                    :right-icon="'bk-icon icon-search'"-->
-        <!--                    :clearable="true"-->
-        <!--                    style="width: 200px;"-->
-        <!--                >-->
-        <!--                </bk-input>-->
-        <!--            </bk-form-item>-->
-        <!--        </bk-form>-->
-        <div>
+        <div class="header-controller-panel"></div>
+        <tabs class="mt15">
             <bk-table class="mt10"
                 :pagination="pagination"
                 @page-change="handleChangePage($event)"
@@ -122,7 +94,7 @@
                     </template>
                 </bk-table-column>
             </bk-table>
-        </div>
+        </tabs>
         <bk-dialog v-model="approvalForm.editing"
             :header-position="'left'"
             :confirm-fn="() => handleConfirmToSubmitDelApproval(approvalForm)"

@@ -18,9 +18,16 @@ const config = {
 function getUser () {
     return store.dispatch('userInfo', config)
 }
-
+// function getGroup () {
+//     const config = {
+//         fromCache: true,
+//         cancelWhenRouteChange: false
+//     }
+//     return store.dispatch('group', config)
+// }
 export default function () {
     return Promise.all([
         getUser()
+        // getGroup()
     ])
 }

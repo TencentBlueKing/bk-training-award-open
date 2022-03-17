@@ -41,8 +41,6 @@ class Admin(models.Model):
 
 
 # 申请表approval_state choices
-
-
 class ApprovalState(Enum):
     review_pending = 0, "待评审"
     review_passed = 1, "评审通过"
@@ -51,8 +49,6 @@ class ApprovalState(Enum):
 
 
 # 申请表
-
-
 class AwardApplicationRecord(models.Model):
     award_id = models.IntegerField(verbose_name="奖项id")
     application_time = models.DateTimeField(verbose_name="申请时间")

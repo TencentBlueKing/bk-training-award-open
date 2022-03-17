@@ -1,75 +1,10 @@
 <template>
     <div class="my-apply-container">
-        <bk-table style="margin-top: 15px;"
-            :data="tableData"
-            :pagination="pagination"
-            @page-change="handlePageChange($event)"
-            @page-limit-change="handleLimitChange($event)"
-            v-bkloading="{ isLoading: isLoading }"
-        >
-            <bk-table-column label="序号"
-                type="index"
-                width="80"
-            ></bk-table-column>
-            <bk-table-column label="奖项名称" prop="award_name"></bk-table-column>
-            <bk-table-column label="申请时间" prop="application_time"></bk-table-column>
-            <bk-table-column label="申请原因"
-                prop="application_reason"
-                :min-width="150"
-            >
-                <template slot-scope="props">
-                    <span v-bk-overflow-tips="{ content: props.row['application_reason'] }">
-                        {{ props.row['application_reason'] }}
-                    </span>
-                </template>
-            </bk-table-column>
-            <bk-table-column label="状态"
-            >
-                <template slot-scope="props">
-                    <span :class="['status',props.row.approval_state_en]">
-                        {{ props.row.approval_state_cn }}
-                    </span>
-                </template>
-            </bk-table-column>
-            <bk-table-column label="操作"
-            >
-                <template slot-scope="props">
-                    <template
-                        v-if="approval_status_button_config[props.row['approval_state']]['is-review_pending']"
-                    >
-                        <bk-button
-                            theme="primary"
-                            :text="true"
-                            @click="handleToApply(props.row)"
-                        >
-                            编辑申请
-                        </bk-button>
-                        <bk-popconfirm
-                            :title="'确认撤销申请该奖项（' + props.row['award_name'] + '）？'"
-                            trigger="click"
-                            content="删除操作无法撤回，请谨慎操作！"
-                            @confirm="handleToDelApply(props.row)"
-                        >
-                            <bk-button
-                                class="ml10"
-                                theme="primary"
-                                :text="true"
-                            >
-                                撤销申请
-                            </bk-button>
-                        </bk-popconfirm>
-                    </template>
-                    <bk-button v-else class="mr10"
-                        theme="primary"
-                        :text="true"
-                        @click="approval_status_button_config[props.row['approval_state']]['button-func'](props.row)"
-                        :disabled="approval_status_button_config[props.row['approval_state']]['disabled']"
-                    >
-                        {{ approval_status_button_config[props.row['approval_state']]['button-title'] }}
-                    </bk-button>
-                </template>
-            </bk-table-column>
-        </bk-table>
+        <top-back></top-back>
+        <div class="header-controller-panel"></div>
+        <tabs class="mt15">
+            <bk-table></bk-table>
+        </tabs>
     </div>
 </template>
 
@@ -86,6 +21,7 @@
     } from '@/constants'
 
     export default {
+        components: { },
         data () {
             return {
                 userInfo: null,
@@ -187,8 +123,8 @@
                 this.$router.push({
                     name: 'detail',
                     params: {
-                      ...curInfo,
-                      type: 'apply'
+          ...curInfo,
+          type: 'apply'
                     }
                 })
             }

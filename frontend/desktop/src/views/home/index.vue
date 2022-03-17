@@ -1,123 +1,207 @@
 <template>
     <div class="home-container">
-        <Divider @click="toGetMoreCanAvailableAward()">
-            <bk-link>可申请奖项</bk-link>
-        </Divider>
-        <div class="available-bar mt10 mb10 bk-slide-fade-left p5">
-            <AwardCardContainer v-for="award in availableAwardList" :key="award.id" :award="award"></AwardCardContainer>
-            <bk-exception v-if="!availableAwardList.length" class="exception-wrap-item exception-part" type="empty"
-                scene="part"></bk-exception>
+        <div class="head-panel">
+            <div class="header-main">
+                <header-nav style="background: var(--gradient-orange-red);"
+                    @click="headerTrigger($store.state['ROUTE_TABLE']['GROUP_MANAGER_ROUTE_PATH'])"
+                >
+                    <bk-icon slot="top-icon" name="sitemap"></bk-icon>
+                    我的小组
+                </header-nav>
+                <header-nav style="background: var(--gradient-blue);"
+                    @click="headerTrigger($store.state['ROUTE_TABLE']['AWARD_FORM_ROUTE_PATH'],{
+                        query: {
+                            type: 'create'
+                        }
+                    })"
+                >
+                    <bk-icon slot="top-icon" name="sitemap"></bk-icon>
+                    创建奖项
+                </header-nav>
+                <header-nav style="background: var(--gradient-orange-pink);"
+                    @click="headerTrigger($store.state['ROUTE_TABLE']['MYAPPLY_ROUTE_PATH'])"
+                >
+                    <bk-icon slot="top-icon" name="sitemap"></bk-icon>
+                    我的申请
+                </header-nav>
+                <header-nav style="background: var(--gradient-green);"
+                    @click="headerTrigger($store.state['ROUTE_TABLE']['AWARD_MANAGER_ROUTE_PATH'])"
+                >
+                    <bk-icon slot="top-icon" name="sitemap"></bk-icon>
+                    奖项列表
+                </header-nav>
+                <header-nav style="background: var(--gradient-purple);"
+                    @click="headerTrigger($store.state['ROUTE_TABLE']['MYCHECK_ROUTE_PATH'])"
+                >
+                    <bk-icon slot="top-icon" name="sitemap"></bk-icon>
+                    审批记录
+                </header-nav>
+            </div>
         </div>
-        <Divider @click="toGetMoreAppliedAward()">
-            <bk-link>历史获得奖项</bk-link>
-        </Divider>
-        <div class="available-bar mt10 bk-slide-fade-left p5">
-            <AwardCardContainer v-for="award in historyAwardList" :key="award.id" :award="award"></AwardCardContainer>
-            <bk-exception v-if="!historyAwardList.length" class="exception-wrap-item exception-part" type="empty"
-                scene="part"></bk-exception>
+        <div class="footer-panel">
+            <tabs style="width: calc(5*118px + 4*8px);"
+                :tab-items="[{
+                    'tab-name': '可申请奖项',
+                    'tab-key': 'available_award'
+                },{
+                    'tab-name': '奖项审批',
+                    'tab-key': 'available_approval'
+                }]"
+                v-model="workbenchCurIndex"
+            >
+                <tempalte>
+                    <div v-show="workbenchCurIndex === 'available_award'">
+                        <bk-table
+                            :data="tableData"
+                            :outer-border="false"
+                            :header-border="false"
+                            :header-cell-style="{ background: '#fff' }"
+                        >
+                            <bk-table-column type="index" label="序列" width="60"></bk-table-column>
+                        </bk-table>
+                    </div>
+                    <div v-show="workbenchCurIndex === 'available_approval'">
+                        <bk-table
+                            :data="tableData"
+                            :outer-border="false"
+                            :header-border="false"
+                            :header-cell-style="{ background: '#fff' }"
+                        >
+                            <bk-table-column type="index" label="序列" width="60"></bk-table-column>
+                            <bk-table-column type="index" label="序列" width="60"></bk-table-column>
+                        </bk-table>
+                    </div>
+                </tempalte>
+            </tabs>
+            <tabs style="width: 370px"
+                :tab-items="[{
+                    'tab-name': '消息记录',
+                    'tab-key': 'message-record'
+                }]"
+            >
+                <bk-link slot="right-controller" underline theme="primary">一键已读</bk-link>
+                <template>
+                    <message-card></message-card>
+                </template>
+            </tabs>
+            <div class="cartoon">
+                <cartoon-robot>
+                    <span>{{grant}}，{{$store.state.user['username']}}</span>
+                </cartoon-robot>
+            </div>
+
         </div>
     </div>
 </template>
 <script>
-    import { fixMixins } from '../../common/mixins'
-    import { getAppliedAwards, getAvailableAwards } from '@/api/service/award-service'
-    import { AWARD_APPROVAL_STATE_EN_MAP, AWARD_APPROVAL_STATE_MAP } from '@/constants'
-
     export default {
         name: 'Home',
         components: {
-            AwardCardContainer: () => import('./components/AwardCard'),
-            Divider: () => import('./components/Divider')
+            MessageCard: () => import('@/views/home/MessageCard'),
+            HeaderNav: () => import('@/views/home/HeaderNav'),
+            Tabs: () => import('@/components/Tabs'),
+            CartoonRobot: () => import('@/components/cartoon-robot')
+
         },
-        mixins: [fixMixins],
         data () {
             return {
-                historyAwardListRemoteData: [],
-                availableAwardListRemoteData: []
+                workbenchCurIndex: 'available_award',
+                remoteData: []
             }
         },
         computed: {
-            historyAwardList (self) {
-                return self.historyAwardListRemoteData?.map?.(item => {
-                    return {
-                        ...item['award_info'],
-                        ...item,
-                        approval_state_en: AWARD_APPROVAL_STATE_EN_MAP[item['approval_state']],
-                        approval_state_cn: AWARD_APPROVAL_STATE_MAP[item['approval_state']]
-                    }
-                }) ?? []
+            tableData (self) {
+                return self.remoteData
             },
-            availableAwardList (self) {
-                return self.availableAwardListRemoteData?.map?.(item => {
-                    return {
-                        ...item['award_info'],
-                        ...item,
-                        approval_state_en: AWARD_APPROVAL_STATE_EN_MAP[item['approval_state']],
-                        approval_state_cn: AWARD_APPROVAL_STATE_MAP[item['approval_state']]
-                    }
-                }) ?? []
+            grant () {
+                const now = (new Date()).getHours()
+                if (now > 0 && now <= 6) {
+                    return '午夜好'
+                }
+                if (now > 6 && now <= 11) {
+                    return '早上好'
+                }
+                if (now > 11 && now <= 14) {
+                    return '中午好'
+                }
+                if (now > 14 && now <= 18) {
+                    return '下午好'
+                }
+                return '晚上好'
             }
+
         },
         created () {
             this.handleInit()
         },
-        mounted () {
-            this.adjustTable()
-        },
         methods: {
             handleInit () {
-                Promise.all([
-                    this.handleGetAvailableAwards(),
-                    this.handleGetApplyedAwards()
-                ])
+                Promise.all([])
             },
-            toGetMoreAppliedAward () {
-                return this.$router.push({
-                    name: 'myapply'
-                })
-            },
-            toGetMoreCanAvailableAward () {
+            headerTrigger (routeName, config = {}) {
                 this.$router.push({
-                    name: 'canawards'
+                    name: routeName,
+                    ...config
                 })
-            },
+            }
             /**
              * 请求区域开始
              * */
-            handleGetAvailableAwards () {
-                return getAvailableAwards(1, 4).then(res => {
-                    this.availableAwardListRemoteData = res['data']['data']
-                    return res
-                })
-            },
-            handleGetApplyedAwards () {
-                return getAppliedAwards(1, 4).then(res => {
-                    console.log(res)
-                    this.historyAwardListRemoteData = res['data']['data']
-                    return res
-                })
-            }
         }
 
     }
 </script>
 <style lang="postcss" scoped>
-@import "@/css/mixins/scroll.css";
-
 .home-container {
-
-  overflow-y: scroll;
+  --gradient-orange-red: linear-gradient(89.69deg, #F39034 2.03%, #FF2727 99.73%);
+  --gradient-blue: linear-gradient(270deg, #003AD2 0%, #0097EC 100%);
+  --gradient-orange-pink: linear-gradient(89.69deg, #FF4433 2.03%, #EC008C 99.73%);
+  --gradient-green: linear-gradient(270.23deg, #00A843 0.19%, #1FD071 99.8%);
+  --gradient-purple: linear-gradient(269.97deg, #5900C9 0.02%, #9852F0 99.98%);
   height: inherit;
-  @mixin scroller 4px #e6e9ea;
 
-  .available-bar {
-    @mixin scroller 2px #e6e9ea;
+  .head-panel {
     display: flex;
-    flex-wrap: wrap;
-    width: inherit;
+    justify-content: center;
+    min-height: 35%;
     overflow-x: scroll;
+    align-items: center;
+    flex: 1;
 
+    .header-main {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+
+    }
+  }
+
+  .footer-panel {
+    min-height: 50%;
+    display: flex;
+    flex: 1;
+    justify-content: space-around;
+    width: inherit;
+
+    .controller-panel {
+      height: 385px;
+      width: 802px;
+      background-color: #FFFFFF;
+      border-radius: 20px;
+      box-shadow: 0 4px 90px rgba(163, 171, 185, 0.24);
+    }
+
+    .message-panel {
+      width: 391px;
+      background-color: #FFFFFF;
+      border-radius: 20px;
+      box-shadow: 0 4px 90px rgba(163, 171, 185, 0.24);
+    }
+
+    .cartoon {
+      width: 391px;
+
+    }
   }
 }
-
 </style>

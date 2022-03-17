@@ -4,7 +4,7 @@
  */
 
 import Vue from 'vue'
-
+import waves from '@/common/directives'
 // 全量引入
 import './fully-import'
 
@@ -51,7 +51,9 @@ export const messageWarn = (message, delay = 3000) => {
         hasCloseIcon: true
     })
 }
-
+Vue.use(waves)
+Vue.component('top-back', () => import('@/components/top-back'))
+Vue.component('tabs', () => import('@/components/Tabs'))
 Vue.prototype.messageError = messageError
 Vue.prototype.messageSuccess = messageSuccess
 Vue.prototype.messageInfo = messageInfo
