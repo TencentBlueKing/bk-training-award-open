@@ -1,0 +1,62 @@
+[tool.poetry]
+name = "bk-award"
+version = "0.1.0"
+description = ""
+authors = ["TencentBlueking"]
+license = "MIT"
+
+[tool.poetry.dependencies]
+python = "^3.9"
+Django = "<4"
+djangorestframework = "^3.13.1"
+drf-yasg = "^1.20.0"
+uvicorn = "^0.17.6"
+gunicorn = "^20.1.0"
+
+[tool.poetry.dev-dependencies]
+black = "^22.1.0"
+isort = "^5.10.1"
+pytest = "^7.1.0"
+pyproject-flake8 = "^0.0.1-alpha.2"
+mypy = "^0.941"
+
+[build-system]
+requires = ["poetry-core>=1.0.0"]
+build-backend = "poetry.core.masonry.api"
+
+[tool.black]
+line-length = 119
+skip-string-normalization = 'true'
+exclude = '''
+/(
+  | .+/migrations
+  | .+/sdk
+  | .+/node_modules
+)/
+'''
+
+[tool.isort]
+multi_line_output = 3
+include_trailing_comma = 'true'
+force_grid_wrap = 0
+use_parentheses = 'true'
+line_length = 119
+skip_glob = ["*/node_modules/**"]
+
+[tool.flake8]
+ignore = "C901,E203,W503"
+max-line-length = 119
+max-complexity = 8
+format = "pylint"
+exclude = "*migrations*,*.pyc,.git,__pycache__"
+
+[tool.mypy]
+ignore_missing_imports = true
+show_error_codes = true
+
+[[tool.mypy.overrides]]
+module = [
+    "*.migrations.*",
+    "*.settings.*",
+]
+ignore_errors = true
