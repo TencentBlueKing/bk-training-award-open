@@ -14,13 +14,12 @@
             }
         },
         methods: {}
-
     }
 </script>
 
 <style lang="postcss" scoped>
 .top-back {
-
+  display: inline-block;
   .top-robot {
     width: 6em;
     transform: rotateY(-180deg);

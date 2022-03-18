@@ -1,9 +1,29 @@
 <template>
     <div class="my-apply-container">
         <top-back></top-back>
-        <div class="header-controller-panel"></div>
-        <tabs class="mt15">
-            <bk-table></bk-table>
+        <div class="header-controller-panel mt15 mb20">
+            <select-search
+                style="width: var(--xs)"
+                behavior="simplicity"
+            ></select-search>
+        </div>
+        <tabs class="mt15"
+            :tab-items="[{
+                'tab-name': '待审批',
+                'tab-key': 'pending-approval'
+            },{
+                'tab-name': '评审中',
+                'tab-key': 'ing-approval'
+            },{
+                'tab-name': '已审批',
+                'tab-key': 'ended-approval'
+            }
+            ]"
+            v-model="curSelectedTable"
+        >
+            <template>
+
+            </template>
         </tabs>
     </div>
 </template>
@@ -19,9 +39,10 @@
         REVIEW_PASSED,
         REVIEW_PENDING
     } from '@/constants'
+    import SelectSearch from '@/components/select-search'
 
     export default {
-        components: { },
+        components: { SelectSearch },
         data () {
             return {
                 userInfo: null,
@@ -53,7 +74,10 @@
                             'button-func': this.handleToApply
                         }
                     }
-                }
+                },
+
+                // 当前选择的表格
+                curSelectedTable: 'pending-approval'
             }
         },
         computed: {
@@ -134,4 +158,9 @@
 
 <style lang="postcss" scoped>
 @import './index.css';
+
+.my-apply-container {
+  $size: 2;
+  --xs: calc($size * 118px + ($size - 1) * 8px);
+}
 </style>

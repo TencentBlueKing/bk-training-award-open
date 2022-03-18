@@ -8,6 +8,7 @@
                 value=""
                 :multiple="false"
                 placeholder="请选择需要查看的小组"
+                :clearable="false"
             ></select-search>
             <div class="button-panel">
                 <bk-button theme="success">加入小组</bk-button>
@@ -16,37 +17,30 @@
             </div>
         </div>
         <tabs>
-            <bk-table size="small"
-                ext-cls="mt15"
-                :data="tableData"
-                :pagination="pagination"
-                :highlight-current-row="true"
-                @page-change="handlePageChange($event)"
-                @page-limit-change="handlePageLimitChange($event)"
-                v-bkloading="{ isLoading: tableDataIsLoading ,title: '加载中' }"
-                max-height="80%"
-            >
+            <self-table>
                 <bk-table-column type="index"
                     label="序号"
                     :width="80"
                 ></bk-table-column>
                 <bk-table-column
                     key="group_full_name"
-                    label="组织名"
+                    label="用户名"
+                    :width="200"
+
                 >
                     <template slot-scope="prop">
                         <span>{{ prop.row['group_full_name'] }}</span>
                     </template>
                 </bk-table-column>
                 <bk-table-column
-                    label="组织级别"
+                    label="手机号"
                 >
                     <template slot-scope="prop">
                         <span>{{ prop.row['group_full_name'] | groupLevel }}</span>
                     </template>
                 </bk-table-column>
                 <bk-table-column
-                    label="秘书"
+                    label="邮箱"
                 >
                     <template slot-scope="prop">
                         <bk-tag v-for="master in prop.row['master'] || []" :key="master['username']">
@@ -57,18 +51,18 @@
 
                 <bk-table-column label="操作"
                     fix="right"
-                    v-if="$store.getters.groupPowerConfig['table-controller']"
                 >
                     <template slot-scope="props">
                         <bk-button theme="primary"
                             @click="toEditRow($refs['EditorDialogForm'],props.row)"
                             :outline="true"
                             :text="true"
-                        >编辑
+                            :disabled="$store.getters.groupPowerConfig['table-controller']"
+                        >移除
                         </bk-button>
                     </template>
                 </bk-table-column>
-            </bk-table>
+            </self-table>
         </tabs>
 
     </div>
@@ -106,8 +100,7 @@
 
                 // E 信息控制区
                 remoteData: [],
-                groupTabItems: [
-                ],
+                groupTabItems: [],
                 groupCurIndexStatus: ''
             }
         },
@@ -206,11 +199,12 @@
 </script>
 
 <style lang="postcss" scoped>
-  .group-manager-container {
-    margin: 0 auto;
-    .controller-panel {
-      display: flex;
-      justify-content: space-between;
-    }
+.group-manager-container {
+  margin: 0 auto;
+
+  .controller-panel {
+    display: flex;
+    justify-content: space-between;
   }
+}
 </style>

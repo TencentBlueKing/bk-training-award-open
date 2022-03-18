@@ -2,8 +2,23 @@
     <div class="mycheck-container">
         <top-back></top-back>
 
-        <div class="header-controller-panel"></div>
-        <tabs class="mt15">
+        <div class="header-controller-panel mt15 mb20">
+            <select-search
+                style="width: var(--xs)"
+                behavior="simplicity"
+            ></select-search>
+        </div>
+        <tabs class="mt15"
+            :tab-items="[{
+                'tab-name': '待审批',
+                'tab-key': 'pending-approval'
+            },{
+                'tab-name': '已审批',
+                'tab-key': 'ended-approval'
+            }
+            ]"
+            v-model="curSelectedTable"
+        >
             <bk-table class="mt10"
                 :pagination="pagination"
                 @page-change="handleChangePage($event)"
@@ -175,9 +190,9 @@
                 // S 弹框控制区域
                 // 附件展示
                 isPreviewAttachFiles: false,
-                tmpAttachFiles: []
+                tmpAttachFiles: [],
                 // S 弹框控制区域
-
+                curSelectedTable: ''
             }
         },
         computed: {

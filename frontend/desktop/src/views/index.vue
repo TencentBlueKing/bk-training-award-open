@@ -1,5 +1,5 @@
 <template>
-    <keep-alive :include="['canawards','award-manager']">
+    <keep-alive>
         <router-view :key="$route.path"></router-view>
     </keep-alive>
 </template>

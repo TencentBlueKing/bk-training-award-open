@@ -17,9 +17,12 @@
             </div>
         </div>
         <div class="tab-content">
-            <transition name="bk-fade-in-linear">
+            <transition name="bk-move-in-left">
                 <slot></slot>
             </transition>
+        </div>
+        <div class="tab-footer">
+            <slot name="tab-footer"></slot>
         </div>
     </div>
 </template>
@@ -49,8 +52,7 @@
 
         },
         data (self) {
-            return {
-            }
+            return {}
         },
         methods: {
             tabClick (tabItem) {
@@ -68,11 +70,16 @@
   border-radius: 20px;
   box-shadow: 0 4px 90px rgba(163, 171, 185, 0.24);
   padding-bottom: 2em;
+  position: relative;
+
+  display: flex;
+  flex-direction: column;
 
   .tab-header {
     display: flex;
     padding: 20px 12px 8px;
     position: relative;
+
     .tab-item {
       font-weight: 700;
       font-size: 16px;
@@ -89,6 +96,7 @@
         transition: width 1s;
         color: #0E7AE2;
       }
+
       &.active::after {
         content: '';
         position: absolute;
@@ -102,23 +110,36 @@
         animation: scale-x .2s linear;
       }
     }
+
     .controller {
       position: absolute;
       right: 2em;
     }
   }
+
   .tab-content {
     width: 98%;
     margin: 12px auto;
     padding: 0 12px;
+    height: calc(100% - 40px - 60px);
+    overflow-y: scroll;
+  }
+
+  .tab-footer {
+    width: 98%;
+    margin: 0 auto;
+    align-self: flex-end;
+    display: flex;
+    justify-content: flex-end;
   }
 }
+
 @keyframes scale-x {
   from {
     width: 0;
   }
   to {
-      width: 82.7%;
+    width: 82.7%;
   }
 }
 </style>
