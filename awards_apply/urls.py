@@ -31,5 +31,7 @@ urlpatterns = [
     url(r"^approval/$", views.ApprovalView.as_view()),
     url(r"^secretary_department/$", views.secretary.secretary_department),
     url(r"^download/(?P<id>\d+)/", views.download, name="download"),
-    url(r"^upload/", views.upload, name="upload")
+    url(r"^upload/", views.upload, name="upload"),
+    path("group/", views.GroupView.as_view()),
+    path("userinfo/", views.UserInfoView.as_view())
 ]
