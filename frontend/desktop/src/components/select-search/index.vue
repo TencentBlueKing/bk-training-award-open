@@ -7,7 +7,7 @@
         :id-key="config[type]['idKey']"
         :display-key="config[type]['displayKey']"
         :loading="loading"
-        :clearable="true"
+        :clearable="clearable"
         :searchable="true"
         :enable-virtual-scroll="true"
         :multiple="multiple"
@@ -46,6 +46,10 @@
             },
             filterFn: {
                 type: Function,
+                default: () => true
+            },
+            clearable: {
+                type: Boolean,
                 default: () => true
             }
         },

@@ -9,11 +9,7 @@
                     我的小组
                 </header-nav>
                 <header-nav style="background: var(--gradient-blue);"
-                    @click="headerTrigger($store.state['ROUTE_TABLE']['AWARD_FORM_ROUTE_PATH'],{
-                        query: {
-                            type: 'create'
-                        }
-                    })"
+                    @click="headerTrigger($store.state['ROUTE_TABLE']['AWARD_FORM_ROUTE_PATH'],{ query: { type: 'create' } })"
                 >
                     <bk-icon slot="top-icon" name="sitemap"></bk-icon>
                     创建奖项
@@ -41,37 +37,24 @@
         <div class="footer-panel">
             <tabs style="width: calc(5*118px + 4*8px);"
                 :tab-items="[{
-                    'tab-name': '可申请奖项',
-                    'tab-key': 'available_award'
-                },{
-                    'tab-name': '奖项审批',
-                    'tab-key': 'available_approval'
-                }]"
+                                 'tab-name': '可申请奖项',
+                                 'tab-key': 'applicable-award'
+                             },{
+                                 'tab-name': '奖项审批',
+                                 'tab-key': 'award-approval'
+                             },
+                             {
+                                 'tab-name': '小组审批',
+                                 'tab-key': 'group-approval'
+                             }
+                ]"
                 v-model="workbenchCurIndex"
             >
-                <tempalte>
-                    <div v-show="workbenchCurIndex === 'available_award'">
-                        <bk-table
-                            :data="tableData"
-                            :outer-border="false"
-                            :header-border="false"
-                            :header-cell-style="{ background: '#fff' }"
-                        >
-                            <bk-table-column type="index" label="序列" width="60"></bk-table-column>
-                        </bk-table>
-                    </div>
-                    <div v-show="workbenchCurIndex === 'available_approval'">
-                        <bk-table
-                            :data="tableData"
-                            :outer-border="false"
-                            :header-border="false"
-                            :header-cell-style="{ background: '#fff' }"
-                        >
-                            <bk-table-column type="index" label="序列" width="60"></bk-table-column>
-                            <bk-table-column type="index" label="序列" width="60"></bk-table-column>
-                        </bk-table>
-                    </div>
-                </tempalte>
+                <template>
+                    <applicable-award v-if="workbenchCurIndex === 'applicable-award'"></applicable-award>
+                    <award-approval v-if="workbenchCurIndex === 'award-approval'"></award-approval>
+                    <group-approval v-if="workbenchCurIndex === 'group-approval'"></group-approval>
+                </template>
             </tabs>
             <tabs style="width: 370px"
                 :tab-items="[{
@@ -86,7 +69,7 @@
             </tabs>
             <div class="cartoon">
                 <cartoon-robot>
-                    <span>{{grant}}，{{$store.state.user['username']}}</span>
+                    <span>{{ grant }}，{{ $store.state.user['username'] }}</span>
                 </cartoon-robot>
             </div>
 
@@ -94,9 +77,15 @@
     </div>
 </template>
 <script>
+    import ApplicableAward from '@/views/home/table/applicable-award'
+    import AwardApproval from '@/views/home/table/award-approval'
+    import GroupApproval from '@/views/home/table/group-approval'
     export default {
         name: 'Home',
         components: {
+            GroupApproval,
+            AwardApproval,
+            ApplicableAward,
             MessageCard: () => import('@/views/home/MessageCard'),
             HeaderNav: () => import('@/views/home/HeaderNav'),
             Tabs: () => import('@/components/Tabs'),
@@ -105,14 +94,10 @@
         },
         data () {
             return {
-                workbenchCurIndex: 'available_award',
-                remoteData: []
+                workbenchCurIndex: 'applicable-award'
             }
         },
         computed: {
-            tableData (self) {
-                return self.remoteData
-            },
             grant () {
                 const now = (new Date()).getHours()
                 if (now > 0 && now <= 6) {

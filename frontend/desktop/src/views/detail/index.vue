@@ -1,16 +1,39 @@
 <template>
-    <div class="detail-container m20" :show-head="false">
-        <div>
-            <Detail :award-form="applyForm"></Detail>
+    <div class="detail-container">
+        <top-back></top-back>
+
+        <!-- 待审批悬浮窗-->
+        <div :class="['approval-list']">
+            <div class="tip-button" @click="trigglePanel" v-waves>
+                {{panelCutOut ? '展开' : '收起'}}
+            </div>
+            <div :class="['approval-content',{
+                'not_active': panelCutOut
+            }]">
+                <tabs style="height: 100%"
+                    :tab-items="[
+                        {
+                            'tab-name': '审批列表',
+                            'tab-key': 'approval-list'
+                        }
+                    ]"
+                >
+                    <template>
+                        <div>asdsad</div>
+                    </template>
+                </tabs>
+            </div>
+        </div>
+        <div class="form-panel">
+            <Detail class="detail" :award-form="applyForm"></Detail>
             <!-- /详情部分 -->
 
             <!-- 编辑部分 -->
-            <ApplyForm v-if="isShowApplyForm"
+            <ApplyForm class="form" v-if="isShowApplyForm"
                 ref="applyForm"
                 :id="applyForm['id']"
             ></ApplyForm>
             <!-- /编辑部分 -->
-
         </div>
         <!-- 底部按钮组 -->
         <div class="tc w100  mt15">
@@ -67,7 +90,7 @@
             </div>
             <!-- /用于跳转申请奖项的按钮 -->
         </div>
-    <!-- /底部按钮组 -->
+        <!-- /底部按钮组 -->
     </div>
 </template>
 <script>
@@ -90,7 +113,8 @@
             return {
                 formType: 'detail',
                 isShow: false,
-                applyForm: {}
+                applyForm: {},
+                panelCutOut: false
             }
         },
         computed: {
@@ -112,7 +136,7 @@
         },
         created () {
             this.applyForm = this.$route.params
-            this.formType = this.$route.params['type']
+            this.formType = this.$route.query['type']
         },
         methods: {
             /**
@@ -144,17 +168,77 @@
                     return
                 }
                 return postRecord(isDraft, {
-                    ...params,
-                    ...defaultInfo
+                ...params,
+                ...defaultInfo
                 })
+            },
+            trigglePanel () {
+                this.panelCutOut = !this.panelCutOut
             }
         }
     }
 </script>
 <style lang="postcss" scoped>
-  @import "@/css/mixins/scroll.css";
-  .monitor-navigation-content {
-    @mixin scroller;
-    overflow-y: scroll;
+.detail-container {
+  width: 80%;
+  margin: 0 auto;
+
+  .form-panel {
+    background-color: #FFFFFF;
+
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+    flex: 1;
+
+    padding: 20px 0 0 20px;
+    width: 1024px;
+    height: 544px;
+
+    box-shadow: 0 4px 4px rgba(0, 0, 0, 0.25);
+    border-radius: 20px;
+    margin: 0 auto;
+
+    .detail {
+      width: 45%;
+    }
+
+    .form {
+      width: 45%;
+    }
   }
+
+  .approval-list {
+    position: absolute;
+    overflow: hidden;
+    left: 0;
+    .tip-button {
+      background-color: #FFFFFF;
+      width: 3em;
+      height: 3em;
+      text-align: center;
+      line-height: 3em;
+      border-radius: 50%;
+      box-shadow: 0 0 1px 0  rgba(0,0,0,.4);
+      cursor: pointer;
+    }
+    .approval-content {
+
+      width: 200px;
+      transition: transform 1s;
+      transform-origin: 0 0;
+
+      &.not_active {
+        transform: scale(0);
+        animation: disappear 1s;
+      }
+    }
+
+  }
+}
+@keyframes disappear {
+  0%,100% {
+    display: none;
+  }
+}
 </style>

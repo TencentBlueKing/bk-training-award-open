@@ -3,8 +3,29 @@
         <top-back></top-back>
         <!-- 表格按钮区域 -->
 
-        <div class="header-controller-panel"></div>
-        <tabs class="mt15">
+        <div class="header-controller-panel mt20 mb20">
+            <select-search behavior="simplicity"
+                style="width: calc(2*118px + 8px)"
+            ></select-search>
+        </div>
+        <tabs class="mt15" :tab-items="[
+            {
+                'tab-name': '待开始',
+                'tab-key': 'pending-start'
+            },
+            {
+                'tab-name': '已开始',
+                'tab-key': 'ing-award'
+            },
+            {
+                'tab-name': '评审中',
+                'tab-key': 'ing-review'
+            },
+            {
+                'tab-name': '已结束',
+                'tab-key': 'ended-review'
+            }
+        ]">
             <bk-table class="mt15"
                 :data="tableData"
                 :size="'small'"
@@ -50,7 +71,6 @@
                     </template>
                 </bk-table-column>
             </bk-table>
-
         </tabs>
         <!-- /表格按钮区域 -->
 
@@ -83,10 +103,12 @@
     import { deleteAward, getAwards } from '@/api/service/award-service'
     import { bus } from '@/common/bus'
     import moment from 'moment'
+    import SelectSearch from '@/components/select-search'
 
     export default {
         name: 'award-manager',
         components: {
+            SelectSearch,
             DialogArea: () => import('./components/DialogArea'),
             BatchCloneForm: () => import('./components/DialogArea/BatchCloneForm'),
             BatchSendEmailForm: () => import('./components/DialogArea/BatchSendEmailForm'),
