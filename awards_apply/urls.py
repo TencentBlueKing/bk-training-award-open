@@ -33,5 +33,8 @@ urlpatterns = [
     url(r"^download/(?P<id>\d+)/", views.download, name="download"),
     url(r"^upload/", views.upload, name="upload"),
     path("group/", views.GroupView.as_view()),
-    path("userinfo/", views.UserInfoView.as_view())
+    path("userinfo/", views.UserInfoView.as_view()),
+    path("group_user/", views.GroupUserView.as_view()),
+    path("message/", views.MessageView.as_view()),
+    path("group_manage/", views.GroupManageView.as_view())
 ]

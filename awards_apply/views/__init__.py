@@ -7,4 +7,5 @@ from awards_apply.views.file_handle import download, upload  # noqa
 from awards_apply.views.secretary import SecretaryViewSet  # noqa
 from awards_apply.views.user import UserView, UserInfoView
 
-from awards_apply.views.group_view import GroupView
+from awards_apply.views.group_view import GroupView, GroupUserView, GroupManageView
+from awards_apply.views.message_view import MessageView
