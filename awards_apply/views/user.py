@@ -1,4 +1,7 @@
-from awards_apply.models import Admin, Secretary
+from django.http import JsonResponse
+
+from awards_apply.models import Admin, Secretary, GroupUser
+from awards_apply.utils.const import success_code
 from blueking.component.shortcuts import get_client_by_request
 from rest_framework.response import Response
 from rest_framework.views import APIView
@@ -24,3 +27,16 @@ class UserView(APIView):
         # 获得CompomentApi并调用
         data = getattr(client.usermanage, api)(query_params)
         return Response(data)
+
+
+class UserInfoView(APIView):
+    # 获取自己的信息
+    def get(self, request):
+        username = request.user.username
+        is_newer = GroupUser.objects.filter(username=username).count() == 0
+        user_info = {
+            "username": username,
+            "display_name": request.user.nickname,
+            "is_newer": is_newer
+        }
+        return JsonResponse(success_code(user_info))

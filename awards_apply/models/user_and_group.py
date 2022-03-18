@@ -33,6 +33,14 @@ class Group(TimeBasic):
     def __str__(self):
         return "组名：" + self.full_name
 
+    def to_json(self):
+        return {
+            "group_id": self.id,
+            "full_name": self.full_name,
+            "secretary": self.secretary,
+            "secretary_display_name": self.secretary_display_name
+        }
+
 
 class GroupUser(models.Model):
     username = models.CharField(max_length=128, verbose_name="组成员账号")

@@ -18,10 +18,11 @@ from django.conf import settings
 from django.contrib.auth.backends import ModelBackend
 from django.db import IntegrityError
 
+from awards_apply.models import User as AwardUser
 from blueapps.account import get_user_model
 from blueapps.account.conf import ConfFixture
 from blueapps.account.utils.http import send
-from blueapps.utils import client
+from blueapps.utils import client, get_client_by_user
 
 logger = logging.getLogger("component")
 
@@ -56,6 +57,8 @@ class TokenBackend(ModelBackend):
             user.set_property(key="wx_userid", value=user_info.get("wx_userid", ""))
             user.set_property(key="chname", value=user_info.get("chname", ""))
 
+            user.nickname = user_info["chname"]
+
             # 用户如果不是管理员，则需要判断是否存在平台权限，如果有则需要加上
             if not user.is_superuser and not user.is_staff:
                 role = user_info.get("role", "")
@@ -63,6 +66,13 @@ class TokenBackend(ModelBackend):
                 user.is_superuser = is_admin
                 user.is_staff = is_admin
                 user.save()
+
+            # 将蓝鲸的用户信息同步到奖项申报平台
+            award_user, _ = AwardUser.objects.get_or_create(id=user.id, username=user.username)
+            award_user.phone = user_info["phone"].replace("\t", "")
+            award_user.display_name = user_info["chname"]
+            award_user.email = user_info["email"]
+            award_user.save()
 
             return user
 
@@ -106,6 +116,11 @@ class TokenBackend(ModelBackend):
 
         try:
             response = client.bk_login.get_user(api_params)
+            # TODO 获取用户id
+            username = "kaisheng"
+            bk_client = get_client_by_user(username)
+            kwargs = {"id": username}
+            user_info = bk_client.usermanage.retrieve_user(kwargs)
         except Exception as err:  # pylint: disable=broad-except
             logger.exception(u"Abnormal error in get_user_info...:%s" % err)
             return False, {}
