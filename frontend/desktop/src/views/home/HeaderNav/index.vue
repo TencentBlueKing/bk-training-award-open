@@ -61,8 +61,12 @@ $card-height: 137px;
       }
     }
 
+    .go-icon {
+      transition: all .3s;
+    }
+
     &:hover .go-icon {
-      animation: shake 1s;
+      transform: scale(3) translateX(2px);
     }
 
     .left-panel {

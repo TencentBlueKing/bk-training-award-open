@@ -4,12 +4,12 @@
         <bk-table-column label="奖项名称" prop="ip"></bk-table-column>
         <bk-table-column label="奖项开始时间" prop="source"></bk-table-column>
         <bk-table-column label="奖项截止时间" prop="status"></bk-table-column>
+        <bk-table-column label="申请人" prop="create_time"></bk-table-column>
         <bk-table-column label="奖项咨询人" prop="create_time"></bk-table-column>
         <bk-table-column label="操作">
             <template slot-scope="approvals">
-                <bk-button theme="primary" :text="true" @click="handleToGetDetail(approvals.row)"> 查看 </bk-button>
-                <bk-button theme="danger" :text="true" @click="handleToRefundApplication(approvals.row)">撤回申请</bk-button>
-                <bk-button theme="warning" :text="true" @click="handleToEditDraft(approvals.row)">编辑草稿</bk-button>
+                <bk-button class="mr10" theme="primary" :text="true" @click="handleToGetDetail(approvals.row)"> 查看 </bk-button>
+                <bk-button class="mr10 ml10" theme="success" :text="true" @click="handleToRefundApplication(approvals.row)">前往审批</bk-button>
             </template>
         </bk-table-column>
     </self-table>
@@ -34,7 +34,9 @@
         methods: {
             handleInit () {},
             handleToGetDetail () {},
-            handleToRefundApplication () {},
+            handleToRefundApplication () {
+
+            },
             handleToEditDraft () {}
         }
     }

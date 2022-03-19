@@ -1,5 +1,7 @@
 <template>
-    <self-table :data="endedReviewData" :loading="loading">
+    <self-table :data="endedReviewData"
+        :loading="loading"
+    >
         <bk-table-column type="index" label="序号" width="60"></bk-table-column>
         <bk-table-column label="奖项名称" prop="ip"></bk-table-column>
         <bk-table-column label="奖项开始时间" prop="source"></bk-table-column>
@@ -21,8 +23,10 @@
 </template>
 
 <script>
+    import { tableMixins } from '@/views/award-manager/table/tableMixins'
     export default {
         name: 'ended-review',
+        mixins: [tableMixins],
         data () {
             return {
                 endedReviewRemoteData: [{}],

@@ -120,7 +120,6 @@
     margin: 12px auto;
     padding: 0 12px;
     height: calc(100% - 40px - 60px);
-    overflow-y: scroll;
   }
 
   .tab-footer {

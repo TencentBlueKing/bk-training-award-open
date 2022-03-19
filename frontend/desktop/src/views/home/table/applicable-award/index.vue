@@ -1,6 +1,10 @@
 <template>
     <!--    可申请奖项表格-->
-    <self-table :data="applicationableAwardList">
+    <self-table :data="applicationableAwardList"
+        :pagination.sync="pagination"
+        :loading="loading"
+        @page-change="handleGetPageData"
+    >
         <bk-table-column label="序列" width="60"></bk-table-column>
         <bk-table-column label="奖项名称"></bk-table-column>
         <bk-table-column label="所属小组"></bk-table-column>
@@ -17,18 +21,28 @@
 
 <script>
     import { DETAIL_ROUTE_PATH } from '@/constants'
+    import { getAwards } from '@/api/service/award-service'
 
     export default {
         name: 'applicable-award',
         data () {
             return {
-                applicationableAwardRemoteList: []
+                applicationableAwardRemoteList: [],
+                loading: false,
+                pagination: {
+                    current: 1,
+                    count: 0,
+                    limit: 10
+                }
             }
         },
         computed: {
             applicationableAwardList (self) {
                 return self.applicationableAwardRemoteList
             }
+        },
+        created () {
+            this.handleInit()
         },
         methods: {
             toApply (group) {
@@ -37,6 +51,23 @@
                     query: {
                         type: 'apply'
                     }
+                })
+            },
+            handleInit () {
+                this.handleGetPageData(this.pagination)
+            },
+            handleGetPageData (config) {
+                const { current: page, limit: size } = config
+                if (this.loading) {
+                    return
+                }
+                this.loading = true
+              
+                return getAwards({ page, size }).then(({ data }) => {
+                    this.pagination.count = data.count
+                    this.groupApprovalRemoteData = data.result
+                }).finally(_ => {
+                    this.loading = false
                 })
             }
 

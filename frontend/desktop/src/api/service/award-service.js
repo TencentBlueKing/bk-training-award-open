@@ -17,7 +17,7 @@ export function postAwards (fields) {
  * @param { number } page
  * @param { number } size
  * */
-export function getAwards (page, size) {
+export function getAwards ({ page, size }) {
     return http.get('awards/', {
         params: {
             page,

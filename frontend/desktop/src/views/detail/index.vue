@@ -3,7 +3,7 @@
         <top-back></top-back>
 
         <!-- 待审批悬浮窗-->
-        <div :class="['approval-list']">
+        <div :class="['approval-list']" v-if="formType === 'approval'">
             <div class="tip-button" @click="trigglePanel" v-waves>
                 {{panelCutOut ? '展开' : '收起'}}
             </div>
@@ -11,15 +11,10 @@
                 'not_active': panelCutOut
             }]">
                 <tabs style="height: 100%"
-                    :tab-items="[
-                        {
-                            'tab-name': '审批列表',
-                            'tab-key': 'approval-list'
-                        }
-                    ]"
+                    :tab-items="approvalTabItems"
                 >
                     <template>
-                        <div>asdsad</div>
+                        <component :is="'approval-list'"></component>
                     </template>
                 </tabs>
             </div>
@@ -38,8 +33,7 @@
         <!-- 底部按钮组 -->
         <div class="tc w100  mt15">
             <!-- 用于申请奖项的按钮 -->
-            <div v-if="isShowApplyForm"
-                class="button-item"
+            <div class="button-item"
             >
                 <bk-button theme="success"
                     class="mr10"
@@ -67,28 +61,9 @@
                 </bk-button>
             </div>
             <!-- /用于申请奖项的按钮 -->
+            <!-- 用于审批的按钮 -->
 
-            <!-- 用于跳转申请奖项的按钮 -->
-            <div v-else
-                class="tc mr15 mt15"
-            >
-                <bk-button theme="primary"
-                    class="mr10"
-                    @click="formType = 'apply'"
-                    icon-right="arrows-right-circle"
-                >
-                    <span class="m5">前往申请</span>
-                </bk-button>
-                <bk-button theme="warning"
-                    class="ml10"
-                    @click="$router.back()"
-                    icon-right="close-circle"
-                >
-                    <span class="m5">取消</span>
-                </bk-button>
-
-            </div>
-            <!-- /用于跳转申请奖项的按钮 -->
+            <!-- /用于审批的按钮 -->
         </div>
         <!-- /底部按钮组 -->
     </div>
@@ -99,6 +74,7 @@
     export default {
         name: 'detail',
         components: {
+            ApprovalList: () => import('./table/approval-list'),
             Detail: () => import('./DetailInfo'),
             ApplyForm: () => import('./ApplyForm')
         },
@@ -114,7 +90,13 @@
                 formType: 'detail',
                 isShow: false,
                 applyForm: {},
-                panelCutOut: false
+                panelCutOut: false,
+                approvalTabItems: [
+                    {
+                        'tab-name': '审批列表',
+                        'tab-key': 'approval-list'
+                    }
+                ]
             }
         },
         computed: {

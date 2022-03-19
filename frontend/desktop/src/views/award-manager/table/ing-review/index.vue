@@ -1,5 +1,8 @@
 <template>
-    <self-table :data="ingReviewData" :loading="loading">
+    <self-table :data="ingReviewData"
+        :loading="loading"
+        :pagination="pagination"
+    >
         <bk-table-column type="index" label="序号" width="60"></bk-table-column>
         <bk-table-column label="奖项名称" prop="ip"></bk-table-column>
         <bk-table-column label="奖项开始时间" prop="source"></bk-table-column>
@@ -21,12 +24,21 @@
 </template>
 
 <script>
+    import { getAwards } from '@/api/service/award-service'
+    import { tableMixins } from '@/views/award-manager/table/tableMixins'
+
     export default {
         name: 'ended-approval',
+        mixins: [tableMixins],
         data () {
             return {
                 ingReviewRemoteData: [{}],
-                loading: false
+                loading: false,
+                pagination: {
+                    limit: 10,
+                    count: 0,
+                    current: 1
+                }
             }
         },
         computed: {
@@ -39,8 +51,19 @@
         },
         methods: {
             handleInit () {
+                Promise.all([this.handleGetPageData()])
             },
             handleGetDetail () {
+              
+            },
+            handleGetPageData () {
+                this.loading = true
+                if (this.loading) return
+                return getAwards().then(response => {
+                  
+                }).finally(() => {
+                    this.loading = false
+                })
             }
 
         }

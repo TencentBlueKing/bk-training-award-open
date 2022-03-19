@@ -7,9 +7,9 @@
         <bk-table-column label="奖项咨询人" prop="create_time"></bk-table-column>
         <bk-table-column label="操作">
             <template slot-scope="approvals">
-                <bk-button theme="primary" :text="true" @click="handleToGetDetail(approvals.row)"> 查看 </bk-button>
-                <bk-button theme="danger" :text="true" @click="handleToRefundApplication(approvals.row)">撤回申请</bk-button>
-                <bk-button theme="warning" :text="true" @click="handleToEditDraft(approvals.row)">编辑草稿</bk-button>
+                <bk-button class="mr10" theme="primary" :text="true" @click="handleToGetDetail(approvals.row)"> 查看 </bk-button>
+                <bk-button class="ml10 mr10" theme="danger" :text="true" @click="handleToRefundApplication(approvals.row)">撤回申请</bk-button>
+                <bk-button class="ml10 mr10" theme="warning" :text="true" @click="handleToEditDraft(approvals.row)">编辑草稿</bk-button>
             </template>
         </bk-table-column>
     </self-table>

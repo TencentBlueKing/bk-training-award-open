@@ -4,7 +4,7 @@
  */
 import http from '@/api'
 
-export function getApproval (page, size) {
+export function getApproval ({ page, size }) {
     return http.get('/approval/', {
         params: {
             page,
