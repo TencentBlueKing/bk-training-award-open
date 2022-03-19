@@ -35,12 +35,13 @@
 
 <script>
     import { mapGetters } from 'vuex'
-    import { bus } from '@/common/bus'
-    import { getUsermanageRetrieveUser } from '@/api/service/group-service'
     import { MYAPPLY_ROUTE_PATH, MYCHECK_ROUTE_PATH, POWER_CONTROLLER } from '@/constants'
 
     export default {
         name: 'monitor-navigation',
+        components: {
+            AppAuth: () => import('@/components/auth')
+        },
         data () {
             return {
                 routerKey: +new Date(),
@@ -74,11 +75,11 @@
             }
         },
         computed: {
-              ...mapGetters(['mainContentLoading', 'user']),
-              userTopMenu (self) {
-                const ident = self.$store.getters.ident
-                return self.userMenu.list.filter(item => item.path && !POWER_CONTROLLER[item.path][ident]['header-button-hidden'])
-              }
+    ...mapGetters(['mainContentLoading', 'user']),
+    userTopMenu (self) {
+      const ident = self.$store.getters.ident
+      return self.userMenu.list.filter(item => item.path && !POWER_CONTROLLER[item.path][ident]['header-button-hidden'])
+    }
         },
         watch: {
             '$route.name': {
@@ -101,27 +102,11 @@
                 this.systemCls = 'win'
             }
 
-            bus.$on('main-loading', (value) => {
+            this.$bus.$on('main-loading', (value) => {
                 this.$store.commit('setMainContentLoading', value)
             })
         },
-        mounted () {
-            this.handleGetUserManageRetrieveUser()
-        },
         methods: {
-            handleGetUserManageRetrieveUser () {
-                bus.$emit('main-loading', true)
-                return getUsermanageRetrieveUser().then(_ => {
-                    const userStatus = {
-                        is_admin: _['data']?.['is_admin'] ?? false,
-                        is_secretary: _['data']?.['is_secretary'] ?? false
-                    }
-                    this.$store.commit('updateUserIdent', userStatus)
-                    // 完成权限获取，生成对应路由
-                }).finally(_ => {
-                    bus.$emit('main-loading', false)
-                })
-            },
             handleSelect (id, item) {
                 this.nav.id = id
                 this.$router.push({
@@ -144,9 +129,11 @@
 @import './css/reset.css';
 @import './css/app.css';
 @import "@/css/mixins/scroll.css";
+
 * {
   @mixin scroller #e6e9ea 2px;
 }
+
 .bk-navigation-title .title-desc {
   user-select: none;
 }
@@ -211,6 +198,7 @@
   height: calc(100% - 84px);
   background: transparent;
   width: 100%;
+
   .main-content {
     height: calc(100%);
     width: 100%;
@@ -234,6 +222,7 @@
   color: #63656e;
   font-size: 12px;
 }
+
 .w-80 {
   width: 80% !important;
 }

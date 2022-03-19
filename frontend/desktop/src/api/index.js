@@ -150,7 +150,9 @@ async function getPromise (method, url, data, userConfig = {}) {
  * @param {Function} promise 拒绝函数
  */
 function handleResponse ({ config, response, resolve, reject }) {
-    if (!response.data && config.globalError) {
+    console.log('response', config.requestId, '->', response)
+
+    if (!response.result && config.globalError) {
         reject({ message: response.message })
     } else {
         resolve(config.originalResponse ? response : response.data, config)

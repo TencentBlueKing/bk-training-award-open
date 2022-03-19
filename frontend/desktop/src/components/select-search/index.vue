@@ -15,21 +15,27 @@
         :value="value"
         :z-index="9999999999"
         :is-tag-width-limit="false"
-        @change="$emit('update:value', $event)"
+        @change="handleChange($event)"
         :behavior="$attrs['behavior']"
     >
     </bk-select>
+
 </template>
 
 <script>
-    import { getListDepartments, getListUsers, getSecretaryDepartment } from '@/api/service/bk-service'
-    import { GROUP_KEYNAME, GROUP_SECRETARY_KEYNAME, GROUP_USERS_KEYNAME } from '@/constants'
+    import { getSecretaryDepartment } from '@/api/service/bk-service'
+    import { BK_GROUP_KEYNAME, GROUP_KEYNAME, GROUP_SECRETARY_KEYNAME, GROUP_USERS_KEYNAME } from '@/constants'
+    import { getGroup, getGroupUser } from '@/api/service/group-service'
 
     export default {
         name: 'select-search',
         props: {
             value: {
-                type: Array || String,
+                type: [Array, String, Number],
+                default: () => []
+            },
+            data: {
+                type: Array,
                 default: () => []
             },
             multiple: {
@@ -37,10 +43,14 @@
                 default: () => true
             },
             type: {
-                type: 'user' || 'group' || 'secretary',
+                type: String,
                 default: () => 'user'
             },
             idKey: {
+                type: String,
+                default: () => 'id'
+            },
+            displayKey: {
                 type: String,
                 default: () => 'id'
             },
@@ -66,10 +76,20 @@
                         idKey: self.idKey || 'id',
                         displayKey: 'full_name'
                     },
+                    'bk-group': {
+                        func: self.handleGetBkGroup,
+                        idKey: self.idKey || 'id',
+                        displayKey: 'full_name'
+                    },
                     'secretary': {
                         func: self.handleGetSecretaryDepartment,
                         idKey: self.idKey || 'id',
                         displayKey: 'full_name'
+                    },
+                    'self': {
+                        func: this.handleSetMySelfData,
+                        idKey: self.idKey || 'id',
+                        displayKey: self.displayKey
                     }
                 },
                 groupUsers: [],
@@ -80,9 +100,14 @@
             list (self) {
                 const config = self['config']
                 const type = self['type']
-                return self.groupUsers?.filter?.(item => {
+                const list = self.groupUsers?.filter?.(item => {
                     return item[config[type]['displayKey']]
                 }).filter(self.filterFn) ?? []
+                if (list && !self.value && !self.multiple) {
+                    console.log(list[0]?.[config[type]['idKey']])
+                    self.handleChange(list[0]?.[config[type]['idKey']] || '')
+                }
+                return list
             }
         },
         created () {
@@ -91,7 +116,31 @@
         methods: {
             handleInit () {
                 const type = this.type
-                this.config[type]['func']()
+                this.config[type]?.['func']?.()
+            },
+            handleChange (event) {
+                if (this.type === 'group') {
+                    this.$bus.curGlobalGroupId = event
+                }
+                this.$emit('change', event)
+                this.$emit('update:value', event)
+            },
+            handleGetBkGroup () {
+                this.loading = true
+                const groupUsers = this.$http.cache.get(BK_GROUP_KEYNAME)
+                if (groupUsers) {
+                    this.groupUsers = groupUsers
+                    this.loading = false
+                    return
+                }
+                return this.$store.dispatch('bkInfo', { fromCache: true }).then(
+                    response => {
+                        this.groupUsers = response['departments']
+                        this.$http.cache.set(BK_GROUP_KEYNAME, response['departments'])
+                    }
+                ).finally(_ => {
+                    this.loading = false
+                })
             },
             handleGetDepartment () {
                 this.loading = true
@@ -101,16 +150,10 @@
                     this.loading = false
                     return
                 }
-                return getListDepartments({ page: 1, page_size: 1 }).then(_ => {
-                    if (!_.data?.count) {
-                        this.messageWarn('出错啦')
-                        this.loading = false
-                        return
-                    }
-                    return getListDepartments({ page: 1, page_size: _.data.count })
-                }).then(response => {
-                    this.groupUsers = response.data.results
-                    this.$http.cache.set(GROUP_KEYNAME, response.data.results)
+                return getGroup().then(response => {
+                    console.log(response)
+                    this.groupUsers = response.data
+                    this.$http.cache.set(GROUP_KEYNAME, response.data)
                 }).finally(_ => {
                     this.loading = false
                 })
@@ -118,32 +161,25 @@
             // 获取用户列表信息
             handleGetUserManageListUsers () {
                 this.loading = true
-                const groupUsers = this.$http.cache.get(GROUP_USERS_KEYNAME)
+                const groupId = this.$bus.curGlobalGroupId
+                const groupUsers = this.$http.cache.get(GROUP_USERS_KEYNAME + groupId)
                 if (groupUsers) {
                     this.groupUsers = groupUsers
                     this.loading = false
                     return
                 }
-
-                // 第一个请求是为了获取总量，避免盲猜
-                return getListUsers({ page: 1, page_size: 1 }).then(_ => {
-                    if (!_.data?.count) {
+                console.log('asd', this.$bus.curGlobalGroupId)
+                return getGroupUser({ groupId: this.$bus.curGlobalGroupId }).then(response => {
+                    if (!response.data) {
                         this.messageWarn('出错啦')
                         this.loading = false
                         return
                     }
-                    return getListUsers({ page: 1, page_size: _.data.count })
-                }).then(response => {
-                    if (!response.data.results) {
-                        this.messageWarn('出错啦')
-                        this.loading = false
-                        return
-                    }
-                    this.groupUsers = response.data.results.map(item => {
+                    this.groupUsers = response.data.map(item => {
                         item['display_name_for_display'] = `${item['username']}(${item['display_name']})`
                         return item
                     })
-                    this.$http.cache.set(GROUP_USERS_KEYNAME, response.data.results)
+                    this.$http.cache.set(GROUP_USERS_KEYNAME + groupId, response.data)
                 }).finally(_ => {
                     this.loading = false
                 })
@@ -158,7 +194,11 @@
                     this.groupUsers = response.data
                     this.$http.cache.set(GROUP_SECRETARY_KEYNAME, response.data)
                 })
+            },
+            handleSetMySelfData () {
+                this.groupUsers = this.data
             }
+
         }
 
     }

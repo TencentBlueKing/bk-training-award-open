@@ -3,26 +3,30 @@
         <top-back></top-back>
         <div class="header-controller-panel mt15 mb20">
             <select-search
-                style="width: var(--xs)"
+                style="width: calc(2*118px + 1*8px);font-size: 15px;"
                 behavior="simplicity"
+                placeholder="请选择小组"
+                :value.sync="$bus.curGlobalGroupId"
+                type="group"
+                :id-key="'group_id'"
+                :multiple="false"
+                @change="handleInit()"
             ></select-search>
         </div>
         <tabs class="mt15"
-            :tab-items="[{
-                'tab-name': '待审批',
-                'tab-key': 'pending-approval'
-            },{
-                'tab-name': '评审中',
-                'tab-key': 'ing-approval'
-            },{
-                'tab-name': '已审批',
-                'tab-key': 'ended-approval'
-            }
-            ]"
+            :tab-items="myApplyTabItems"
             v-model="curSelectedTable"
         >
             <template>
-
+                <pending-approval ref="pending-approval"
+                    v-if="curSelectedTable === 'pending-approval'">
+                </pending-approval>
+                <ing-approval ref="ing-approval"
+                    v-if="curSelectedTable === 'ing-approval'">
+                </ing-approval>
+                <ended-approval ref="ended-approval"
+                    v-if="curSelectedTable === 'ended-approval'">
+                </ended-approval>
             </template>
         </tabs>
     </div>
@@ -33,21 +37,18 @@
     import { getRecord } from '@/api/service/apply-service'
     import {
         APPLY_APPROVAL_STATE_EN_MAP,
-        APPLY_APPROVAL_STATE_MAP,
-        DRAFT,
-        REVIEW_NOT_PASSED,
-        REVIEW_PASSED,
-        REVIEW_PENDING
+        APPLY_APPROVAL_STATE_MAP
     } from '@/constants'
-    import SelectSearch from '@/components/select-search'
 
     export default {
-        components: { SelectSearch },
+        components: {
+            PendingApproval: () => import('@/views/myapply/table/pending-approval'),
+            IngApproval: () => import('@/views/myapply/table/ing-approval'),
+            EndedApproval: () => import('@/views/myapply/table/ended-approval')
+        },
         data () {
             return {
                 userInfo: null,
-                size: 'small',
-                departValue: '',
                 data: [],
                 pagination: {
                     current: 1,
@@ -56,28 +57,21 @@
                 },
                 remoteData: [],
                 isLoading: false,
-                config: {
-                    approval_status_button: {
-                        [REVIEW_PENDING]: {
-                            'is-review_pending': true
-                        },
-                        [REVIEW_PASSED]: {
-                            'button-title': '--',
-                            'disabled': true
-                        },
-                        [REVIEW_NOT_PASSED]: {
-                            'button-title': '重新申请',
-                            'button-func': this.handleToApply
-                        },
-                        [DRAFT]: {
-                            'button-title': '发起申请',
-                            'button-func': this.handleToApply
-                        }
-                    }
-                },
 
                 // 当前选择的表格
-                curSelectedTable: 'pending-approval'
+                curSelectedTable: 'pending-approval',
+                myApplyTabItems: [
+                    {
+                        'tab-name': '待审批',
+                        'tab-key': 'pending-approval'
+                    }, {
+                        'tab-name': '评审中',
+                        'tab-key': 'ing-approval'
+                    }, {
+                        'tab-name': '已审批',
+                        'tab-key': 'ended-approval'
+                    }
+                ]
             }
         },
         computed: {
@@ -97,14 +91,10 @@
                 return self.config['approval_status_button']
             }
         },
-        created () {
-            this.handleGetPageData()
-        },
         methods: {
-            handleInit () {
-                this.handleGetPageData()
+            handleInit (curSelectedTable = this.curSelectedTable) {
+                this.$refs[curSelectedTable]?.handleInit?.()
             },
-
             handlePageChange (current) {
                 this.pagination.current = current
                 return this.handleGetPageData()
@@ -160,7 +150,7 @@
 @import './index.css';
 
 .my-apply-container {
-  $size: 2;
+$size: 2;
   --xs: calc($size * 118px + ($size - 1) * 8px);
 }
 </style>

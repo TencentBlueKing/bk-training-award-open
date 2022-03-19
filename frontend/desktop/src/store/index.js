@@ -8,16 +8,19 @@ import Vuex from 'vuex'
 
 import { unifyObjectStyle } from '@/common/util'
 import {
+    APP_AUTH_NEWER, GROUP_KEYNAME,
     GROUP_MANAGER_ROUTE_PATH,
     IDENT_ADMIN,
     IDENT_COMMON,
     IDENT_SECRETARY,
     MYCHECK_ROUTE_PATH,
-    POWER_CONTROLLER, ROUTE_TABLE
+    POWER_CONTROLLER,
+    ROUTE_TABLE
 } from '@/constants'
 import { getUserInfo } from '@/api/service/user-service'
-import { getGroup } from '@/api/service/group-service'
-
+import { bus } from '@/store/bus'
+import http from '@/api'
+import { getGroup, getUsermanageRetrieveUser } from '@/api/service/group-service'
 Vue.use(Vuex)
 
 const store = new Vuex.Store({
@@ -28,7 +31,10 @@ const store = new Vuex.Store({
         mainContentLoading: false,
         // 系统当前登录用户
         user: {},
+        // bk 上的用户信息
+        bkInfo: {},
         groupList: [],
+        curGlobalSelectGroup: null,
         ROUTE_TABLE: Object.freeze(ROUTE_TABLE),
         /**
          * 根据用户细节调整部分系统部分控件的
@@ -45,7 +51,14 @@ const store = new Vuex.Store({
     getters: {
         mainContentLoading: state => state.mainContentLoading,
         user: state => state.user,
-        groupList: state => state.groupList,
+        groupMap: state => {
+            const map = {}
+            const groups = http.cache.get(GROUP_KEYNAME)
+            groups?.forEach(group => {
+                map[group['group_id']] = group
+            })
+            return map
+        },
         ident: state => state.user_ident.ident,
         // 将权限转移到对应的页面，这样会更合适一些
         groupPowerConfig: state => {
@@ -56,6 +69,7 @@ const store = new Vuex.Store({
             const ident = state.user_ident['ident']
             return POWER_CONTROLLER[MYCHECK_ROUTE_PATH][ident]
         }
+        
     },
     // 公共 mutations
     mutations: {
@@ -78,7 +92,6 @@ const store = new Vuex.Store({
         updateUser (state, user) {
             state.user = { ...user }
         },
-
         updateGroupList (state, groupList) {
             state.groupList = [...groupList]
         },
@@ -95,6 +108,12 @@ const store = new Vuex.Store({
                 is_secretary: isSecretary,
                 ident: ident
             }
+        },
+        updateCurGlobalSelectGroup (state, groupId) {
+            state.curGlobalSelectGroup = groupId
+        },
+        updateBkInfo (state, data) {
+            state.bkInfo = data
         }
     },
     actions: {
@@ -116,16 +135,32 @@ const store = new Vuex.Store({
             return getUserInfo(config).then(response => {
                 const userData = response.data || {}
                 context.commit('updateUser', userData)
-                return userData
+                return Promise.resolve(userData)
+            }).then(userData => {
+                bus.$emit(APP_AUTH_NEWER, userData['is_newer'])
+                return Promise.resolve(userData)
             })
         },
         group (context, config = {}) {
-            return getGroup(config).then(response => {
-                const groupList = response.data || {}
-                context.commit('updateGroupList', groupList)
-                return groupList
+            const groupUsers = http.cache.get(GROUP_KEYNAME)
+            if (groupUsers) {
+                context.commit('curGlobalSelectGroup', groupUsers[0]['group_id'])
+                return groupUsers
+            }
+            return getGroup(config).then(async response => {
+                await http.cache.set(GROUP_KEYNAME, response.data)
+                context.commit('curGlobalSelectGroup', response.data[0]['group_id'])
+                return Promise.resolve(response.data)
+            })
+        },
+        bkInfo (context, config) {
+            return getUsermanageRetrieveUser(config).then(response => {
+                const bkInfo = response.data || {}
+                context.commit('updateBkInfo', bkInfo)
+                return Promise.resolve(bkInfo)
             })
         }
+
     }
 })
 

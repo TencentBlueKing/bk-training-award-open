@@ -8,9 +8,9 @@
             <bk-tag effect="filled"
                 style="background-color: #0E7AE2;color: white"
             >
-                {{ message['group_name'] }}
+                {{ message['group_name'] || 'undefined'}}
             </bk-tag>
-            <bk-link theme="primary"> {{ message['action_user'] }}( {{ message['action_display_name'] }})</bk-link>
+            <bk-link theme="primary"> {{ message['action_user'] || 'undefined' }}( {{ message['action_display_name'] || 'undefined' }})</bk-link>
             {{ message['message'] }}
         </div>
     </div>

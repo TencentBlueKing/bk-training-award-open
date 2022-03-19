@@ -1,17 +1,16 @@
 <template>
     <div class="self-table">
         <bk-table size="small"
-            :data="$attrs['data']"
+            :data="data"
             :pagination="$attrs['pagination']"
             :highlight-current-row="true"
             @page-change="$emit('page-change',$event)"
             @page-limit-change="$emit('page-limit-change',$event)"
-            v-bkloading="{ isLoading: $attrs['loading'] ,title: '加载中' }"
+            v-bkloading="{ isLoading: $attrs['loading'] ,title: '请稍等,正在为您安放数据' }"
             :outer-border="false"
             :header-border="false"
             header-row-class-name="table-header"
         >
-
             <slot></slot>
         </bk-table>
     </div>
@@ -20,7 +19,12 @@
 <script>
     export default {
         name: 'self-table',
-        props: {},
+        props: {
+            data: {
+                type: Array,
+                default: () => []
+            }
+        },
         data () {
             return {}
         }

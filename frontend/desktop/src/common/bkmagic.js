@@ -4,7 +4,6 @@
  */
 
 import Vue from 'vue'
-import waves from '@/common/directives'
 // 全量引入
 import './fully-import'
 
@@ -55,9 +54,3 @@ Vue.prototype.messageError = messageError
 Vue.prototype.messageSuccess = messageSuccess
 Vue.prototype.messageInfo = messageInfo
 Vue.prototype.messageWarn = messageWarn
-
-// 一些自定义的组件或者指令
-Vue.use(waves)
-Vue.component('top-back', () => import('@/components/top-back'))
-Vue.component('tabs', () => import('@/components/Tabs'))
-Vue.component('self-table', () => import('@/components/self-table'))
