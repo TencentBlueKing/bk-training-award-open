@@ -35,7 +35,7 @@ class GroupView(APIView):
                 # TODO 重名时尝试创建数据，失败时也会导致占用自增id
                 group = group.save()
             except IntegrityError:
-                return JsonResponse(false_code("组名被占用，请选择其他组名字"))
+                return JsonResponse(false_code("组名被占用，请换一个吧"))
             GroupUser.objects.create(
                 group_id=group.id,
                 username=request.user.username,
@@ -82,6 +82,12 @@ class GroupUserView(APIView):
         except Group.DoesNotExist:
             return JsonResponse(false_code("不存在对应的组，请核对组id"))
         try:
+            GroupUser.objects.get(group_id=group_id, username=request.user.username)
+            return JsonResponse(false_code("您已加入该组，无需再次申请"))
+        except GroupUser.DoesNotExist:
+            # 找不到说明未加入组，可以进行申请
+            pass
+        try:
             GroupApply.objects.create(
                 group_id=group_id,
                 group_name=group.full_name,
@@ -104,7 +110,7 @@ class GroupUserView(APIView):
 
     # 退出小组
     def delete(self, request):
-        group_id = request.GET.get("group_id")
+        group_id = request.data.get("group_id")
         try:
             group = Group.objects.get(id=group_id)
         except (Group.DoesNotExist, GroupUser.DoesNotExist):
@@ -131,11 +137,16 @@ class GroupManageView(APIView):
     # 获取所有的申请
     def get(self, request):
         group_id = request.GET.get("group_id")
-        try:
-            Group.objects.get(id=group_id, secretary=request.user.username)
-        except Group.DoesNotExist:
-            return JsonResponse(false_code("对应组不存在或没有权限"))
-        group_applies = GroupApply.objects.filter(group_id=group_id)
+        # 未传组id就获取当前用户所有的审批
+        if group_id is None:
+            group_ids = Group.objects.filter(secretary=request.user.username).values_list("id", flat=True)
+            group_applies = GroupApply.objects.filter(group_id__in=group_ids)
+        else:
+            try:
+                Group.objects.get(id=group_id, secretary=request.user.username)
+            except Group.DoesNotExist:
+                return JsonResponse(false_code("对应组不存在或没有权限"))
+            group_applies = GroupApply.objects.filter(group_id=group_id)
         return JsonResponse(success_code([apply.to_json() for apply in group_applies]))
 
     # 审批入组请求

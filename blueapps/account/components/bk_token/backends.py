@@ -43,11 +43,12 @@ class TokenBackend(ModelBackend):
 
         user_model = get_user_model()
         try:
-            user, _ = user_model.objects.get_or_create(username=username)
             get_user_info_result, user_info = self.get_user_info(bk_token)
             # 判断是否获取到用户信息,获取不到则返回None
             if not get_user_info_result:
                 return None
+            user_id = user_info.get("id", "")
+            user, _ = user_model.objects.get_or_create(id=user_id, username=username)
             user.set_property(key="qq", value=user_info.get("qq", ""))
             user.set_property(key="language", value=user_info.get("language", ""))
             user.set_property(key="time_zone", value=user_info.get("time_zone", ""))
@@ -69,6 +70,7 @@ class TokenBackend(ModelBackend):
 
             # 将蓝鲸的用户信息同步到奖项申报平台
             award_user, _ = AwardUser.objects.get_or_create(id=user.id, username=user.username)
+            award_user.id = user_info["id"]
             award_user.phone = user_info["phone"].replace("\t", "")
             award_user.display_name = user_info["chname"]
             award_user.email = user_info["email"]
@@ -116,11 +118,6 @@ class TokenBackend(ModelBackend):
 
         try:
             response = client.bk_login.get_user(api_params)
-            # TODO 获取用户id
-            username = "kaisheng"
-            bk_client = get_client_by_user(username)
-            kwargs = {"id": username}
-            user_info = bk_client.usermanage.retrieve_user(kwargs)
         except Exception as err:  # pylint: disable=broad-except
             logger.exception(u"Abnormal error in get_user_info...:%s" % err)
             return False, {}
@@ -145,6 +142,17 @@ class TokenBackend(ModelBackend):
             elif settings.DEFAULT_BK_API_VER == "":
                 user_info["username"] = origin_user_info.get("username", "")
                 user_info["role"] = origin_user_info.get("role", "")
+
+            # 获取用户id
+            username = "kaisheng"
+            bk_client = get_client_by_user(username)
+            kwargs = {"id": user_info["username"]}
+            user_detail = bk_client.usermanage.retrieve_user(kwargs)
+            if user_detail.get("result"):
+                user_info["id"] = user_detail.get("data").get("id")
+            if user_info["id"] is None:
+                return False, user_info
+
             return True, user_info
         else:
             error_msg = response.get("message", "")
