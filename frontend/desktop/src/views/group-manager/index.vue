@@ -7,7 +7,7 @@
             :header-position="'left'"
             :confirm-fn="handleTransferCurGroup"
         >
-            <bk-form :label-width="100">
+            <bk-form :label-width="100" ref="transfer-form">
                 <bk-form-item label="确认小组名"
                     :required="true"
                 >
@@ -41,7 +41,7 @@
                     :required="true"
                 >
                     <bk-input v-model="outCurGroupForm['full_name']"
-                        :placeholder="'请再次输入小组名（' + $bus.curGlobalSelectedGroup['full_name'] + '）以确认移交'"
+                        :placeholder="'请再次输入小组名（' + $bus.curGlobalSelectedGroup['full_name'] + '）以确认退出小组'"
                     ></bk-input>
                 </bk-form-item>
             </bk-form>
@@ -137,7 +137,7 @@
                         <bk-popconfirm trigger="click"
                             width="280"
                             @confirm="toRemoveUser(people.row)"
-                            :disabled="!$bus.isCurGroupAdmin && people.row['username'] === $store.state.user['username']"
+                            :disabled="!$bus.isCurGroupAdmin || people.row['username'] === $store.state.user['username']"
                         >
                             <div slot="content">
                                 <div class="demo-custom">
@@ -148,7 +148,7 @@
                             <bk-button theme="primary"
                                 :outline="true"
                                 :text="true"
-                                :disabled="!$bus.isCurGroupAdmin && people.row['username'] === $store.state.user['username']"
+                                :disabled="!$bus.isCurGroupAdmin || people.row['username'] === $store.state.user['username']"
                             >
                                 移除
                             </bk-button>
@@ -161,7 +161,7 @@
 </template>
 <script>
     import { tableMixins } from '@/common/mixins'
-    import { deleteGroupUser, getGroupUser } from '@/api/service/group-service'
+    import { deleteGroupUser, getGroupUser, putGroupManage } from '@/api/service/group-service'
     import { APP_GROUP_DIALOG, GROUP_MANAGER_ROUTE_PATH } from '@/constants'
     import SelectSearch from '@/components/select-search'
     import Tabs from '@/components/Tabs'
@@ -278,7 +278,26 @@
             toOutCurGroup () {
                 this.isOutCurGroup = true
             },
-            handleTransferCurGroup () {
+            async transferValidator () {
+                const transferValidator = this.$refs['transfer-form']
+                return transferValidator.validator().then((res) => {
+                    console.log(res)
+                })
+            },
+            async handleTransferCurGroup () {
+                const validator = await this.transferValidator()
+                if (!validator) {
+                    return
+                }
+                const params = this.transferForm
+                const action = await putGroupManage(params).then(_ => {
+                    this.$store.dispatch('userInfo')
+                    this.$bus.handleGetGroupList()
+                    return true
+                }).catch(_ => {
+                    return false
+                })
+                return action
             },
             async handleOutCurGroup () {
                 const curGroupName = this.$bus.curGlobalGroupId
@@ -287,9 +306,11 @@
                 }
 
                 const action = await deleteGroupUser(params).then(_ => {
-                    console.log(_)
                     this.$store.dispatch('userInfo')
-                    return Promise.resolve(true)
+                    return true
+                }).catch(_ => {
+                    console.log(_)
+                    return false
                 })
                 return action
             }

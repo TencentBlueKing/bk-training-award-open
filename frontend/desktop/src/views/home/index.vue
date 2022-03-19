@@ -2,35 +2,13 @@
     <div class="home-container">
         <div class="head-panel">
             <div class="header-main">
-                <header-nav style="background: var(--gradient-orange-red);"
-                    @click="headerTrigger($store.state['ROUTE_TABLE']['GROUP_MANAGER_ROUTE_PATH'])"
+                <header-nav
+                    v-for="nav in headerNavList"
+                    :key="nav.title"
+                    :style="nav.style"
+                    @click="headerTrigger(...nav.routerParams())"
                 >
-                    <bk-icon slot="top-icon" name="sitemap"></bk-icon>
-                    我的小组
-                </header-nav>
-                <header-nav style="background: var(--gradient-blue);"
-                    @click="headerTrigger($store.state['ROUTE_TABLE']['AWARD_FORM_ROUTE_PATH'],{ query: { type: 'create' } })"
-                >
-                    <bk-icon slot="top-icon" name="sitemap"></bk-icon>
-                    创建奖项
-                </header-nav>
-                <header-nav style="background: var(--gradient-orange-pink);"
-                    @click="headerTrigger($store.state['ROUTE_TABLE']['MYAPPLY_ROUTE_PATH'])"
-                >
-                    <bk-icon slot="top-icon" name="sitemap"></bk-icon>
-                    我的申请
-                </header-nav>
-                <header-nav style="background: var(--gradient-green);"
-                    @click="headerTrigger($store.state['ROUTE_TABLE']['AWARD_MANAGER_ROUTE_PATH'])"
-                >
-                    <bk-icon slot="top-icon" name="sitemap"></bk-icon>
-                    奖项列表
-                </header-nav>
-                <header-nav style="background: var(--gradient-purple);"
-                    @click="headerTrigger($store.state['ROUTE_TABLE']['MYCHECK_ROUTE_PATH'])"
-                >
-                    <bk-icon slot="top-icon" name="sitemap"></bk-icon>
-                    审批记录
+                    <span>{{ nav.title }}</span>
                 </header-nav>
             </div>
         </div>
@@ -40,27 +18,22 @@
                 v-model="workbenchCurIndex"
             >
                 <template>
-                    <applicable-award :data="applicableAward"
-                        v-if="workbenchCurIndex === 'applicable-award'"
-                    ></applicable-award>
-                    <award-approval :data="applicableAward"
-                        v-if="workbenchCurIndex === 'award-approval'"
-                    ></award-approval>
-                    <group-approval :data="applicableAward"
-                        v-if="workbenchCurIndex === 'group-approval'"
-                    ></group-approval>
+                    <component :is="workbenchCurIndex" :ref="workbenchCurIndex"></component>
                 </template>
             </tabs>
             <tabs style="width: 370px"
                 :tab-items="messageTabItems"
+                class="mr10 ml10"
             >
                 <bk-link slot="right-controller"
                     theme="primary"
                     :underline="true"
-                    @click="handleAllAns(messageList)"
-                >一键已读</bk-link>
+                    @click="handleAllAns($refs['message-list'])"
+                >
+                    一键已读
+                </bk-link>
                 <template>
-                    <message-list :data="messageList"></message-list>
+                    <message-list ref="message-list"></message-list>
                 </template>
             </tabs>
             <div class="cartoon">
@@ -73,7 +46,7 @@
     </div>
 </template>
 <script>
-    import { getGroupManage, getMessage } from '@/api/service/message-service'
+    import { getGroupManage } from '@/api/service/message-service'
 
     export default {
         name: 'Home',
@@ -86,8 +59,19 @@
             Tabs: () => import('@/components/Tabs'),
             CartoonRobot: () => import('@/components/cartoon-robot')
         },
-        data () {
+        data (self) {
             return {
+                headerNavList: [
+                    { style: 'background: var(--gradient-orange-red);', title: '我的小组', routerParams: () => [self.$store.state['ROUTE_TABLE']['GROUP_MANAGER_ROUTE_PATH']] },
+                    { style: 'background: var(--gradient-blue);',
+                      title: '创建奖项',
+                      routerParams: () => [self.$store.state['ROUTE_TABLE']['AWARD_FORM_ROUTE_PATH'], {
+                          query: { type: 'create' }
+                      }] },
+                    { style: 'background: var(--gradient-orange-pink);', title: '我的申请', routerParams: () => [self.$store.state['ROUTE_TABLE']['MYAPPLY_ROUTE_PATH']] },
+                    { style: 'background: var(--gradient-green);', title: '奖项列表', routerParams: () => [self.$store.state['ROUTE_TABLE']['AWARD_MANAGER_ROUTE_PATH']] },
+                    { style: 'background: var(--gradient-purple);', title: '审批记录', routerParams: () => [self.$store.state['ROUTE_TABLE']['MYCHECK_ROUTE_PATH']] }
+                ],
                 workbenchTabItems: [
                     {
                         'tab-name': '可申请奖项',
@@ -105,12 +89,7 @@
                 messageTabItems: [{
                     'tab-name': '消息记录',
                     'tab-key': 'message-record'
-                }],
-                // 远程消息列表
-                messageRemoteList: [],
-                applicableAwardRemoteData: [],
-                awardApprovalRemoteData: [],
-                groupApprovalRemoteData: []
+                }]
             }
         },
         computed: {
@@ -129,18 +108,6 @@
                     return '下午好'
                 }
                 return '晚上好'
-            },
-            messageList (self) {
-                return self.messageRemoteList
-            },
-            applicableAward (self) {
-                return self.applicableAwardRemoteData
-            },
-            awardApproval (self) {
-                return self.awardApprovalRemoteData
-            },
-            groupApproval (self) {
-                return self.groupApprovalRemoteData
             }
 
         },
@@ -150,23 +117,16 @@
         methods: {
             handleInit () {
                 Promise.all([
-                    this.handleGetGroupManage(),
-                    this.handleGetMessage()
+                    this.handleGetGroupManage()
                 ])
             },
             handleGetGroupManage () {
                 return getGroupManage()
             },
-
-            handleGetMessage () {
-                return getMessage().then(res => {
-
-                })
-            },
             headerTrigger (routeName, config = {}) {
                 this.$router.push(Object.assign({
                     name: routeName
-                }, config))
+                }, config || {}))
             },
             handleAllAns (messageList) {
                 if (!messageList.length) {

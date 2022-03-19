@@ -24,8 +24,8 @@
 
 <script>
     import { getSecretaryDepartment } from '@/api/service/bk-service'
-    import { BK_GROUP_KEYNAME, GROUP_KEYNAME, GROUP_SECRETARY_KEYNAME, GROUP_USERS_KEYNAME } from '@/constants'
-    import { getGroup, getGroupUser } from '@/api/service/group-service'
+    import { BK_GROUP_KEYNAME, GROUP_SECRETARY_KEYNAME, GROUP_USERS_KEYNAME } from '@/constants'
+    import { getGroupUser } from '@/api/service/group-service'
 
     export default {
         name: 'select-search',
@@ -103,6 +103,9 @@
                 const list = self.groupUsers?.filter?.(item => {
                     return item[config[type]['displayKey']]
                 }).filter(self.filterFn) ?? []
+                if (type === 'group') {
+                    return self.$bus.groupList
+                }
                 if (list && !self.value && !self.multiple) {
                     console.log(list[0]?.[config[type]['idKey']])
                     self.handleChange(list[0]?.[config[type]['idKey']] || '')
@@ -143,20 +146,7 @@
                 })
             },
             handleGetDepartment () {
-                this.loading = true
-                const groupUsers = this.$http.cache.get(GROUP_KEYNAME)
-                if (groupUsers) {
-                    this.groupUsers = groupUsers
-                    this.loading = false
-                    return
-                }
-                return getGroup().then(response => {
-                    console.log(response)
-                    this.groupUsers = response.data
-                    this.$http.cache.set(GROUP_KEYNAME, response.data)
-                }).finally(_ => {
-                    this.loading = false
-                })
+                this.groupUsers = this.$bus.groupList
             },
             // 获取用户列表信息
             handleGetUserManageListUsers () {

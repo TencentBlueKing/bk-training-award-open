@@ -4,7 +4,7 @@
  */
 
 import store from '@/store'
-
+import { bus } from '@/store/bus'
 const config = {
     fromCache: true,
     cancelWhenRouteChange: false
@@ -19,7 +19,7 @@ function getUser () {
     return store.dispatch('userInfo', config)
 }
 function getGroup () {
-    return global.bus.handleGetGroupList(config)
+    return bus.handleGetGroupList()
     // return store.dispatch('group', config)
 }
 function getBkInfo () {

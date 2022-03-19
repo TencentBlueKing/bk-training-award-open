@@ -35,3 +35,23 @@ $mediaWidth: 1500px;
 
 /* 背景 hover */
 $bgHoverColor: #fafbfd;
+
+
+:root {
+    --borderColor: $borderColor;
+    --borderWeightColor: $borderWeightColor;
+    --fontColor: $fontColor;
+    --fontWeightColor: $fontWeightColor;
+    --iconPrimaryColor: $iconPrimaryColor;
+    --primaryColor: $primaryColor;
+    --iconSuccessColor: $iconSuccessColor;
+    --successColor: $successColor;
+    --iconFailColor: $iconFailColor;
+    --failColor: $failColor;
+    --dangerColor: $dangerColor;
+    --iconWarningColor: $iconWarningColor;
+    --warningColor: $warningColor;
+    --primaryLightColor: $primaryLightColor;
+    --mediaWidth: $mediaWidth;
+    --bgHoverColor: $bgHoverColor;
+}

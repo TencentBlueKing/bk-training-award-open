@@ -21,8 +21,11 @@
 </template>
 
 <script>
+    import { tableMixins } from '@/views/award-manager/table/tableMixins'
+
     export default {
         name: 'pending-start',
+        mixins: [tableMixins],
         data () {
             return {
                 pendingStartRemoteData: [{}],

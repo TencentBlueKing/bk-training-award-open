@@ -63,7 +63,6 @@
 
 <script>
     import { APP_AUTH_NEWER, APP_GROUP_DIALOG } from '@/constants'
-    import { bus } from '@/store/bus'
     import { postGroup, postGroupUser } from '@/api/service/group-service'
 
     export default {
@@ -98,11 +97,11 @@
         },
         computed: {},
         mounted () {
-            bus.$on(APP_AUTH_NEWER, (isNewer) => {
+            this.$bus.$on(APP_AUTH_NEWER, (isNewer) => {
                 this.isShow = isNewer
                 this.isNewer = isNewer
             })
-            bus.$on(APP_GROUP_DIALOG, ([isShow, canCancel, type = 'join']) => {
+            this.$bus.$on(APP_GROUP_DIALOG, ([isShow, canCancel, type = 'join']) => {
                 this.isShow = isShow
                 this.isNewer = !canCancel
                 this.createType = type
@@ -135,6 +134,7 @@
                 return postGroup(params).then(res => {
                     this.messageSuccess('创建成功,请尽情使用本系统')
                     this.isShow = false
+                    this.$bus.groupList.push(res.data)
                 })
             },
             fromBkGroup (params) {

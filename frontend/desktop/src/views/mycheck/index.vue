@@ -60,7 +60,6 @@
                     >
                         {{ fileIdx + 1 }} {{ file.name }}
                     </bk-link>
-
                 </li>
             </ul>
         </bk-dialog>

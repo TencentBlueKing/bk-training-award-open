@@ -21,8 +21,10 @@
 </template>
 
 <script>
+    import { tableMixins } from '@/views/award-manager/table/tableMixins'
     export default {
         name: 'ended-approval',
+        mixins: [tableMixins],
         data () {
             return {
                 ingAwardRemoteData: [{}],

@@ -81,6 +81,17 @@ export function deleteGroupManage ({ username, group_id }) {
     })
 }
 
+/**
+ * @param username
+ * @param group_id
+ * */
+export function putGroupManage ({ username, group_id }) {
+    return http.delete('/group_manage/', {
+        group_id,
+        new_secretary: username
+    })
+}
+
 export function deleteGroupUser ({ group_id }) {
     return http.delete('/group_user/', {
         data: {
