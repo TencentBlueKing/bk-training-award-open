@@ -36,35 +36,31 @@
         </div>
         <div class="footer-panel">
             <tabs style="width: calc(5*118px + 4*8px);"
-                :tab-items="[{
-                                 'tab-name': '可申请奖项',
-                                 'tab-key': 'applicable-award'
-                             },{
-                                 'tab-name': '奖项审批',
-                                 'tab-key': 'award-approval'
-                             },
-                             {
-                                 'tab-name': '小组审批',
-                                 'tab-key': 'group-approval'
-                             }
-                ]"
+                :tab-items="workbenchTabItems"
                 v-model="workbenchCurIndex"
             >
                 <template>
-                    <applicable-award v-if="workbenchCurIndex === 'applicable-award'"></applicable-award>
-                    <award-approval v-if="workbenchCurIndex === 'award-approval'"></award-approval>
-                    <group-approval v-if="workbenchCurIndex === 'group-approval'"></group-approval>
+                    <applicable-award :data="applicableAward"
+                        v-if="workbenchCurIndex === 'applicable-award'"
+                    ></applicable-award>
+                    <award-approval :data="applicableAward"
+                        v-if="workbenchCurIndex === 'award-approval'"
+                    ></award-approval>
+                    <group-approval :data="applicableAward"
+                        v-if="workbenchCurIndex === 'group-approval'"
+                    ></group-approval>
                 </template>
             </tabs>
             <tabs style="width: 370px"
-                :tab-items="[{
-                    'tab-name': '消息记录',
-                    'tab-key': 'message-record'
-                }]"
+                :tab-items="messageTabItems"
             >
-                <bk-link slot="right-controller" underline theme="primary">一键已读</bk-link>
+                <bk-link slot="right-controller"
+                    theme="primary"
+                    :underline="true"
+                    @click="handleAllAns(messageList)"
+                >一键已读</bk-link>
                 <template>
-                    <message-card></message-card>
+                    <message-list :data="messageList"></message-list>
                 </template>
             </tabs>
             <div class="cartoon">
@@ -77,24 +73,44 @@
     </div>
 </template>
 <script>
-    import ApplicableAward from '@/views/home/table/applicable-award'
-    import AwardApproval from '@/views/home/table/award-approval'
-    import GroupApproval from '@/views/home/table/group-approval'
+    import { getGroupManage, getMessage } from '@/api/service/message-service'
+
     export default {
         name: 'Home',
         components: {
-            GroupApproval,
-            AwardApproval,
-            ApplicableAward,
-            MessageCard: () => import('@/views/home/MessageCard'),
+            MessageList: () => import('@/views/home/table/message-list'),
+            GroupApproval: () => import('@/views/home/table/group-approval'),
+            AwardApproval: () => import('@/views/home/table/award-approval'),
+            ApplicableAward: () => import('@/views/home/table/applicable-award'),
             HeaderNav: () => import('@/views/home/HeaderNav'),
             Tabs: () => import('@/components/Tabs'),
             CartoonRobot: () => import('@/components/cartoon-robot')
-
         },
         data () {
             return {
-                workbenchCurIndex: 'applicable-award'
+                workbenchTabItems: [
+                    {
+                        'tab-name': '可申请奖项',
+                        'tab-key': 'applicable-award'
+                    }, {
+                        'tab-name': '奖项审批',
+                        'tab-key': 'award-approval'
+                    },
+                    {
+                        'tab-name': '小组审批',
+                        'tab-key': 'group-approval'
+                    }
+                ],
+                workbenchCurIndex: 'applicable-award',
+                messageTabItems: [{
+                    'tab-name': '消息记录',
+                    'tab-key': 'message-record'
+                }],
+                // 远程消息列表
+                messageRemoteList: [],
+                applicableAwardRemoteData: [],
+                awardApprovalRemoteData: [],
+                groupApprovalRemoteData: []
             }
         },
         computed: {
@@ -113,6 +129,18 @@
                     return '下午好'
                 }
                 return '晚上好'
+            },
+            messageList (self) {
+                return self.messageRemoteList
+            },
+            applicableAward (self) {
+                return self.applicableAwardRemoteData
+            },
+            awardApproval (self) {
+                return self.awardApprovalRemoteData
+            },
+            groupApproval (self) {
+                return self.groupApprovalRemoteData
             }
 
         },
@@ -121,13 +149,29 @@
         },
         methods: {
             handleInit () {
-                Promise.all([])
+                Promise.all([
+                    this.handleGetGroupManage(),
+                    this.handleGetMessage()
+                ])
+            },
+            handleGetGroupManage () {
+                return getGroupManage()
+            },
+
+            handleGetMessage () {
+                return getMessage().then(res => {
+
+                })
             },
             headerTrigger (routeName, config = {}) {
-                this.$router.push({
-                    name: routeName,
-                    ...config
-                })
+                this.$router.push(Object.assign({
+                    name: routeName
+                }, config))
+            },
+            handleAllAns (messageList) {
+                if (!messageList.length) {
+                    this.messageWarn('消息这么空,既然世界这么大,不如去看看?')
+                }
             }
             /**
              * 请求区域开始

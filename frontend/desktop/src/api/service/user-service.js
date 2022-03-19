@@ -5,7 +5,7 @@
 import http from '@/api'
 
 export function getUserInfo (config) {
-    const url = USER_INFO_URL
+    const url = '/userinfo/'
 
     return http.get(url, {}, config)
 }

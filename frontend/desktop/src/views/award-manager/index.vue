@@ -101,7 +101,7 @@
     import { tableMixins } from '@/common/mixins'
     import { APPLYED, AWARD_APPROVAL_STATE_MAP, ENDED, NOT_APPLY } from '@/constants'
     import { deleteAward, getAwards } from '@/api/service/award-service'
-    import { bus } from '@/common/bus'
+    import { bus } from '@/store/bus'
     import moment from 'moment'
     import SelectSearch from '@/components/select-search'
 

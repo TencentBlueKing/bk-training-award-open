@@ -13,17 +13,26 @@ import { injectCSRFTokenToHeaders } from '@/api'
 import auth from '@/common/auth'
 import Img403 from '@/images/403.png'
 import Exception from '@/components/exception'
-import { bus } from '@/common/bus'
-import AuthComponent from '@/components/auth'
+import { bus } from '@/store/bus'
 import '@/common/bkmagic'
 
+// 一些自定义的组件或者指令
+import waves from '@/common/directives'
+Vue.use(waves)
+
+Vue.component('top-back', () => import('@/components/top-back'))
+Vue.component('tabs', () => import('@/components/Tabs'))
+Vue.component('self-table', () => import('@/components/self-table'))
+Vue.component('select-search', () => import('@/components/select-search'))
+Vue.component('empty', () => import('@/components/empty'))
+
 Vue.component('app-exception', Exception)
-Vue.component('app-auth', AuthComponent)
 
 auth.requestCurrentUser().then(user => {
     injectCSRFTokenToHeaders()
     if (user.isAuthenticated) {
         global.bus = bus
+        Vue.prototype.$bus = bus
         global.mainComponent = new Vue({
             el: '#app',
             router,

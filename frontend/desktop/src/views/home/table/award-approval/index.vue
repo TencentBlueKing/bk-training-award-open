@@ -7,7 +7,7 @@
         <bk-table-column label="操作">
             <template slot-scope="awardApprovalRecords">
                 <bk-button :text="true" @click="toApproval(awardApprovalRecords.row)">
-                    前往审批👉
+                    前往审批
                 </bk-button>
             </template>
         </bk-table-column>

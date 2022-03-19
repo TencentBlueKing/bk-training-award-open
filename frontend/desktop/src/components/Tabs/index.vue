@@ -1,7 +1,7 @@
 <template>
     <div class="tab-container">
         <div class="tab-header">
-            <div v-for="item in tabItems"
+            <div v-for="item in tabItems || []"
                 :key="item['tab-name']"
                 :class="[
                     'tab-item',
@@ -17,9 +17,9 @@
             </div>
         </div>
         <div class="tab-content">
-            <transition name="bk-move-in-left">
-                <slot></slot>
-            </transition>
+            <!--            <transition name="bk-move-in-left">-->
+            <slot></slot>
+            <!--            </transition>-->
         </div>
         <div class="tab-footer">
             <slot name="tab-footer"></slot>

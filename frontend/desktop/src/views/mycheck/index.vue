@@ -1,7 +1,6 @@
 <template>
     <div class="mycheck-container">
         <top-back></top-back>
-
         <div class="header-controller-panel mt15 mb20">
             <select-search
                 style="width: var(--xs)"
@@ -9,14 +8,7 @@
             ></select-search>
         </div>
         <tabs class="mt15"
-            :tab-items="[{
-                'tab-name': '待审批',
-                'tab-key': 'pending-approval'
-            },{
-                'tab-name': '已审批',
-                'tab-key': 'ended-approval'
-            }
-            ]"
+            :tab-items="checkTabItems"
             v-model="curSelectedTable"
         >
             <bk-table class="mt10"
@@ -103,7 +95,8 @@
                         >
                             打回
                         </bk-button>
-                        <span class="text-gray" style="cursor:pointer;" v-show="props.row['approval_state'] !== config['award_approval_state_controller']['review_pending']">
+                        <span class="text-gray" style="cursor:pointer;"
+                            v-show="props.row['approval_state'] !== config['award_approval_state_controller']['review_pending']">
                             --
                         </span>
                     </template>
@@ -135,7 +128,7 @@
                     <bk-link :href="file.path"
                         theme="primary"
                     >
-                        {{fileIdx + 1}} {{file.name}}
+                        {{ fileIdx + 1 }} {{ file.name }}
                     </bk-link>
 
                 </li>
@@ -149,10 +142,9 @@
     import {
         APPLY_APPROVAL_STATE_EN_MAP,
         APPLY_APPROVAL_STATE_MAP,
-        REVIEW_PENDING,
+        REVIEW_NOT_PASSED,
         REVIEW_PASSED,
-        REVIEW_NOT_PASSED
-
+        REVIEW_PENDING
     } from '@/constants'
     import moment from 'moment'
 
@@ -177,7 +169,7 @@
                         pass: REVIEW_PASSED,
                         no_pass: REVIEW_NOT_PASSED,
                         review_pending: REVIEW_PENDING
-                      
+
                     }
                 },
                 approvalForm: {
@@ -192,7 +184,18 @@
                 isPreviewAttachFiles: false,
                 tmpAttachFiles: [],
                 // S 弹框控制区域
-                curSelectedTable: ''
+                // Tab 栏
+                curSelectedTable: '',
+                checkTabItems: [
+                    {
+                        'tab-name': '待审批',
+                        'tab-key': 'pending-approval'
+                    },
+                    {
+                        'tab-name': '已审批',
+                        'tab-key': 'ended-approval'
+                    }
+                ]
             }
         },
         computed: {

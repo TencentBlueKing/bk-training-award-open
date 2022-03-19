@@ -8,7 +8,7 @@
         <bk-table-column label="操作">
             <template slot-scope="groups">
                 <bk-button :text="true" @click="toApply(groups.row)">
-                    立即申请👉
+                    立即申请
                 </bk-button>
             </template>
         </bk-table-column>
@@ -22,7 +22,7 @@
         name: 'applicable-award',
         data () {
             return {
-                applicationableAwardRemoteList: [{}]
+                applicationableAwardRemoteList: []
             }
         },
         computed: {

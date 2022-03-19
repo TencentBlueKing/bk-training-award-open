@@ -3,9 +3,9 @@
         <div class="bk-login-wrapper">
             <div class="container">
                 <p class="title">
-                    {{ config[creatType]['tips'] }}
-                    <span v-bk-tooltips="config[creatType]['question']"
-                        v-if="config[creatType]['question']"
+                    {{ config[createType]['tips'] }}
+                    <span v-bk-tooltips="config[createType]['question']"
+                        v-if="config[createType]['question']"
                         style="color:dodgerblue;"
                         class="bottom-middle"
                     >
@@ -14,64 +14,45 @@
                 </p>
                 <div class="select-panel center-content">
                     <transition-group name="bk-move-in-right">
-                        <div v-show="creatType === 'create'" key="create">
+                        <div v-if="isShow && createType === 'create'" key="create">
                             <div class="dialog-content">
-                                <bk-form :label-width="100">
-                                    <bk-form-item label="新的小组"
-                                        required
-                                    >
-                                        <bk-input placeholder="请输入小组名" style="width: calc(2*118px + 8px)"></bk-input>
-                                    </bk-form-item>
-                                </bk-form>
+                                <create-group-form v-if="createType === 'create'" ref="create"></create-group-form>
                             </div>
                             <div class="tips-panel center-content mb20">
-                                <bk-link theme="primary" @click=" handleTriggerType('join','加入小组')">  加入小组？ </bk-link>
-                                <bk-link theme="primary" @click=" handleTriggerType('from-bk','加入小组')" underline>  从蓝鲸系统迁移？ </bk-link>
+                                <bk-link theme="primary" @click=" handleTriggerType('join','加入小组')"> 加入小组？</bk-link>
+                                <bk-link theme="primary" @click=" handleTriggerType('from-bk','从蓝鲸系统迁移')" underline> 从蓝鲸系统迁移？</bk-link>
                             </div>
                         </div>
-                        <div v-show="creatType === 'join'" key="join">
+                        <div v-if="isShow && createType === 'join'" key="join">
                             <div class="dialog-content">
-                                <bk-form :label-width="90">
-                                    <bk-form-item label="组织名"
-                                        required
-                                    >
-                                        <select-search placeholder="请输入需要加入的组织名"
-                                            style="width: calc(2*118px + 8px)"
-                                            type="group"
-                                            :multiple="false"
-                                        ></select-search>
-                                    </bk-form-item>
-                                </bk-form>
+                                <user-join-form v-if="isShow && createType === 'join'" ref="join"></user-join-form>
                             </div>
                             <div class="tips-panel center-content mb15">
-                                <bk-link theme="primary" @click="handleTriggerType('create','创建小组')">  创建小组？ </bk-link>
-                                <bk-link theme="primary" @click="handleTriggerType('from-bk','创建小组')" underline>  从蓝鲸系统迁移？</bk-link>
+                                <bk-link theme="primary" @click="handleTriggerType('create','创建小组')"> 创建小组？</bk-link>
+                                <bk-link theme="primary" @click="handleTriggerType('from-bk','从蓝鲸系统迁移')" underline> 从蓝鲸系统迁移？</bk-link>
                             </div>
                         </div>
-                        <div v-show="creatType === 'from-bk'" key="from-bk">
+                        <div v-if="isShow && createType === 'from-bk'" key="from-bk">
                             <div class="dialog-content">
-                                <bk-form :label-width="80">
-                                    <bk-form-item label="组织名"
-                                        required
-                                    >
-                                        <select-search placeholder="请选择要迁移的小组"
-                                            style="width: calc(2*118px + 8px)"
-                                            type="group"
-                                        ></select-search>
-                                    </bk-form-item>
-                                </bk-form>
+                                <bk-group-form v-if="isShow && createType === 'from-bk'" ref="from-bk"></bk-group-form>
                             </div>
 
                             <div class="tips-panel center-content mb20">
-                                <bk-link theme="primary" @click=" handleTriggerType('join','加入小组')" underline>  加入小组？</bk-link>
-                                <bk-link theme="primary" @click="handleTriggerType('create','创建小组')">  创建小组？</bk-link>
+                                <bk-link theme="primary" @click=" handleTriggerType('join','加入小组')" underline> 加入小组？</bk-link>
+                                <bk-link theme="primary" @click="handleTriggerType('create','创建小组')"> 创建小组？</bk-link>
                             </div>
                         </div>
                     </transition-group>
-
                 </div>
                 <div class="button-panel left-content">
-                    <bk-button theme="primary">
+                    <bk-button theme="danger"
+                        class="mr10"
+                        v-if="!isNewer"
+                        @click="isShow = false"
+                    >
+                        取消
+                    </bk-button>
+                    <bk-button theme="primary" class="ml10" @click="handleToBeOlder(createType,$refs[createType])">
                         确认
                     </bk-button>
                 </div>
@@ -81,32 +62,83 @@
 </template>
 
 <script>
-    import SelectSearch from '@/components/select-search'
+    import { APP_AUTH_NEWER, APP_GROUP_DIALOG } from '@/constants'
+    import { bus } from '@/store/bus'
+    import { postGroup, postGroupUser } from '@/api/service/group-service'
 
     export default {
         name: 'app-auth',
-        components: { SelectSearch },
+        components: {
+            CreateGroupForm: () => import('@/components/auth/create-group-form'),
+            UserJoinForm: () => import('@/components/auth/user-join-form'),
+            BkGroupForm: () => import('@/components/auth/bk-group-form')
+        },
         data () {
             return {
                 config: {
                     'join': {
-                        'tips': '加入小组'
+                        tips: '加入小组'
                     },
                     'create': {
-                        'tips': '创建小组'
+                        tips: '创建小组'
                     },
                     'from-bk': {
-                        'tips': '从蓝鲸系统迁移',
-                        'question': '将蓝鲸用户管理中的组织同步到本系统中'
+                        tips: '从蓝鲸系统迁移',
+                        question: '从蓝鲸用户管理系统中选取组织'
                     }
                 },
                 isShow: false,
-                creatType: 'join'
+                createType: 'join',
+                isNewer: false,
+                groupForm: {
+                    group_name: ''
+                }
+
             }
+        },
+        computed: {},
+        mounted () {
+            bus.$on(APP_AUTH_NEWER, (isNewer) => {
+                this.isShow = isNewer
+                this.isNewer = isNewer
+            })
+            bus.$on(APP_GROUP_DIALOG, ([isShow, canCancel, type = 'join']) => {
+                this.isShow = isShow
+                this.isNewer = !canCancel
+                this.createType = type
+            })
         },
         methods: {
             handleTriggerType (type) {
-                this.creatType = type
+                this.createType = type
+            },
+            handleToBeOlder (createType, formInstance) {
+                const params = formInstance.getFields()
+                switch (createType) {
+                    case 'join':
+                        this.joinGroup(params)
+                        break
+                    case 'create':
+                        this.createGroup(params)
+                        break
+                    case 'from-bk':
+                        this.fromBkGroup(params)
+                        break
+                }
+            },
+            joinGroup (params) {
+                return postGroupUser(params).then(res => {
+                    console.log(res)
+                })
+            },
+            createGroup (params) {
+                return postGroup(params).then(res => {
+                    this.messageSuccess('创建成功,请尽情使用本系统')
+                    this.isShow = false
+                })
+            },
+            fromBkGroup (params) {
+
             }
         }
     }
@@ -142,6 +174,7 @@
     justify-content: center;
     align-items: center;
   }
+
   .tips-panel {
     display: flex;
     justify-content: space-around;

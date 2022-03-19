@@ -3,7 +3,6 @@
  * @author couriourc
  */
 import http from '@/api'
-
 /**
  * 创建组织的映射关系
  * @param { number } page
@@ -37,10 +36,55 @@ export function putSecretary (id, { group_id, secretaries, group_full_name }) {
 /**
  * API-获取用户是否为秘书, 是否为管理员
  * */
-export function getUsermanageRetrieveUser () {
-    return http.get('/usermanage/retrieve_user/')
+export function getUsermanageRetrieveUser (config = {}) {
+    return http.get('/usermanage/retrieve_user/', {}, config)
 }
 
-export function getGroup () {
-    return http.get('/group/')
+export function getGroup (config = {}) {
+    return http.get('/group/', {}, config)
+}
+/**
+ * 更新组织的映射关系
+ * @param { string } group_name 组名
+ * */
+export function postGroup ({ group_name }) {
+    return http.post('/group/', {
+        group_name
+    })
+}
+
+/**
+ * @param group_id 小组 id
+ * */
+
+export function postGroupUser ({ group_id }) {
+    return http.post('/group_user/', {
+        group_id
+    })
+}
+export function getGroupUser ({ groupId }) {
+    console.log(groupId)
+    return http.get('/group_user/', {
+        params: {
+            group_id: groupId
+        }
+    })
+}
+/**
+ * @param username
+ * @param group_id
+ * */
+export function deleteGroupManage ({ username, group_id }) {
+    return http.delete('/group_manage/', {
+        group_id,
+        username
+    })
+}
+
+export function deleteGroupUser ({ group_id }) {
+    return http.delete('/group_user/', {
+        data: {
+            group_id
+        }
+    })
 }

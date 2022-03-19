@@ -65,6 +65,7 @@ export const AWARD_LEVEL_EN_MAP = {
 
 export const GROUP_USERS_KEYNAME = 'user'
 export const GROUP_KEYNAME = 'group'
+export const BK_GROUP_KEYNAME = 'bk-group'
 export const GROUP_SECRETARY_KEYNAME = 'secretary'
 
 /**
@@ -102,8 +103,7 @@ export const POWER_CONTROLLER = {
         [IDENT_COMMON]: {}
     },
     [MYAPPLY_ROUTE_PATH]: {
-        [IDENT_ADMIN]: {
-        },
+        [IDENT_ADMIN]: {},
         [IDENT_SECRETARY]: {},
         [IDENT_COMMON]: {}
     },
@@ -115,35 +115,27 @@ export const POWER_CONTROLLER = {
             'table-controller': true
         },
         [IDENT_SECRETARY]: {},
-        [IDENT_COMMON]: {
-        }
+        [IDENT_COMMON]: {}
     },
     [AWARD_MANAGER_ROUTE_PATH]: {
-        [IDENT_ADMIN]: {
-        },
-        [IDENT_SECRETARY]: {
-        },
-        [IDENT_COMMON]: {
-        }
+        [IDENT_ADMIN]: {},
+        [IDENT_SECRETARY]: {},
+        [IDENT_COMMON]: {}
     },
     [MYCHECK_ROUTE_PATH]: {
-        [IDENT_ADMIN]: {
-        },
+        [IDENT_ADMIN]: {},
         [IDENT_SECRETARY]: {},
-        [IDENT_COMMON]: {
-        }
+        [IDENT_COMMON]: {}
     },
     [DETAIL_ROUTE_PATH]: {
-        [IDENT_ADMIN]: {
-        },
+        [IDENT_ADMIN]: {},
         [IDENT_SECRETARY]: {},
         [IDENT_COMMON]: {}
     },
     [AWARD_FORM_ROUTE_PATH]: {
         [IDENT_ADMIN]: {},
         [IDENT_SECRETARY]: {},
-        [IDENT_COMMON]: {
-        }
+        [IDENT_COMMON]: {}
     },
     [BAD_404_ROUTE_PATH]: {
         [IDENT_ADMIN]: {},
@@ -168,3 +160,7 @@ export const ROUTE_TABLE = {
     BAD_404_ROUTE_PATH,
     LOGIN_SUCCESS_ROUTE_PATH
 }
+
+// 事件集
+export const APP_AUTH_NEWER = 'auth-newer'
+export const APP_GROUP_DIALOG = 'auth-newer_dialog'

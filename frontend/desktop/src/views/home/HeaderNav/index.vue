@@ -1,6 +1,5 @@
 <template>
     <div class="header-nav"
-        v-waves
         @click="$emit('click',$event)"
     >
         <div class="header-container">
@@ -10,7 +9,6 @@
                 </div>
             </div>
             <div class="left-panel">
-                <slot name="top-icon"></slot>
                 <bk-icon type="arrows-right-circle" class="go-icon" />
             </div>
         </div>
@@ -70,7 +68,7 @@ $card-height: 137px;
     .left-panel {
       display: flex;
       flex-direction: column;
-      justify-content: space-between;
+      justify-content: center;
       width: calc($card-width - 25% - 70%);
       padding: 12px 0;
 

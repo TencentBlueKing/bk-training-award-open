@@ -1,76 +1,168 @@
 <template>
     <div class="group-manager-container">
+
+        <bk-dialog v-model="transferMyGroup"
+            :render-directive="'if'"
+            :mask-close="false"
+            :header-position="'left'"
+            :confirm-fn="handleTransferCurGroup"
+        >
+            <bk-form :label-width="100">
+                <bk-form-item label="确认小组名"
+                    :required="true"
+                >
+                    <bk-input v-model="transferForm['full_name']"
+                        :placeholder="'请再次输入小组名（' + $bus.curGlobalSelectedGroup['full_name'] + '）以确认移交'"
+                    ></bk-input>
+                </bk-form-item>
+                <bk-form-item label="移交对象"
+                    :required="true"
+                >
+                    <select-search
+                        type="self"
+                        :data="tableData"
+                        :id-key="'username'"
+                        :display-key="'display_name_for_display'"
+                        :multiple="false"
+                        placeholder="请选择组内成员转交权限"
+                        v-model="transferForm['target_username']"
+                    ></select-search>
+                </bk-form-item>
+            </bk-form>
+        </bk-dialog>
+        <bk-dialog v-model="isOutCurGroup"
+            :render-directive="'if'"
+            :mask-close="false"
+            :header-position="'left'"
+            :confirm-fn="handleOutCurGroup"
+        >
+            <bk-form :label-width="100">
+                <bk-form-item label="退出该小组"
+                    :required="true"
+                >
+                    <bk-input v-model="outCurGroupForm['full_name']"
+                        :placeholder="'请再次输入小组名（' + $bus.curGlobalSelectedGroup['full_name'] + '）以确认移交'"
+                    ></bk-input>
+                </bk-form-item>
+            </bk-form>
+        </bk-dialog>
+        <!--      弹框区-->
         <top-back></top-back>
+        <!--      偏上操作栏-->
         <div class="controller-panel mt20 mb15">
             <select-search behavior="simplicity"
                 style="width: calc(2*118px + 1*8px);font-size: 15px;"
+                :id-key="'group_id'"
                 type="group"
-                value=""
                 :multiple="false"
                 placeholder="请选择需要查看的小组"
                 :clearable="false"
+                :value.sync="$bus.curGlobalGroupId"
+                @change="handleInit($event)"
             ></select-search>
             <div class="button-panel">
-                <bk-button theme="success">加入小组</bk-button>
-                <bk-button theme="primary">创建小组</bk-button>
-                <bk-button theme="danger">移交小组</bk-button>
+                <bk-button theme="success" @click="toJoinGroup()">加入小组</bk-button>
+                <bk-button theme="primary" @click="toCreateGroup()">创建小组</bk-button>
+                <bk-dropdown-menu ref="dropdown">
+                    <div class="dropdown-trigger-btn"
+                        slot="dropdown-trigger">
+                        <bk-button theme="danger">更多操作 <i :class="['bk-icon icon-angle-down']"></i></bk-button>
+
+                    </div>
+                    <ul class="more-action" slot="dropdown-content">
+                        <bk-button class="mb10"
+                            @click="toOutCurGroup()"
+                            :text="true"
+                        >邀请入组
+                        </bk-button>
+                        <bk-button class="mb10"
+                            @click="toTransferGroup()"
+                            v-if="$bus.isCurGroupAdmin"
+                            :text="true"
+                        >移交小组
+                        </bk-button>
+                        <bk-button class="mb10"
+                            @click="toOutCurGroup()"
+                            v-else
+                            :text="true"
+                        >退出小组
+                        </bk-button>
+                    </ul>
+                </bk-dropdown-menu>
             </div>
         </div>
+        <!--      操作区域-->
         <tabs>
-            <self-table>
+            <self-table :data="tableData" :loading="tableDataIsLoading">
                 <bk-table-column type="index"
                     label="序号"
                     :width="80"
                 ></bk-table-column>
                 <bk-table-column
-                    key="group_full_name"
                     label="用户名"
                     :width="200"
-
                 >
-                    <template slot-scope="prop">
-                        <span>{{ prop.row['group_full_name'] }}</span>
+                    <template slot-scope="people">
+                        <span>{{ people.row['display_name'] }}</span>
+                    </template>
+                </bk-table-column>
+
+                <bk-table-column
+                    label="姓名"
+                    :width="200"
+                >
+                    <template slot-scope="people">
+                        <span>{{ people.row['display_name'] }}</span>
                     </template>
                 </bk-table-column>
                 <bk-table-column
                     label="手机号"
                 >
-                    <template slot-scope="prop">
-                        <span>{{ prop.row['group_full_name'] | groupLevel }}</span>
+                    <template slot-scope="people">
+                        <span>{{ people.row['phone'] }}</span>
                     </template>
                 </bk-table-column>
                 <bk-table-column
                     label="邮箱"
                 >
-                    <template slot-scope="prop">
-                        <bk-tag v-for="master in prop.row['master'] || []" :key="master['username']">
-                            {{ master['username'] }}（{{ master['display_name'] }}）
-                        </bk-tag>
+                    <template slot-scope="people">
+                        <span>{{ people.row['email'] }}</span>
+
                     </template>
                 </bk-table-column>
-
                 <bk-table-column label="操作"
                     fix="right"
                 >
-                    <template slot-scope="props">
-                        <bk-button theme="primary"
-                            @click="toEditRow($refs['EditorDialogForm'],props.row)"
-                            :outline="true"
-                            :text="true"
-                            :disabled="$store.getters.groupPowerConfig['table-controller']"
-                        >移除
-                        </bk-button>
+                    <template slot-scope="people">
+                        <bk-popconfirm trigger="click"
+                            width="280"
+                            @confirm="toRemoveUser(people.row)"
+                            :disabled="!$bus.isCurGroupAdmin && people.row['username'] === $store.state.user['username']"
+                        >
+                            <div slot="content">
+                                <div class="demo-custom">
+                                    <i class="bk-icon icon-info-circle-shape pr5 content-icon" style="color: #cc1111"></i>
+                                    <div class="content-text">注意: 将会移除该成员</div>
+                                </div>
+                            </div>
+                            <bk-button theme="primary"
+                                :outline="true"
+                                :text="true"
+                                :disabled="!$bus.isCurGroupAdmin && people.row['username'] === $store.state.user['username']"
+                            >
+                                移除
+                            </bk-button>
+                        </bk-popconfirm>
                     </template>
                 </bk-table-column>
             </self-table>
         </tabs>
-
     </div>
 </template>
 <script>
     import { tableMixins } from '@/common/mixins'
-    import { getSecretary, postSecretary, putSecretary } from '@/api/service/group-service'
-    import { GROUP_MANAGER_ROUTE_PATH } from '@/constants'
+    import { deleteGroupUser, getGroupUser } from '@/api/service/group-service'
+    import { APP_GROUP_DIALOG, GROUP_MANAGER_ROUTE_PATH } from '@/constants'
     import SelectSearch from '@/components/select-search'
     import Tabs from '@/components/Tabs'
 
@@ -80,38 +172,39 @@
             Tabs,
             SelectSearch
         },
-        filters: {
-            groupLevel (value) {
-                const groupLevel = value.split && value.split('/').slice(-1)[0]
-                return groupLevel || value
-            }
-        },
         mixins: [tableMixins],
         data () {
             return {
-                // S 状态控制区
-                newGroupLoading: false,
-                // E 状态控制区
-                // S 信息控制区
-                tableSettings: {
-                    group_full_name: '组织名',
-                    master: '负责人'
-                },
-
-                // E 信息控制区
                 remoteData: [],
                 groupTabItems: [],
-                groupCurIndexStatus: ''
+                groupCurIndexStatus: '',
+
+                transferMyGroup: false,
+                transferForm: {
+                    full_name: '',
+                    target_username: ''
+                },
+                // 退出当前组表单
+                isOutCurGroup: false,
+                outCurGroupForm: {},
+                //    邀请入组表单
+                isInviteUser: false,
+                isInviteUserForm: {}
             }
         },
         computed: {
             tableData (self) {
                 const remoteData = self.remoteData
-                return remoteData?.map?.((rawData, index) => {
+                return remoteData?.map?.((rawData) => {
+                    const username = rawData['username']
+                    const displayName = rawData['display_name']
                     return {
-                        ...rawData,
-                        'group_level': rawData['group_full_name'],
-                        master: rawData['secretaries']
+                        display_name: rawData['display_name'],
+                        email: rawData['email'],
+                        phone: rawData['phone'],
+                        user_id: rawData['user_id'],
+                        username: rawData['username'],
+                        display_name_for_display: username + '(' + displayName + ')'
                     }
                 }) ?? []
             }
@@ -134,10 +227,8 @@
             toAddNewGroup (toAddNewGroup) {
                 toAddNewGroup.show()
             },
-            toEditRow (toEditDialogForm, rawData) {
-                toEditDialogForm.show({
-                    data: rawData
-                })
+            toRemoveUser () {
+                this.transferMyGroup = true
             },
             /**
              * 页面改变发起请求
@@ -161,38 +252,46 @@
              * */
             handleGetPageData (page = this.pagination.page, size = this.pagination.limit) {
                 this.tableDataIsLoading = true
-                return getSecretary(page, size).then(res => {
-                    this.pagination.count = res.data['count']
-                    this.remoteData = res.data['results']
+                const curGlobalGroupId = this.$bus.curGlobalGroupId
+                const params = {
+                    groupId: curGlobalGroupId
+                }
+                return getGroupUser(params).then(res => {
+                    this.remoteData = res.data
                 }).finally(_ => {
                     this.tableDataIsLoading = false
                 })
             },
-
-            handleConfirmAddNewGroup (groupForm, groupDialog) {
-                if (this.newGroupLoading) {
-                    return
-                }
-                this.newGroupLoading = true
-                return postSecretary(groupForm).then(res => {
-                    this.messageSuccess('创建成功')
-                    /**
-                     * 成功后需要更新一下
-                     * */
-                    this.handleInit()
-                    groupDialog.hidden()
-                }).finally(_ => {
-                    this.newGroupLoading = false
-                })
+            toJoinGroup () {
+                this.$bus.$emit(APP_GROUP_DIALOG, [true, true, 'join'])
             },
-            handleConfirmEditGroup (groupForm, groupDialog) {
-                return putSecretary(groupForm.id, groupForm).then(_ => {
-                    this.messageSuccess('修改成功')
-                    this.handleInit()
-                    groupDialog.hidden()
-                }).catch(_ => {
-                    this.messageError('修改失败')
+            toCreateGroup () {
+                this.$bus.$emit(APP_GROUP_DIALOG, [true, true, 'create'])
+            },
+            toTransferGroup () {
+                this.transferMyGroup = true
+            },
+            toInviteUser () {
+
+            },
+
+            toOutCurGroup () {
+                this.isOutCurGroup = true
+            },
+            handleTransferCurGroup () {
+            },
+            async handleOutCurGroup () {
+                const curGroupName = this.$bus.curGlobalGroupId
+                const params = {
+                    group_id: curGroupName
+                }
+
+                const action = await deleteGroupUser(params).then(_ => {
+                    console.log(_)
+                    this.$store.dispatch('userInfo')
+                    return Promise.resolve(true)
                 })
+                return action
             }
         }
     }
@@ -201,10 +300,17 @@
 <style lang="postcss" scoped>
 .group-manager-container {
   margin: 0 auto;
+  width: 80%;
 
   .controller-panel {
     display: flex;
     justify-content: space-between;
+  }
+
+  .more-action {
+    display: flex;
+    flex-direction: column;
+    justify-content: space-around;
   }
 }
 </style>
