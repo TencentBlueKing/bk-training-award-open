@@ -18,13 +18,9 @@ def upload_file_handler(file):
         return None
     file_md5 = file_md5_calculate(file)
     suffix = Path(file.name).suffix
-    path = settings.MEDIA_ROOT + file_md5 + suffix
-    if default_storage.exists(path):
-        return {"path": path, "name": file.name, "size": file.size}
-    else:
-        path = default_storage.save(path, file)
-        print(path)
-        return {"path": path, "name": file.name, "size": file.size}
+    path = settings.MEDIA_URL + file_md5 + suffix
+    path = default_storage.save(path, file)
+    return {"path": path, "name": file.name, "size": file.size}
 
 
 def file_md5_calculate(data, block_size=65536):

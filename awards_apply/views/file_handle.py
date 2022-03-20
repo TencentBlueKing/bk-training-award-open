@@ -14,7 +14,7 @@ def upload(request):
     """上传文件"""
     file = request.FILES.get("upload_file")
     if not file:
-        return JsonResponse(param_error("file"))
+        return JsonResponse(param_error("upload_file"))
     file_info = upload_file_handler(file)
     return JsonResponse(success_code({
         "path": settings.MEDIA_URL + file_info.name,
@@ -32,4 +32,6 @@ def download(request, filename):
     except FileNotFoundError:
         return JsonResponse(object_not_exist_error("file"))
     else:
-        return FileResponse(file, as_attachment=True, filename=filename)
+        origin_filename = request.query_params.get("filename")
+        return FileResponse(file, as_attachment=True, filename=origin_filename if origin_filename else
+                            filename)

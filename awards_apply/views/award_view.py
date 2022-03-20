@@ -9,6 +9,7 @@ from awards_apply.utils.pagination import PagePagination
 from django.core.paginator import EmptyPage
 from django.db import transaction
 from django.db.models import Q
+from django.db.models.query import QuerySet
 from django.forms import model_to_dict
 from django.http import JsonResponse
 from django.shortcuts import render
@@ -36,8 +37,8 @@ class AwardView(APIView):
         now = timezone.now()
         # ids表示：当前用户申请过的所有申请记录（包括草稿和正式申请）中的所有奖项id列表
         ids = AwardApplicationRecord.objects.filter(
-            application_users__contain={"username": request.user.username}).values_list(
-            "award_id")
+            application_users__contain={"username": request.user.username}).exclude(
+            approval_users__contains=request.user.username).values_list("award_id")
         # valid_awards表示：符合规定时间内的，用户没申请过的奖项
         valid_awards = Awards.objects.exclude(id__in=ids).filter(start_time__lt=now).filter(end_time__gt=now).order_by(
             "id")
@@ -89,8 +90,18 @@ class RecordView(APIView):
 
     def get(self, request):
         """获取我的申请记录"""
+        def get_queryset_by_status(status, record: QuerySet):
+            queryset = {
+                "1": record.filter(approval_state=ApprovalState.review_pending.value[0]),
+                "2": record.filter(approval_state=ApprovalState.review_not_passed.value[0]),
+                "3": record.filter(approval_state=ApprovalState.review_passed.value[0])
+            }
+            return queryset[status].order_by("id")
         record = AwardApplicationRecord.objects.filter(
-            application_users__contains={"username": request.user.username}).order_by('id')
+            application_users__contains={"username": request.user.username}).filter(
+            award_department_id=request.query_params["group_id"]
+        )
+        record = get_queryset_by_status(request.query_params["apply_status"], record)
         pagination = PagePagination()
         try:
             pager_roles = pagination.paginate_queryset(queryset=record, request=request, view=self)
@@ -126,8 +137,9 @@ class RecordView(APIView):
         # 判断用户是否已经申请过该奖项
         if application:
             return JsonResponse(false_code("指定用户已申请过该奖项"))
-        award_record.save()
-        return JsonResponse(success_code({}))
+        record.update({"application_users": [request.user.username]})
+        record = award_record.create(record)
+        return JsonResponse(success_code(record))
 
     def put(self, request):
         id = request.query_params.get("id")
@@ -140,16 +152,24 @@ class AvailableAwardsView(APIView):
 
     def get(self, request):
         """获取可申请的奖项（所属部门的）"""
-        department_id = request.query_params.get("id")
         now = timezone.now()
+
+        def get_queryset_by_status(status, valid_awards: QuerySet):
+            award_status = {
+                "1": valid_awards.filter(Q(start_time__gt=now)),
+                "2": valid_awards.filter(Q(start_time__lt=now) & Q(end_time__gt=now)),
+                "3": valid_awards.filter(Q(end_time__lt=now)),
+                "4": valid_awards.filter(approval_state=1),
+            }
+            return award_status[status].order_by('-create_time')
+        department_id = request.query_params.get("group_id")
         if department_id:
-            valid_awards = Awards.objects.filter(award_department_id=department_id).filter(
-                Q(start_time__lt=now) & Q(end_time__gt=now)).order_by('-create_time')
+            valid_awards = Awards.objects.filter(award_department_id=department_id)
         else:
             departments_id = GroupUser.objects.filter(username=request.user.username).values_list("group_id")
             departments_id = [item[0] for item in departments_id]
-            valid_awards = Awards.objects.filter(award_department_id__in=departments_id).filter(
-                Q(start_time__lt=now) & Q(end_time__gt=now)).order_by('-create_time')
+            valid_awards = Awards.objects.filter(award_department_id__in=departments_id)
+        valid_awards = get_queryset_by_status(request.query_params.get("award_status"), valid_awards)
         pagination = PagePagination()
         try:
             pager_roles = pagination.paginate_queryset(queryset=valid_awards, request=request, view=self)
