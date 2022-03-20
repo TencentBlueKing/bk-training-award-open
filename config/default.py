@@ -180,3 +180,10 @@ REST_FRAMEWORK = {
     'DEFAULT_RENDERER_CLASSES':
         ('rest_framework.renderers.JSONRenderer',)
 }
+
+# BKREPO 相关配置信息, 启用增强服务后会自动往环境变量中添加对应的配置
+BKREPO_ENDPOINT_URL = os.environ['BKREPO_ENDPOINT_URL']
+BKREPO_USERNAME = os.environ['BKREPO_USERNAME']
+BKREPO_PASSWORD = os.environ['BKREPO_PASSWORD']
+BKREPO_PROJECT = os.environ['BKREPO_PROJECT']
+BKREPO_BUCKET = os.environ['BKREPO_BUCKET']

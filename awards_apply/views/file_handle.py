@@ -1,10 +1,12 @@
 from awards_apply.utils.const import (object_not_exist_error, param_error,
                                       success_code)
 from awards_apply.utils.upload_file_handler import upload_file_handler
+from bkstorages.backends.bkrepo import BKRepoStorage
 from django.conf import settings
-from django.core.files.storage import default_storage
 from django.http import FileResponse, JsonResponse
 from django.views.decorators.http import require_GET, require_POST
+
+default_storage = BKRepoStorage()
 
 
 @require_POST

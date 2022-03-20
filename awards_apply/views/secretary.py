@@ -1,6 +1,6 @@
 from awards_apply.models import Admin, Secretary
 from awards_apply.serializers import SecretarySerializer
-from awards_apply.utils.const import object_not_exist_error, success_code
+from awards_apply.utils.const import success_code
 from awards_apply.utils.pagination import CommonPaginaation
 from awards_apply.utils.permission import AssignSecretaryPermission
 from blueking.component.shortcuts import get_client_by_request
@@ -41,7 +41,7 @@ def secretary_department(request, *args, **kwargs):
     id_list = Secretary.objects.filter(
         secretaries__contains={"username": request.user.username}).values_list("group_id")
     if not id_list:
-        return Response(object_not_exist_error("group"))
+        return Response(success_code([]))
     id_list = [i[0] for i in id_list]
     client = get_client_by_request(request)
     department_list = client.usermanage.list_departments()

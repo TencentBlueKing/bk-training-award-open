@@ -7,7 +7,6 @@ from django_mysql.models import JSONField
 # Create your models here.
 class Awards(models.Model):
     award_name = models.CharField(max_length=128, verbose_name="奖项名称")
-    award_level = models.CharField(max_length=128, verbose_name="奖项级别")
     award_description = models.CharField(max_length=512, verbose_name="奖项描述")
     award_department_id = models.IntegerField(verbose_name="奖项所属部门id")
     award_department_fullname = models.CharField(
@@ -17,7 +16,6 @@ class Awards(models.Model):
     award_consultant = models.CharField(max_length=128, verbose_name="奖项顾问")
     award_consultant_displayname = models.CharField(max_length=100, verbose_name="顾问真实姓名")
     award_demand = models.CharField(max_length=1000, verbose_name="奖项说明")
-    award_image = models.CharField(max_length=1000, verbose_name='图片地址')
     create_time = models.DateTimeField(auto_now_add=True, verbose_name="创建时间")
     update_time = models.DateTimeField(auto_now=True, verbose_name="更新时间")
     start_time = models.DateTimeField(verbose_name="开始申请时间")
