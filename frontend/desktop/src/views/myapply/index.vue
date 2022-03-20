@@ -18,15 +18,7 @@
             v-model="curSelectedTable"
         >
             <template>
-                <pending-approval ref="pending-approval"
-                    v-if="curSelectedTable === 'pending-approval'">
-                </pending-approval>
-                <ing-approval ref="ing-approval"
-                    v-if="curSelectedTable === 'ing-approval'">
-                </ing-approval>
-                <ended-approval ref="ended-approval"
-                    v-if="curSelectedTable === 'ended-approval'">
-                </ended-approval>
+                <component :is="curSelectedTable" :ref="curSelectedTable"></component>
             </template>
         </tabs>
     </div>
@@ -137,8 +129,8 @@
                 this.$router.push({
                     name: 'detail',
                     params: {
-          ...curInfo,
-          type: 'apply'
+                      ...curInfo,
+                      type: 'apply'
                     }
                 })
             }

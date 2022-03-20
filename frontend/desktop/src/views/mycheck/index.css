@@ -1,7 +1,8 @@
 @import "@/css/variable.css";
 
 .mycheck-container {
-
+    width: 80%;
+    margin: 0 auto;
     .status {
         display: inline-block;
         min-width: 60px;

@@ -1,5 +1,5 @@
 <template>
-    <self-table :data="endedApprovalData" :loading="loading">
+    <self-table :data="pendingStartData" :loading="loading">
         <bk-table-column type="index" label="序号" width="60"></bk-table-column>
         <bk-table-column label="奖项名称" prop="ip"></bk-table-column>
         <bk-table-column label="奖项开始时间" prop="source"></bk-table-column>
@@ -22,16 +22,16 @@
 
 <script>
     export default {
-        name: 'ended-approval',
+        name: 'pending-start',
         data () {
             return {
-                endedApprovalRemoteData: [{}],
+                pendingStartRemoteData: [{}],
                 loading: false
             }
         },
         computed: {
-            endedApprovalData (self) {
-                return self.endedApprovalRemoteData
+            pendingStartData (self) {
+                return self.pendingStartRemoteData
             }
         },
         mounted () {

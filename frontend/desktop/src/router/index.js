@@ -121,7 +121,7 @@ const routes = setBaseRoutes([
         component: AwardManager,
         meta: {
             parent_id: '管理中心',
-            title: '奖项管理',
+            title: '奖项列表',
             icon: 'icon-data',
             order: 4
         }
