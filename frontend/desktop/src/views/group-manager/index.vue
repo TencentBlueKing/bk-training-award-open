@@ -7,9 +7,14 @@
             :header-position="'left'"
             :confirm-fn="handleTransferCurGroup"
         >
-            <bk-form :label-width="100" ref="transfer-form">
+            <bk-form :label-width="100"
+                ref="transfer-form"
+                :rules="transferFormRules"
+                :model="transferFormRules"
+            >
                 <bk-form-item label="确认小组名"
                     :required="true"
+                    :property="'full_name'"
                 >
                     <bk-input v-model="transferForm['full_name']"
                         :placeholder="'请再次输入小组名（' + $bus.curGlobalSelectedGroup['full_name'] + '）以确认移交'"
@@ -17,6 +22,7 @@
                 </bk-form-item>
                 <bk-form-item label="移交对象"
                     :required="true"
+                    :property="'target_username'"
                 >
                     <select-search
                         type="self"
@@ -25,7 +31,7 @@
                         :display-key="'display_name_for_display'"
                         :multiple="false"
                         placeholder="请选择组内成员转交权限"
-                        v-model="transferForm['target_username']"
+                        :value.sync="transferForm['target_username']"
                     ></select-search>
                 </bk-form-item>
             </bk-form>
@@ -36,7 +42,10 @@
             :header-position="'left'"
             :confirm-fn="handleOutCurGroup"
         >
-            <bk-form :label-width="100">
+            <bk-form :label-width="100"
+                :rules="outCurGroupFormRules"
+                :model="outCurGroupForm"
+            >
                 <bk-form-item label="退出该小组"
                     :required="true"
                 >
@@ -142,7 +151,7 @@
                             <div slot="content">
                                 <div class="demo-custom">
                                     <i class="bk-icon icon-info-circle-shape pr5 content-icon" style="color: #cc1111"></i>
-                                    <div class="content-text">注意: 将会移除该成员</div>
+                                    <span class="content-text">注意: 将会移除该成员</span>
                                 </div>
                             </div>
                             <bk-button theme="primary"
@@ -161,7 +170,7 @@
 </template>
 <script>
     import { tableMixins } from '@/common/mixins'
-    import { deleteGroupUser, getGroupUser, putGroupManage } from '@/api/service/group-service'
+    import { deleteGroupManage, deleteGroupUser, getGroupUser, putGroupManage } from '@/api/service/group-service'
     import { APP_GROUP_DIALOG, GROUP_MANAGER_ROUTE_PATH } from '@/constants'
     import SelectSearch from '@/components/select-search'
     import Tabs from '@/components/Tabs'
@@ -173,20 +182,59 @@
             SelectSearch
         },
         mixins: [tableMixins],
-        data () {
+        data (self) {
             return {
                 remoteData: [],
                 groupTabItems: [],
                 groupCurIndexStatus: '',
-
+                // 移交小组表单及配置
                 transferMyGroup: false,
                 transferForm: {
                     full_name: '',
                     target_username: ''
                 },
+                transferFormRules: Object.freeze({
+                    full_name: [
+                        {
+                            required: true,
+                            message: '请输入您想移交的小组名',
+                            trigger: 'blur'
+                        },
+                        {
+                            message: '请正确输入您想移交的小组名',
+                            trigger: 'blur',
+                            validator () {
+                                return self.$bus.curGlobalSelectedGroup['full_name'] === self.transferForm['full_name']
+                            }
+                        }
+                    ],
+                    target_username: [
+                        {
+                            required: true,
+                            message: '请选择你想转交给的用户',
+                            trigger: 'blur'
+                        }
+                    ]
+                }),
                 // 退出当前组表单
                 isOutCurGroup: false,
                 outCurGroupForm: {},
+                outCurGroupFormRules: Object.freeze({
+                    full_name: [
+                        {
+                            required: true,
+                            message: '请输入您想退出的小组名',
+                            trigger: 'blur'
+                        },
+                        {
+                            message: '请正确输入您想退出的小组名',
+                            trigger: 'blur',
+                            validator () {
+                                return self.$bus.curGlobalSelectedGroup['full_name'] === self.outCurGroupForm['full_name']
+                            }
+                        }
+                    ]
+                }),
                 //    邀请入组表单
                 isInviteUser: false,
                 isInviteUserForm: {}
@@ -227,8 +275,22 @@
             toAddNewGroup (toAddNewGroup) {
                 toAddNewGroup.show()
             },
-            toRemoveUser () {
-                this.transferMyGroup = true
+            toRemoveUser (target) {
+                const { username } = target
+                const params = {
+                    username
+                }
+                if (this.tableDataIsLoading) {
+                    return
+                }
+                this.tableDataIsLoading = true
+                return deleteGroupManage(params).then(_ => {
+                    console.log(_)
+                    //  TODO 移除对应的人
+                    this.messageSuccess('移除成功')
+                }).finally(_ => {
+                    this.tableDataIsLoading = false
+                })
             },
             /**
              * 页面改变发起请求
@@ -280,7 +342,7 @@
             },
             async transferValidator () {
                 const transferValidator = this.$refs['transfer-form']
-                return transferValidator.validator().then((res) => {
+                return transferValidator.validate().then((res) => {
                     console.log(res)
                 })
             },

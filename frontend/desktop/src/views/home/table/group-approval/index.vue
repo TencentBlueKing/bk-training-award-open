@@ -56,8 +56,8 @@
                 this.loading = true
               
                 return getGroupManage({ page, size }).then(({ data }) => {
-                    this.pagination.count = data.count
-                    this.groupApprovalRemoteData = data.result
+                    this.pagination.count = data?.count
+                    this.groupApprovalRemoteData = data?.result
                 }).finally(_ => {
                     this.loading = false
                 })

@@ -20,47 +20,40 @@
             </div>
         </div>
         <div class="form-panel">
-            <Detail class="detail" :award-form="applyForm"></Detail>
+            <DetailInfo class="detail" ref="award-detail"></DetailInfo>
             <!-- /详情部分 -->
 
             <!-- 编辑部分 -->
-            <ApplyForm class="form" v-if="isShowApplyForm"
+            <ApplyForm class="form"
+                v-if="isShowApplyForm"
                 ref="applyForm"
                 :id="applyForm['id']"
             ></ApplyForm>
             <!-- /编辑部分 -->
         </div>
         <!-- 底部按钮组 -->
-        <div class="tc w100  mt15">
+        <div class="tc w100  mt15" v-if="$route.query['type'] === 'approval'">
             <!-- 用于申请奖项的按钮 -->
-            <div class="button-item"
-            >
-                <bk-button theme="success"
-                    class="mr10"
-                    @click="handleToSendApplyForm($refs['applyForm'])"
-                    ext-cls="button-item"
-                >
-                    <bk-icon type="check-circle" />
-                    <span>发起申请</span>
-                </bk-button>
-                <bk-button theme="primary"
-                    class="mr10"
+            <div class="button-item">
+                <bk-button theme="danger"
+                    class="mr20 ml20"
                     @click="handleToSaveApplyForm($refs['applyForm'])"
                     ext-cls="button-item"
                 >
-                    <bk-icon type="save" />
-                    <span>保存草稿</span>
+                    <bk-icon type="close-circle" />
+                    <span>不通过</span>
                 </bk-button>
-                <bk-button theme="warning"
-                    class="mr10"
-                    @click="$router.back()"
+                <bk-button theme="success"
+                    class="mr20 ml20"
+                    @click="handleToSendApplyForm($refs['applyForm'])"
                     ext-cls="button-item"
                 >
-                    <bk-icon type="minus-circle" />
-                    <span>取消</span>
+                    <span>通过</span>
+                    <bk-icon type="check-circle" />
                 </bk-button>
             </div>
             <!-- /用于申请奖项的按钮 -->
+
             <!-- 用于审批的按钮 -->
 
             <!-- /用于审批的按钮 -->
@@ -75,7 +68,7 @@
         name: 'detail',
         components: {
             ApprovalList: () => import('./table/approval-list'),
-            Detail: () => import('./DetailInfo'),
+            DetailInfo: () => import('./DetailInfo'),
             ApplyForm: () => import('./ApplyForm')
         },
         props: {
@@ -111,16 +104,18 @@
              * */
             defaultInfo () {
                 return {
-                    award_apply_record_id: this.applyForm.award_apply_record_id,
-                    award_id: this.applyForm.id
+                    award_id: this.$route.query['award_id']
                 }
             }
         },
         created () {
-            this.applyForm = this.$route.params
-            this.formType = this.$route.query['type']
+            this.handleInit()
         },
         methods: {
+            handleInit () {
+                this.applyForm = this.$route.params
+                this.formType = this.$route.query['type']
+            },
             /**
              * 保存草稿
              * */

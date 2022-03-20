@@ -62,8 +62,8 @@
                 }
                 this.loading = true
                 return getApproval({ page, size }).then(({ data }) => {
-                    this.pagination.count = data.count
-                    this.awardApprovalRemoteList = data.result
+                    this.pagination.count = data?.count
+                    this.awardApprovalRemoteList = data?.result
                 }).finally(_ => {
                     this.loading = false
                 })

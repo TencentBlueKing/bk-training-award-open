@@ -5,7 +5,7 @@
 
 import Vue from 'vue'
 import http from '@/api'
-import { GROUP_KEYNAME } from '@/constants'
+import { GROUP_KEYNAME, GROUP_USERS_KEYNAME } from '@/constants'
 import { getGroup } from '@/api/service/group-service'
 import store from '@/store/index'
 
@@ -31,6 +31,10 @@ export const bus = new Vue({
         },
         isCurGroupAdmin (self) {
             return self.curGlobalSelectedGroup['secretary'] === store.state.user['username']
+        },
+        curGroupUsers (self) {
+            const groupId = self.curGlobalGroupId
+            return self.$http.cache.get(GROUP_USERS_KEYNAME + groupId)
         }
     },
     created () {

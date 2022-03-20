@@ -1,5 +1,5 @@
 <template>
-    <div class="top-back" @click="$router.back()">
+    <div class="top-back" @click="$router.go(-1)">
         <img :src="robotImg" alt="返回按钮" class="top-robot" :draggable="false" /><span class="title">返回</span>
     </div>
 </template>

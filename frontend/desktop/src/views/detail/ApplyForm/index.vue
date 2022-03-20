@@ -1,31 +1,65 @@
 <template>
     <div class="apply-form-container">
         <bk-divider align="center">申请奖项</bk-divider>
-        <bk-form :label-width="140">
-            <bk-form-item label="申请人">
-                <select-search
-                    :value.sync="applicationUsers"
-                    placeholder="请选择申请人"
-                    ext-cls="w-90"
-                    :id-key="'id'"
-                    type="user"
-                    :multiple="true"
-                    :filter-fn="handleOnlyGroup"
-                ></select-search>
+        <bk-form :label-width="90" class="form"
+        >
+            <bk-form-item label="申请人" v-if="false">
+
             </bk-form-item>
-            <bk-form-item label="申请理由">
-                <bk-input v-model="applyForm['application_reason']"
-                    placeholder="请输入申请理由"
-                    ext-cls="w-90"
-                ></bk-input>
+            <bk-form-item label="申请理由"
+                required="true"
+            >
+                <bk-input
+                    placeholder="请输入255字以内的申请理由"
+                    :type="'textarea'"
+                    :rows="3"
+                    :maxlength="255"
+                    v-model="applyForm['application_reason']"
+                >
+                </bk-input>
             </bk-form-item>
-            <bk-form-item label="申请材料">
+            <bk-form-item label="申请材料"
+                required="true"
+            >
                 <Uploader v-model="applyForm['application_attachments']"
-                    ext-cls="w-90"
-                    :limit="3"
+                    :limit="2"
+                    :readonly="false"
                 ></Uploader>
             </bk-form-item>
         </bk-form>
+        <!-- 用于申请奖项的按钮 -->
+        <div class="button-item" v-if="$route.query['type'] !== 'approval'">
+            <bk-button theme="warning"
+                class="mr10"
+                @click="$router.back()"
+                ext-cls="button-item"
+            >
+                <bk-icon type="minus-circle" />
+                <span>取消</span>
+            </bk-button>
+            <bk-button theme="primary"
+                class="mr10"
+                @click="handleToSaveApplyForm($refs['applyForm'])"
+                ext-cls="button-item"
+            >
+                <bk-icon type="save" />
+                <span>保存草稿</span>
+            </bk-button>
+            <bk-button theme="success"
+                class="mr10"
+                @click="handleToSendApplyForm($refs['applyForm'])"
+                ext-cls="button-item"
+            >
+                <bk-icon type="check-circle" />
+                <span>发起申请</span>
+            </bk-button>
+            <!-- /用于申请奖项的按钮 -->
+
+            <!-- 用于审批的按钮 -->
+
+            <!-- /用于审批的按钮 -->
+        </div>
+
     </div>
 </template>
 <script>
@@ -34,7 +68,6 @@
     export default {
         name: 'apply-form',
         components: {
-            SelectSearch: () => import('@/components/select-search'),
             Uploader: () => import('@/components/uploader')
         },
         data () {
@@ -59,23 +92,7 @@
         computed: {
             groupUsers (self) {
                 return self.$http.cache.get(GROUP_USERS_KEYNAME) ?? []
-            },
-            applicationUsers: {
-                get (self) {
-                    return Object.keys(self.applyForm.application_users || {})?.map(item => ~~item) ?? []
-                },
-                set (newValue) {
-                    this.applyForm.application_users = this.groupUsers.filter(item => {
-                        return newValue.includes(item.id)
-                    }).reduce((memo, cur) => {
-                        return {
-                          ...memo,
-                          [cur.id]: cur['display_name']
-                        }
-                    }, {})
-                }
             }
-
         },
         created () {
             this.handleInit()
@@ -88,10 +105,6 @@
                 this.handleSetDefaultInfo()
             },
             handleSetDefaultInfo () {
-                console.log(this.$route.params)
-                if (this.$route.params) {
-                    this.applyForm = this.$route.params
-                }
             },
             /**
              * 部分需要手动判断的参数
@@ -143,7 +156,17 @@
     }
 </script>
 <style lang="postcss" scoped>
-/deep/ .w-90 {
-  width: 90% !important;
-}
+  .apply-form-container {
+    padding: 2px;
+    position: relative;
+    .form {
+      height:calc(90% - 80px) ;
+      overflow-y: scroll;
+    }
+    .button-item {
+      display: flex;
+      justify-content: center;
+
+    }
+  }
 </style>

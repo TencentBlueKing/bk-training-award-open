@@ -57,7 +57,7 @@
                         'tab-name': '待审批',
                         'tab-key': 'pending-approval'
                     }, {
-                        'tab-name': '评审中',
+                        'tab-name': '审批中',
                         'tab-key': 'ing-approval'
                     }, {
                         'tab-name': '已审批',

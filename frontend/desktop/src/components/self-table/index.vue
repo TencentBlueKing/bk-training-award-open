@@ -9,6 +9,7 @@
         :header-border="false"
         header-row-class-name="table-header"
         :max-height="$attrs['max-height']"
+        :min-height="$attrs['min-height']"
         :height="$attrs['height']"
         v-bkloading="{ isLoading: $attrs['loading'] ,title: '请稍等,正在为您安放数据' }"
     >

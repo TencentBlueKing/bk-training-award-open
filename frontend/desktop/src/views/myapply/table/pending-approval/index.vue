@@ -16,6 +16,8 @@
 </template>
 
 <script>
+    import { DETAIL_ROUTE_PATH } from '@/constants'
+
     export default {
         name: 'pending-approval',
         data () {
@@ -35,7 +37,19 @@
             handleInit () {},
             handleToGetDetail () {},
             handleToRefundApplication () {},
-            handleToEditDraft () {}
+            handleToEditDraft (recordInfo) {
+                if (!recordInfo['award_id']) {
+                    return
+                }
+                this.$router.push({
+                    name: DETAIL_ROUTE_PATH,
+                    query: {
+                        type: 'edit',
+                        award_id: recordInfo['award_id'],
+                        record_id: recordInfo['record_id']
+                    }
+                })
+            }
         }
     }
 </script>
