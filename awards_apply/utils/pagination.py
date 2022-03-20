@@ -12,7 +12,7 @@ class PagePagination(PageNumberPagination):
         return ({
             'count': self.page.paginator.count,
             'data': data,
-            'sum_pages': math.ceil(self.page.paginator.count / len(data))  # 总页数
+            'sum_pages': math.ceil(self.page.paginator.count / self.page_size)  # 总页数
         })
 
 
