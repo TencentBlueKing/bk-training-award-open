@@ -1,3 +1,4 @@
+from awards_apply.models import ApprovalState
 from awards_apply.models import AwardApplicationRecord as Application
 from awards_apply.serializers.application_serializer import \
     ApplicationSerializer
@@ -13,9 +14,21 @@ class ApprovalView(APIView):
 
     def get(self, request, *args, **kwargs):
         """我的审批: 查询我的审批列表"""
-        queryset = Application.objects.filter(
-            approval_users__contains=request.user.username
-        ).order_by("id")
+        approval_state = request.query_params["approval_status"]
+        group_id = request.query_params["group_id"]
+        if approval_state:
+            queryset = Application.objects.filter(
+                approval_users__contains=request.user.username
+            ).filter(approval_state__in=[ApprovalState.review_passed.value[0],
+                                         ApprovalState.review_not_passed.value[0]]).order_by("id").filter(
+                award_department_id=group_id
+            ).order_by("id")
+        else:
+            queryset = Application.objects.filter(
+                approval_users__contains=request.user.username
+            ).filter(approval_state=ApprovalState.review_pending.value[0]).filter(
+                award_department_id=group_id
+            ).order_by("id")
         page = CommonPaginaation()
         queryset = page.paginate_queryset(queryset, request, self)
         serializer = ApplicationSerializer(

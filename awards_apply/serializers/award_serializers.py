@@ -30,8 +30,8 @@ class AwardsSerializers(serializers.Serializer):
 class AwardsRecordSerializers(serializers.Serializer):
     id = serializers.IntegerField(default=None, required=False)
     award_id = serializers.IntegerField()
+    award_department_id = serializers.IntegerField()
     application_reason = serializers.CharField(required=False)
-    application_users = serializers.JSONField()
     application_attachments = serializers.ListField(required=False)
     approval_state = serializers.IntegerField(default=0, required=False)
     application_time = serializers.DateTimeField(format=TIME_FORMAT, required=False)

@@ -51,6 +51,7 @@ class ApprovalState(Enum):
 # 申请表
 class AwardApplicationRecord(models.Model):
     award_id = models.IntegerField(verbose_name="奖项id")
+    award_department_id = models.IntegerField(verbose_name="奖项所在组id")
     application_time = models.DateTimeField(verbose_name="申请时间")
     application_reason = models.TextField(verbose_name="申请理由")
     application_users = JSONField(verbose_name="申请人username列表", default=list)
