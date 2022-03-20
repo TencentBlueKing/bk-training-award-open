@@ -1,18 +1,23 @@
+from awards_apply.models import (ApprovalState, AwardApplicationRecord, Awards,
+                                 GroupUser)
+from awards_apply.serializers.award_serializers import (
+    AwardsRecordSerializers, AwardsSerializers)
+from awards_apply.utils.const import (false_code, object_not_exist_error,
+                                      page_num_exception, success_code,
+                                      value_exception)
+from awards_apply.utils.pagination import PagePagination
 from django.core.paginator import EmptyPage
+from django.db import transaction
 from django.db.models import Q
+from django.forms import model_to_dict
 from django.http import JsonResponse
 from django.shortcuts import render
 from django.utils import timezone
+from rest_framework.decorators import api_view
 from rest_framework.views import APIView
-from awards_apply.utils.const import success_code, false_code, page_num_exception, value_exception, \
-    object_not_exist_error
-from awards_apply.serializers.award_serializers import AwardsSerializers, AwardsRecordSerializers
-from awards_apply.models import Awards, AwardApplicationRecord
-from awards_apply.utils.pagination import PagePagination
-from awards_apply.utils.user_info import get_user_info
 
 # 奖项的状态
-AwardsStatus = {'not_start': 0, 'started': 1, 'end': 2}
+AwardsStatus = {'start': 0, 'end': 1}
 # 奖项申请的状态
 RecordStatus = {'wait': 0, 'pass': 1, 'not_pass': 2, 'draft': 3}
 
@@ -28,11 +33,10 @@ class AwardView(APIView):
 
     def get(self, request, *args, **kwargs):
         """获取用户未申请过的奖项"""
-        user_info = get_user_info(request)
         now = timezone.now()
         # ids表示：当前用户申请过的所有申请记录（包括草稿和正式申请）中的所有奖项id列表
         ids = AwardApplicationRecord.objects.filter(
-            application_users__contain={user_info['data']['id']: user_info['data']['display_name']}).values_list(
+            application_users__contain={"username": request.user.username}).values_list(
             "award_id")
         # valid_awards表示：符合规定时间内的，用户没申请过的奖项
         valid_awards = Awards.objects.exclude(id__in=ids).filter(start_time__lt=now).filter(end_time__gt=now).order_by(
@@ -77,19 +81,16 @@ class AwardView(APIView):
             award = Awards.objects.get(pk=award_id)
         except Awards.DoesNotExist:
             return JsonResponse(object_not_exist_error("award"))
-        if request.user.username == award.award_consultant:
-            award.delete()
-            return JsonResponse(success_code('删除奖项成功'))
-        return JsonResponse(false_code("您不是该奖项负责人，无法删除该奖项"))
+        award.delete()
+        return JsonResponse(success_code(None, message='删除奖项成功'))
 
 
 class RecordView(APIView):
 
     def get(self, request):
         """获取我的申请记录"""
-        user_info = get_user_info(request)
         record = AwardApplicationRecord.objects.filter(
-            application_users__contains={user_info['data']['id']: user_info['data']['display_name']}).order_by('id')
+            application_users__contains={"username": request.user.username}).order_by('id')
         pagination = PagePagination()
         try:
             pager_roles = pagination.paginate_queryset(queryset=record, request=request, view=self)
@@ -100,61 +101,55 @@ class RecordView(APIView):
         except BaseException:
             return JsonResponse(value_exception())
 
-    def put(self, request, *args, **kwargs):
+    def delete(self, request, *args, **kwargs):
         """撤回申请"""
         award_apply_record_id = request.data.get('id')
         award_apply_record_id = int(award_apply_record_id)
-        user_info = get_user_info(request)
-        award = AwardApplicationRecord.objects.filter(pk=award_apply_record_id).first()
+        award = AwardApplicationRecord.objects.filter(pk=award_apply_record_id).filter(
+            application_users__contains={"username": request.user.username}).first()
         if not award:
-            return JsonResponse(object_not_exist_error("award"))
-        for key in award.application_users:
-            # 可能存在重名用户，所以只对申请用户的id做判断
-            if key == str(user_info['data']['id']):
-                AwardApplicationRecord.objects.filter(pk=award_apply_record_id).update(
-                    approval_state=RecordStatus['draft'])
-                return JsonResponse(success_code({}))
-        return JsonResponse(false_code("您不是申请用户，无法撤回申请"))
+            return JsonResponse(false_code("您不是申请用户，无法撤回申请"))
+        AwardApplicationRecord.objects.filter(pk=award_apply_record_id).update(
+            approval_state=RecordStatus['draft'])
+        return JsonResponse(success_code({}))
 
     def post(self, request, *args, **kwargs):
         """保存草稿和正式申请"""
         # 校验请求参数
         award_record = AwardsRecordSerializers(data=request.data)
-        if award_record.is_valid() is False:
-            return JsonResponse(false_code(award_record.errors))
+        award_record.is_valid(raise_exception=True)
         record = award_record.validated_data
-        application_users = AwardApplicationRecord.objects.filter(award_id=record["award_id"]).filter(
-            ~Q(approval_state=RecordStatus['draft']) &
-            ~Q(approval_state=RecordStatus['not_pass'])
-        ).values_list("application_users")
+        application = AwardApplicationRecord.objects.filter(award_id=record["award_id"]).filter(
+            ~Q(approval_state=RecordStatus['draft'])
+            & ~Q(approval_state=RecordStatus['not_pass'])
+        ).filter(application_users__contains={"username": request.user.username}).first()
         # 判断用户是否已经申请过该奖项
-        for item in application_users:
-            for key in item[0]:
-                # 可能存在重名用户，所以只对申请用户的id做判断
-                if key in record["application_users"].keys():
-                    return JsonResponse(false_code("指定用户已申请过该奖项"))
+        if application:
+            return JsonResponse(false_code("指定用户已申请过该奖项"))
         award_record.save()
         return JsonResponse(success_code({}))
+
+    def put(self, request):
+        id = request.query_params.get("id")
+        application = AwardApplicationRecord.objects.filter(approval_state=RecordStatus['draft']).filter(pk=id)
+        data = application.update(**request.data)
+        return JsonResponse(success_code(data))
 
 
 class AvailableAwardsView(APIView):
 
     def get(self, request):
         """获取可申请的奖项（所属部门的）"""
-        user_info = get_user_info(request)
-        # 获取用户所在的组列表
-        user_departments = set()
-        for item in user_info['data']['departments']:
-            item_department = item['full_name'].split('/')
-            department_child = ''
-            # 提取用户所在组的子列表
-            for i in range(len(item_department)):
-                department_child += item_department[i]
-                user_departments.add(department_child)
-                department_child += '/'
+        department_id = request.query_params.get("id")
         now = timezone.now()
-        valid_awards = Awards.objects.filter(award_department_fullname__in=user_departments).filter(
-            Q(start_time__lt=now) & Q(end_time__gt=now)).order_by('-create_time')
+        if department_id:
+            valid_awards = Awards.objects.filter(award_department_id=department_id).filter(
+                Q(start_time__lt=now) & Q(end_time__gt=now)).order_by('-create_time')
+        else:
+            departments_id = GroupUser.objects.filter(username=request.user.username).values_list("group_id")
+            departments_id = [item[0] for item in departments_id]
+            valid_awards = Awards.objects.filter(award_department_id__in=departments_id).filter(
+                Q(start_time__lt=now) & Q(end_time__gt=now)).order_by('-create_time')
         pagination = PagePagination()
         try:
             pager_roles = pagination.paginate_queryset(queryset=valid_awards, request=request, view=self)
@@ -170,13 +165,9 @@ class ApplyedRecordView(APIView):
 
     def get(self, request):
         """获取用户已经获得的奖项"""
-        user_info = get_user_info(request)
-        if user_info['result'] is False:
-            return JsonResponse(false_code(object_not_exist_error('user')))
         record = AwardApplicationRecord.objects.filter(Q(approval_state=RecordStatus["pass"]) & Q(
-            application_users__contains={user_info['data']['id']: user_info['data']['display_name']}))\
+            application_users__contains={"username": request.user.username}))\
             .order_by('-application_time')
-
         pagination = PagePagination()
         try:
             pager_roles = pagination.paginate_queryset(queryset=record, request=request, view=self)
@@ -186,3 +177,29 @@ class ApplyedRecordView(APIView):
             return JsonResponse(page_num_exception())
         except BaseException:
             return JsonResponse(value_exception())
+
+
+@api_view(["GET"])
+def get_award_by_id(request, id):
+    award = Awards.objects.filter(pk=id).first()
+    return JsonResponse(success_code(model_to_dict(award) if award else None))
+
+
+@api_view(["GET"])
+def get_application_by_id(request, id):
+    application = AwardApplicationRecord.objects.filter(pk=id).first()
+    return JsonResponse(success_code(model_to_dict(application) if application else None))
+
+
+@api_view(["POST"])
+def finish_award(request, id):
+    award = Awards.objects.filter(pk=id).first()
+    if award:
+        with transaction.atomic():
+            award.approval_state = AwardsStatus["end"]
+            award.save()
+            AwardApplicationRecord.objects.filter(award_id=award.id).update(
+                approval_state=ApprovalState.review_not_passed.value[0])
+        return JsonResponse(success_code(None))
+    else :
+        return JsonResponse(object_not_exist_error("奖项"))

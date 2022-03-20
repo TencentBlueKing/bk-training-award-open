@@ -3,14 +3,13 @@ from awards_apply.serializers.application_serializer import \
     ApplicationSerializer
 from awards_apply.utils.const import object_not_exist_error, success_code
 from awards_apply.utils.pagination import CommonPaginaation
-from awards_apply.utils.permission import ApprovalPermission
 from django.forms import model_to_dict
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
 
 class ApprovalView(APIView):
-    permission_classes = [ApprovalPermission]
+    # permission_classes = [ApprovalPermission]
 
     def get(self, request, *args, **kwargs):
         """我的审批: 查询我的审批列表"""

@@ -1,4 +1,4 @@
-def success_code(data, message="success"):
+def success_code(data, message="操作成功"):
     """成功返回信息模板
 
     :param data: 要返回的数据
@@ -19,7 +19,7 @@ def object_not_exist_error(object):
     """
     return {
         "code": 40004,
-        "message": f"{object} not exist",
+        "message": f"{object} 不存在",
         "result": False,
         "data": None,
     }
@@ -33,7 +33,7 @@ def param_error(error=None):
     return {
         "code": 40001,
         "result": False,
-        "message": f"param {error} is need",
+        "message": f"缺少参数 {error} ",
         "data": None,
     }
 
@@ -53,7 +53,7 @@ def permission_denied():
     return {
         "code": 30000,
         "result": False,
-        "message": "permission denied",
+        "message": "您没有权限访问此页面",
         "data": None,
     }
 
@@ -66,7 +66,7 @@ def serializer_errors(errors):
     return {
         "code": 40001,
         "result": False,
-        "message": "params is missing",
+        "message": "参数校验失败",
         "data": errors,
     }
 

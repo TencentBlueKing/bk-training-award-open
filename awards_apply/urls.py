@@ -1,7 +1,6 @@
-from django.urls import path
-
 from awards_apply import views
 from django.conf.urls import url
+from django.urls import path
 
 urlpatterns = [
     url(
@@ -24,7 +23,10 @@ urlpatterns = [
     # url(r"^upload/$", views.upload),
     # url(r"^media/(?P<filename>.*)/$", views.download),
     url(r"^$", views.home),
+    url(r"^awards/(?P<id>\d+)/$", views.get_award_by_id),
+    url(r"^application/(?P<id>\d+)/$", views.get_application_by_id),
     url(r"^awards/", views.AwardView.as_view()),
+    url(r"^finish_award/(?P<id>\d+)/$", views.finish_award),
     url(r"^record/$", views.RecordView.as_view()),
     url(r"^get_available_awards/", views.AvailableAwardsView.as_view()),
     url(r"^get_applyed_awards/", views.ApplyedRecordView.as_view()),

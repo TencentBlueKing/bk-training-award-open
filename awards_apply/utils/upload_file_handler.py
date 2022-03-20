@@ -1,10 +1,11 @@
 import hashlib
 from functools import partial
 from pathlib import Path
+
+from bkstorages.backends.bkrepo import BKRepoStorage
 from django.conf import settings
 
-# from config.default import MEDIA_URL
-from django.core.files.storage import default_storage
+default_storage = BKRepoStorage()
 
 
 def upload_file_handler(file):
@@ -22,6 +23,7 @@ def upload_file_handler(file):
         return {"path": path, "name": file.name, "size": file.size}
     else:
         path = default_storage.save(path, file)
+        print(path)
         return {"path": path, "name": file.name, "size": file.size}
 
 
