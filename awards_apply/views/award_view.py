@@ -1,5 +1,5 @@
 from awards_apply.models import (ApprovalState, AwardApplicationRecord, Awards,
-                                 GroupUser)
+                                 GroupUser, Notification)
 from awards_apply.serializers.award_serializers import (
     AwardsRecordSerializers, AwardsSerializers)
 from awards_apply.utils.const import (false_code, object_not_exist_error,
@@ -58,6 +58,21 @@ class AwardView(APIView):
         if award.is_valid() is False:
             return JsonResponse(false_code(award.errors))
         award.save()
+        print(GroupUser.objects.filter(group_id=request.data["award_department_id"]).values_list("username"))
+        # 创建消息
+        messages = [{
+            "group_id": request.data["award_department_id"],
+            "group_name": request.data["award_department_fullname"],
+            "action_type": 1,
+            "action_username": request.user.username,
+            "action_display_name": request.user.nickname,
+            "action_target":username[0],
+            "message":"创建了奖项"
+        } for username in GroupUser.objects.filter(
+            group_id=request.data["award_department_id"]).values_list("username")]
+        for item in messages:
+            message = Notification(**item)
+            message.save()
         return JsonResponse(success_code(award.data))
 
     def put(self, request, *args, **kwargs):

@@ -1,5 +1,6 @@
 from awards_apply.models import ApprovalState
 from awards_apply.models import AwardApplicationRecord as Application
+from awards_apply.models import Group, Notification
 from awards_apply.serializers.application_serializer import \
     ApplicationSerializer
 from awards_apply.utils.const import object_not_exist_error, success_code
@@ -51,4 +52,16 @@ class ApprovalView(APIView):
         if not application:
             return Response(object_not_exist_error("application"))
         result = serializer.update(application, serializer.validated_data)
+        group = Group.objects.filter(pk=application.award_department_id).first()
+        Notification.objects.create(
+            **{
+                "group_id": group.id,
+                "group_name": group.full_name,
+                "action_type": 0,
+                "action_username": request.user.username,
+                "action_display_name": request.user.nickname,
+                "action_target": application.application_users[0],
+                "message": "审批了你的申请"
+            }
+        )
         return Response(success_code(model_to_dict(result)))
