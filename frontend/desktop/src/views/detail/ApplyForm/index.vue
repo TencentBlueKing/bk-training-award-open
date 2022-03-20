@@ -2,12 +2,16 @@
     <div class="apply-form-container">
         <bk-divider align="center">申请奖项</bk-divider>
         <bk-form :label-width="90" class="form"
+            :rules="applyFormRules"
+            :model="applyForm"
+            ref="apply-form"
         >
             <bk-form-item label="申请人" v-if="false">
-
+                <bk-input></bk-input>
             </bk-form-item>
             <bk-form-item label="申请理由"
                 required="true"
+                :property="'application_reason'"
             >
                 <bk-input
                     placeholder="请输入255字以内的申请理由"
@@ -39,7 +43,7 @@
             </bk-button>
             <bk-button theme="primary"
                 class="mr10"
-                @click="handleToSaveApplyForm($refs['applyForm'])"
+                @click="handleToSaveApplyForm(applyForm)"
                 ext-cls="button-item"
             >
                 <bk-icon type="save" />
@@ -47,7 +51,7 @@
             </bk-button>
             <bk-button theme="success"
                 class="mr10"
-                @click="handleToSendApplyForm($refs['applyForm'])"
+                @click="handleToSendApplyForm(applyForm)"
                 ext-cls="button-item"
             >
                 <bk-icon type="check-circle" />
@@ -64,13 +68,15 @@
 </template>
 <script>
     import { GROUP_USERS_KEYNAME } from '@/constants'
+    import { postRecord } from '@/api/service/award-service'
 
     export default {
         name: 'apply-form',
         components: {
             Uploader: () => import('@/components/uploader')
         },
-        data () {
+        inject: ['awardDetail'],
+        data (self) {
             return {
                 applyForm: {
                     /**
@@ -78,20 +84,28 @@
                      * */
                     application_reason: '',
                     /**
-                     * 申请人列表
-                     * */
-                    application_users: {},
-                    /**
                      * 申请附件列表
                      * */
                     application_attachments: []
-                }
+                },
+                applyFormRules: Object.freeze({
+                    application_reason: [
+                        {
+                            required: true,
+                            message: '请填写申请理由',
+                            trigger: 'blur'
+                        }
+                    ]
+                })
 
             }
         },
         computed: {
             groupUsers (self) {
                 return self.$http.cache.get(GROUP_USERS_KEYNAME) ?? []
+            },
+            award (self) {
+                return self.awardDetail()
             }
         },
         created () {
@@ -106,46 +120,44 @@
             },
             handleSetDefaultInfo () {
             },
-            /**
-             * 部分需要手动判断的参数
-             * */
-            checkEmptyForm (awardForm) {
-                let message = ''
-                console.log(Object.keys(awardForm['application_users']))
-                if (!Object.keys(awardForm['application_users'])?.length) message = '请选择申请人'
-                if (!awardForm['application_reason']?.length) message = '请输入申请理由'
-                if (!awardForm['application_attachments']?.length) message = '请传入申请材料'
-                if (message) {
-                    this.messageWarn(message)
-                    return
+            validator () {
+                if (!this.applyForm.application_attachments?.length) {
+                    this.messageWarn('请上传附件')
+                    throw new SyntaxError('请上传附件')
                 }
-                return true
-            },
-            handleCancel () {
-                this.$emit('cancel')
-            },
-            handleSave (awardForm) {
-                if (this.checkEmptyForm(awardForm)) {
-                    this.$emit('save', awardForm)
-                }
-            },
-            handleConfirm (awardForm) {
-                if (this.checkEmptyForm(awardForm)) {
-                    awardForm['application_attachments'] = awardForm['application_attachments'].map(item => ({
-                        url: item.path
-                    }))
-                    this.$emit('confirm', awardForm)
-                }
+                return this.$refs['apply-form'].validate()
             },
             /**
-             *  获取这个表单的信息
+             * 保存草稿
              * */
-            getFields () {
-                const awardForm = this.applyForm
-                if (this.checkEmptyForm(awardForm)) {
-                    return JSON.parse(JSON.stringify(awardForm))
-                }
-                return null
+            async handleToSaveApplyForm (applyForm) {
+                await this.validator()
+                this.handleToDealWidthApply(true, applyForm).then(res => {
+                    this.messageSuccess('保存草稿成功')
+                })
+            },
+            /**
+             * 发起申请
+             * */
+            async handleToSendApplyForm (applyForm) {
+                await this.validator()
+                this.handleToDealWidthApply(false, applyForm).then(res => {
+                    this.messageSuccess('申请成功')
+                    return this.$router.back()
+                })
+            },
+            /**
+             * 处理奖项的统一入口
+             * @param {boolean} isDraft
+             * @param {object} applyForm
+             * */
+            handleToDealWidthApply (isDraft, applyForm) {
+                return postRecord(isDraft, {
+                    award_department_id: this.award['award_department_id'],
+                    award_id: this.award['id'],
+                    ...applyForm
+
+                })
             },
             handleOnlyGroup (value) {
                 const department = value['departments'].map(item => item['full_name'])
@@ -156,17 +168,19 @@
     }
 </script>
 <style lang="postcss" scoped>
-  .apply-form-container {
-    padding: 2px;
-    position: relative;
-    .form {
-      height:calc(90% - 80px) ;
-      overflow-y: scroll;
-    }
-    .button-item {
-      display: flex;
-      justify-content: center;
+.apply-form-container {
+  padding: 2px;
+  position: relative;
 
-    }
+  .form {
+    height: calc(90% - 80px);
+    overflow-y: scroll;
   }
+
+  .button-item {
+    display: flex;
+    justify-content: center;
+
+  }
+}
 </style>

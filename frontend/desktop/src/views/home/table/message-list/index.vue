@@ -5,9 +5,9 @@
         >
             <message-card v-for="item in messageData" :key="item['id']" :message="item"></message-card>
         </div>
-        <empty v-if="!messageData.length"></empty>
+        <empty v-show="!messageData.length"></empty>
         <bk-pagination
-            small v-else
+            small
             :current.sync="pagination.current"
             :count.sync="pagination.count"
             :limit.sync="pagination.limit"
@@ -29,7 +29,7 @@
                 loading: false,
                 pagination: {
                     current: 1,
-                    count: 10,
+                    count: 0,
                     limit: 10
                 }
             }
@@ -47,10 +47,10 @@
                 this.handleGetPageData()
             },
             handleGetPageData (page = this.pagination.current, size = this.pagination.limit) {
-                this.loading = true
                 if (this.loading) {
                     return
                 }
+                this.loading = true
                 return getMessage({
                     page,
                     size

@@ -37,7 +37,7 @@
             <div class="button-item">
                 <bk-button theme="danger"
                     class="mr20 ml20"
-                    @click="handleToSaveApplyForm($refs['applyForm'])"
+                    @click="handleToPaasApproval()"
                     ext-cls="button-item"
                 >
                     <bk-icon type="close-circle" />
@@ -45,7 +45,7 @@
                 </bk-button>
                 <bk-button theme="success"
                     class="mr20 ml20"
-                    @click="handleToSendApplyForm($refs['applyForm'])"
+                    @click="handleToRejectApproval()"
                     ext-cls="button-item"
                 >
                     <span>通过</span>
@@ -62,8 +62,6 @@
     </div>
 </template>
 <script>
-    import { postRecord } from '@/api/service/award-service'
-
     export default {
         name: 'detail',
         components: {
@@ -77,6 +75,13 @@
                 default: () => null
             }
 
+        },
+        provide () {
+            return {
+                awardDetail: () => {
+                    return this.$refs['award-detail'].awardForm
+                }
+            }
         },
         data () {
             return {
@@ -116,42 +121,11 @@
                 this.applyForm = this.$route.params
                 this.formType = this.$route.query['type']
             },
-            /**
-             * 保存草稿
-             * */
-            handleToSaveApplyForm (applyForm) {
-                this.handleToDealWidthApply(true, applyForm).then(res => {
-                    this.messageSuccess('保存草稿成功')
-                })
-            },
-            /**
-             * 发起申请
-             * */
-            handleToSendApplyForm (applyForm) {
-                this.handleToDealWidthApply(false, applyForm).then(res => {
-                    this.messageSuccess('申请成功')
-                    return this.$router.back()
-                })
-            },
-            /**
-             * 处理奖项的统一入口
-             * @param {boolean} isDraft
-             * @param {object} applyForm
-             * */
-            handleToDealWidthApply (isDraft, applyForm) {
-                const defaultInfo = this.defaultInfo
-                const params = applyForm.getFields()
-                if (!params) {
-                    return
-                }
-                return postRecord(isDraft, {
-                ...params,
-                ...defaultInfo
-                })
-            },
             trigglePanel () {
                 this.panelCutOut = !this.panelCutOut
-            }
+            },
+            handleToPaasApproval () {},
+            handleToRejectApproval () {}
         }
     }
 </script>

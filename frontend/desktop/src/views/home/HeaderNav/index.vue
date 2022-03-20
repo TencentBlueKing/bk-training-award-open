@@ -1,6 +1,7 @@
 <template>
     <div class="header-nav"
         @click="$emit('click',$event)"
+        v-bk-tooltips.light="$attrs['description']"
     >
         <div class="header-container">
             <div class="right-panel">

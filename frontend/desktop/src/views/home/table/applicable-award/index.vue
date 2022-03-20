@@ -4,7 +4,7 @@
         :pagination.sync="pagination"
         :loading="loading"
         :height="300"
-        @page-change="handleGetPageData"
+        @page-change="handleInit()"
     >
         <bk-table-column label="序列" width="60" type="index"></bk-table-column>
         <bk-table-column label="奖项名称" prop="award_name"></bk-table-column>
@@ -84,10 +84,9 @@
                 })
             },
             handleInit () {
-                this.handleGetPageData(this.pagination)
+                this.handleGetPageData()
             },
-            handleGetPageData (config) {
-                const { current: page, limit: size } = config
+            handleGetPageData (page = this.pagination.current, size = this.pagination.limit) {
                 if (this.loading) {
                     return
                 }

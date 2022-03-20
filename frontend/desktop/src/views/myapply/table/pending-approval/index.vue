@@ -1,5 +1,9 @@
 <template>
-    <self-table :data="pendingApprovalData">
+    <self-table :data="pendingApprovalData"
+        :loading="loading"
+        :pagination.sync="pagination"
+        @page-change="handleInit()"
+    >
         <bk-table-column type="index" label="序号" width="60"></bk-table-column>
         <bk-table-column label="奖项名称" prop="ip"></bk-table-column>
         <bk-table-column label="奖项开始时间" prop="source"></bk-table-column>
@@ -16,13 +20,16 @@
 </template>
 
 <script>
-    import { DETAIL_ROUTE_PATH } from '@/constants'
+    import { DETAIL_ROUTE_PATH, PENDING_APPROVAL } from '@/constants'
+    import { getRecord } from '@/api/service/apply-service'
+    import { applyTableMixins } from '@/views/myapply/table/mixins'
 
     export default {
         name: 'pending-approval',
+        mixins: [applyTableMixins],
         data () {
             return {
-                pendingApprovalRemoteData: [{}]
+                pendingApprovalRemoteData: []
             }
         },
         computed: {
@@ -34,8 +41,29 @@
             this.handleInit()
         },
         methods: {
-            handleInit () {},
-            handleToGetDetail () {},
+            handleInit () {
+                Promise.all([
+                    this.handleGetPendingApproval()
+                ])
+            },
+            handleGetPendingApproval (page = this.pagination.current, size = this.pagination.limit) {
+                const params = {
+                    page,
+                    size,
+                    group_id: this.$bus.curGlobalGroupId,
+                    apply_status: PENDING_APPROVAL
+                }
+                if (this.loading) return
+                this.loading = true
+                return getRecord(params).then(response => {
+                    console.log(response)
+                    const applications = response.data
+                    this.pagination['count'] = applications.count
+                    this.pendingApprovalRemoteData = applications.data
+                }).finally(_ => {
+                    this.loading = false
+                })
+            },
             handleToRefundApplication () {},
             handleToEditDraft (recordInfo) {
                 if (!recordInfo['award_id']) {
@@ -45,6 +73,16 @@
                     name: DETAIL_ROUTE_PATH,
                     query: {
                         type: 'edit',
+                        award_id: recordInfo['award_id'],
+                        record_id: recordInfo['record_id']
+                    }
+                })
+            },
+            handleToGetDetail (recordInfo) {
+                this.$router.push({
+                    name: DETAIL_ROUTE_PATH,
+                    query: {
+                        type: 'detail',
                         award_id: recordInfo['award_id'],
                         record_id: recordInfo['record_id']
                     }

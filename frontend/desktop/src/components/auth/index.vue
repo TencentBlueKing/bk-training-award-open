@@ -62,7 +62,7 @@
 </template>
 
 <script>
-    import { APP_AUTH_NEWER, APP_GROUP_DIALOG } from '@/constants'
+    import { APP_AUTH_NEWER, APP_GROUP_DIALOG, INVITE_ROUTE_PATH } from '@/constants'
     import { postGroup, postGroupUser } from '@/api/service/group-service'
 
     export default {
@@ -98,6 +98,9 @@
         computed: {},
         mounted () {
             this.$bus.$on(APP_AUTH_NEWER, (isNewer) => {
+                if (this.$route.name === INVITE_ROUTE_PATH) {
+                    return
+                }
                 this.isShow = isNewer
                 this.isNewer = isNewer
             })
@@ -111,8 +114,8 @@
             handleTriggerType (type) {
                 this.createType = type
             },
-            handleToBeOlder (createType, formInstance) {
-                const params = formInstance.getFields()
+            async handleToBeOlder (createType, formInstance) {
+                const params = await formInstance.getFields()
                 switch (createType) {
                     case 'join':
                         this.joinGroup(params)
@@ -127,7 +130,8 @@
             },
             joinGroup (params) {
                 return postGroupUser(params).then(res => {
-                    console.log(res)
+                    this.isShow = false
+                    this.messageSuccess('申请加入成功，请耐心等待审批')
                 })
             },
             createGroup (params) {
@@ -138,7 +142,11 @@
                 })
             },
             fromBkGroup (params) {
-
+                return postGroup(params).then(res => {
+                    this.messageSuccess('创建成功,请尽情使用本系统')
+                    this.isShow = false
+                    this.$bus.groupList.push(res.data)
+                })
             }
         }
     }
