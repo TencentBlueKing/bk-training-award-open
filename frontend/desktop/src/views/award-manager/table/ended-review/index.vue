@@ -1,6 +1,8 @@
 <template>
     <self-table :data="endedReviewData"
         :loading="loading"
+        :pagination.sync="pagination"
+        @page-change="handleInit()"
     >
         <bk-table-column type="index" label="序号" width="60"></bk-table-column>
         <bk-table-column label="奖项名称" prop="ip"></bk-table-column>
@@ -23,7 +25,9 @@
 </template>
 
 <script>
-    import { tableMixins } from '@/views/award-manager/table/tableMixins'
+    import { tableMixins } from '@/views/mycheck/table/tableMixins'
+    import { ENDED_REVIEW } from '@/constants'
+    import { getAvailableAwards } from '@/api/service/award-service'
     export default {
         name: 'ended-review',
         mixins: [tableMixins],
@@ -43,6 +47,26 @@
         },
         methods: {
             handleInit () {
+                Promise.all([
+                    this.handleGetEndedAwardAwards()
+                ])
+            },
+            handleGetEndedAwardAwards (page = this.pagination.current, size = this.pagination.size) {
+                if (this.loading) return
+                this.loading = true
+                const params = {
+                    page,
+                    size,
+                    award_status: ENDED_REVIEW,
+                    group_id: this.$bus.curGlobalGroupId
+                }
+                return getAvailableAwards(params).then(response => {
+                    const endedReviewAwards = response.data
+                    this.pagination.count = endedReviewAwards.count
+                    this.endedReviewRemoteData = endedReviewAwards.data
+                }).finally(_ => {
+                    this.loading = false
+                })
             },
             handleGetDetail () {
             }

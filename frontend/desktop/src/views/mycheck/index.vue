@@ -22,10 +22,9 @@
                 v-model="approvalType"
                 ext-cls="select-custom"
                 ext-popover-cls="select-popover-custom"
-                :searchable="true"
                 :clearable="false"
             >
-                <bk-option id="group" name="小组审批"> </bk-option>
+                <bk-option id="group" name="小组审批" v-if="$bus.isCurGroupAdmin"> </bk-option>
                 <bk-option id="award" name="奖项审批"> </bk-option>
             </bk-select>
             <template>
@@ -66,7 +65,7 @@
     </div>
 </template>
 <script>
-    import { getApproval, postApproval } from '@/api/service/apply-service'
+    import { getAwardApproval, postApproval } from '@/api/service/apply-service'
     import {
         APPLY_APPROVAL_STATE_EN_MAP,
         APPLY_APPROVAL_STATE_MAP
@@ -161,7 +160,7 @@
              * 全局获取数据的接口
              * */
             handleGetPageData (current = this.pagination.current, size = this.pagination.limit) {
-                return getApproval(current, size).then(res => {
+                return getAwardApproval(current, size).then(res => {
                     this.remoteData = res.data['results']
                     this.pagination = res.data['count']
                 })

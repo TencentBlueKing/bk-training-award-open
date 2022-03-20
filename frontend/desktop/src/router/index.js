@@ -17,10 +17,9 @@ import {
     CANAWARDS_ROUTE_PATH,
     DETAIL_ROUTE_PATH,
     GROUP_MANAGER_ROUTE_PATH,
-    HOME_ROUTE_PATH,
+    HOME_ROUTE_PATH, INVITE_ROUTE_PATH,
     MYAPPLY_ROUTE_PATH,
-    MYCHECK_ROUTE_PATH,
-    POWER_CONTROLLER
+    MYCHECK_ROUTE_PATH
 } from '@/constants'
 
 Vue.use(VueRouter)
@@ -45,7 +44,7 @@ const Detail = () => import(/* webpackChunkName: 'detail' */'@/views/detail')
 // 可申报奖项
 const Canawards = () => import(/* webpackChunkName: 'canawards' */'@/views/canawards')
 // 登陆成功后重定向
-
+const Invite = () => import(/* webpackChunkName: 'invite' */'@/views/invite')
 // E 自定义页面组件
 
 function setBaseRoutes (otherRoutes) {
@@ -153,6 +152,14 @@ const routes = setBaseRoutes([
         meta: {
             title: '奖项信息'
         }
+    },
+    {
+        path: INVITE_ROUTE_PATH,
+        name: INVITE_ROUTE_PATH,
+        component: Invite,
+        meta: {
+            title: '邀请链接'
+        }
     }
 ])
 
@@ -175,12 +182,8 @@ router.beforeEach(async (to, from, next) => {
     canceling = true
     await cancelRequest()
     canceling = false
-    const ident = store.getters.ident
-    if (to.name !== BAD_404_ROUTE_PATH && POWER_CONTROLLER[to.name][ident]['is_forbidden']) {
-        next({ name: '404' })
-    } else {
-        next()
-    }
+   
+    next()
 })
 
 router.afterEach(async (to, from) => {

@@ -29,12 +29,16 @@ export function getAwards ({ page, size }) {
  * 获取可申请奖项
  * @param { number } page
  * @param { number } size
+ * @param award_status
+ * @param group_id
  * */
-export function getAvailableAwards (page, size) {
+export function getAvailableAwards ({ page, size, award_status, group_id }) {
     return http.get('get_available_awards/', {
         params: {
             page,
-            size
+            size,
+            award_status: award_status,
+            group_id: group_id
         }
     })
 }

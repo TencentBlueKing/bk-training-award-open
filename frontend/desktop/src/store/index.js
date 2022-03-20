@@ -137,7 +137,9 @@ const store = new Vuex.Store({
                 context.commit('updateUser', userData)
                 return Promise.resolve(userData)
             }).then(userData => {
-                bus.$emit(APP_AUTH_NEWER, userData['is_newer'])
+                if (userData['is_newer']) {
+                    bus.$emit(APP_AUTH_NEWER, true)
+                }
                 return Promise.resolve(userData)
             })
         },

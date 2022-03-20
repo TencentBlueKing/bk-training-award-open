@@ -80,7 +80,7 @@
                     </div>
                     <ul class="more-action" slot="dropdown-content">
                         <bk-button class="mb10"
-                            @click="toOutCurGroup()"
+                            v-bk-copy="inviteLink"
                             :text="true"
                         >邀请入组
                         </bk-button>
@@ -255,6 +255,9 @@
                         display_name_for_display: username + '(' + displayName + ')'
                     }
                 }) ?? []
+            },
+            inviteLink (self) {
+                return `${window.location.origin}/invite?group_id=${self.$bus.curGlobalGroupId}`
             }
         },
         created () {

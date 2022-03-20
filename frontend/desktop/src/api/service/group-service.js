@@ -3,6 +3,7 @@
  * @author couriourc
  */
 import http from '@/api'
+
 /**
  * 创建组织的映射关系
  * @param { number } page
@@ -33,6 +34,7 @@ export function postSecretary ({ group_id, secretaries, group_full_name }) {
 export function putSecretary (id, { group_id, secretaries, group_full_name }) {
     return http.put(`/secretary/${id}/`, { group_id, secretaries, group_full_name })
 }
+
 /**
  * API-获取用户是否为秘书, 是否为管理员
  * */
@@ -43,6 +45,7 @@ export function getUsermanageRetrieveUser (config = {}) {
 export function getGroup (config = {}) {
     return http.get('/group/', {}, config)
 }
+
 /**
  * 更新组织的映射关系
  * @param { string } group_name 组名
@@ -62,6 +65,7 @@ export function postGroupUser ({ group_id }) {
         group_id
     })
 }
+
 export function getGroupUser ({ groupId }) {
     console.log(groupId)
     return http.get('/group_user/', {
@@ -70,6 +74,7 @@ export function getGroupUser ({ groupId }) {
         }
     })
 }
+
 /**
  * @param username
  * @param group_id
@@ -78,6 +83,22 @@ export function deleteGroupManage ({ username, group_id }) {
     return http.delete('/group_manage/', {
         group_id,
         username
+    })
+}
+
+/**
+ * @param apply_id
+ * @param is_allow
+ * */
+export function postGroupManage ({
+    apply_id,
+    is_allow
+}) {
+    return http.post('/group_manage/', {
+        data: {
+            apply_id,
+            is_allow
+        }
     })
 }
 
@@ -92,10 +113,28 @@ export function putGroupManage ({ username, group_id }) {
     })
 }
 
+// 退出小组
 export function deleteGroupUser ({ group_id }) {
     return http.delete('/group_user/', {
         data: {
             group_id
+        }
+    })
+}
+
+/**
+ * @param { number } page 页码
+ * @param { number } size 每页大小
+ * @param group_id
+ * @param approval_status
+ * */
+export function getGroupApproval ({ page, size, group_id, approval_status }) {
+    return http.get('/approval/', {
+        params: {
+            page,
+            size,
+            group_id,
+            approval_status
         }
     })
 }

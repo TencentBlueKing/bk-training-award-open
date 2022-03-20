@@ -1,5 +1,9 @@
 <template>
-    <self-table :data="ingApprovalData" :loading="loading">
+    <self-table :data="ingApprovalData"
+        :loading="loading"
+        :pagination.sync="pagination"
+        @page-change="handleInit()"
+    >
         <bk-table-column type="index" label="序号" width="60"></bk-table-column>
         <bk-table-column label="奖项名称" prop="ip"></bk-table-column>
         <bk-table-column label="奖项开始时间" prop="source"></bk-table-column>
@@ -27,31 +31,36 @@
 </template>
 
 <script>
+    import { DETAIL_ROUTE_PATH, ING_APPROVAL } from '@/constants'
+    import { getRecord } from '@/api/service/apply-service'
+    import { applyTableMixins } from '@/views/myapply/table/mixins'
     export default {
         name: 'ing-approval',
+        mixins: [applyTableMixins],
         data () {
             return {
-                ingApprovalRemoteData: [{
-                    'id': 1,
-                    'award_name': '奖项名称',
-                    'award_description': '奖项名称',
-                    'award_department_id': 1,
-                    'award_department_fullname': '西华大学',
-                    'award_reviewers': [[
-                        {
-                            'username': '3234853521Q',
-                            'display_name': '陈润'
-                        }
-                    ]],
-                    'award_consultant': '3234853521Q',
-                    'award_consultant_displayname': '3234853521Q（陈润）',
-                    'award_demand': '奖项名称',
-                    'start_time': '2022-03-19T12:00:00',
-                    'end_time': '2022-04-30T11:59:00',
-                    'approval_state': 0,
-                    'time_range': '2022-03-19 12:00~2022-04-30 11:59'
-                }],
-                loading: false
+                ingApprovalRemoteData: [
+                    // {
+                    //     'id': 1,
+                    //     'award_name': '奖项名称',
+                    //     'award_description': '奖项名称',
+                    //     'award_department_id': 1,
+                    //     'award_department_fullname': '西华大学',
+                    //     'award_reviewers': [[
+                    //         {
+                    //             'username': '3234853521Q',
+                    //             'display_name': '陈润'
+                    //         }
+                    //     ]],
+                    //     'award_consultant': '3234853521Q',
+                    //     'award_consultant_displayname': '3234853521Q（陈润）',
+                    //     'award_demand': '奖项名称',
+                    //     'start_time': '2022-03-19T12:00:00',
+                    //     'end_time': '2022-04-30T11:59:00',
+                    //     'approval_state': 0,
+                    //     'time_range': '2022-03-19 12:00~2022-04-30 11:59'
+                    // }
+                ]
             }
         },
         computed: {
@@ -64,9 +73,37 @@
         },
         methods: {
             handleInit () {
-                console.log('getData')
+                Promise.all(
+                    [this.handleGetIngApproval()]
+                )
             },
-            handleToGetDetail () {}
+            handleGetIngApproval (page = this.pagination.current, size = this.pagination.limit) {
+                const params = {
+                    page,
+                    size,
+                    group_id: this.$bus.curGlobalGroupId,
+                    apply_status: ING_APPROVAL
+                }
+                if (this.loading) return
+                this.loading = true
+                return getRecord(params).then(response => {
+                    const applications = response.data
+                    this.pagination['count'] = applications.count
+                    this.ingApprovalRemoteData = applications.data
+                }).finally(_ => {
+                    this.loading = false
+                })
+            },
+            handleToGetDetail (recordInfo) {
+                this.$router.push({
+                    name: DETAIL_ROUTE_PATH,
+                    query: {
+                        type: 'detail',
+                        award_id: recordInfo['award_id'],
+                        record_id: recordInfo['record_id']
+                    }
+                })
+            }
         }
 
     }

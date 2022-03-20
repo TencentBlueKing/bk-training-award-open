@@ -155,7 +155,7 @@
 </template>
 <script>
     import { formatDate } from '@/common/util'
-    import { AWARD_LEVEL_MAP } from '@/constants'
+    import { AWARD_LEVEL_MAP, AWARD_MANAGER_ROUTE_PATH } from '@/constants'
     import { postAwards, putAward } from '@/api/service/award-service'
     import moment from 'moment'
 
@@ -352,8 +352,8 @@
                 if (valid) {
                     const awardForm = this.awardForm
     
-                    awardForm.start_time = formatDate(awardForm.start_time).format('YYYY-MM-DD hh:mm')
-                    awardForm.end_time = formatDate(awardForm.end_time).format('YYYY-MM-DD hh:mm')
+                    awardForm.start_time = formatDate(awardForm.start_time)
+                    awardForm.end_time = formatDate(awardForm.end_time)
                   
                     this.awardForm['award_consultant_displayname'] = this.$bus.curGroupUsers.find(item => item['username'] === awardForm['award_consultant'])['display_name']
                     this.awardForm['award_department_id'] = this.$bus.curGlobalGroupId
@@ -396,6 +396,9 @@
                 this.submitLoading = true
                 return postAwards(form).then(_ => {
                     this.messageSuccess('创建成功')
+                    this.$router.replace({
+                        name: AWARD_MANAGER_ROUTE_PATH
+                    })
                 }).catch(_ => {
                     this.messageWarn('创建失败')
                 }).finally(_ => {

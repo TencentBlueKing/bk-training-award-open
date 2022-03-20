@@ -83,13 +83,31 @@ export const IDENT_COMMON = 'common'
 export const HOME_ROUTE_PATH = 'home'
 export const CANAWARDS_ROUTE_PATH = 'canawards'
 export const MYAPPLY_ROUTE_PATH = 'myapply'
+// S 申请路由中的状态量
+export const PENDING_APPROVAL = 1
+export const ING_APPROVAL = 2
+export const ENDED_APPROVAL = 3
+// E 申请路由中的状态量
+
 export const GROUP_MANAGER_ROUTE_PATH = 'group-manager'
 export const AWARD_MANAGER_ROUTE_PATH = 'award-manager'
+// S 奖项路由中的状态量
+export const PENDING_START = 1
+export const ING_AWARD = 2
+export const ING_REVIEW = 3
+export const ENDED_REVIEW = 4
+// E 奖项路由中的状态量
+
 export const AWARD_FORM_ROUTE_PATH = 'award-form'
 export const MYCHECK_ROUTE_PATH = 'mycheck'
+// S
+export const GROUP_PENDING_APPROVAL = 1
+export const GROUP_ENDED_APPROVAL = 2
+// E
 export const DETAIL_ROUTE_PATH = 'detail'
 export const BAD_404_ROUTE_PATH = '404'
 export const LOGIN_SUCCESS_ROUTE_PATH = '/account/login_success'
+export const INVITE_ROUTE_PATH = 'invite'
 
 export const POWER_CONTROLLER = {
     [HOME_ROUTE_PATH]: {
@@ -143,6 +161,11 @@ export const POWER_CONTROLLER = {
         [IDENT_COMMON]: {}
     },
     [LOGIN_SUCCESS_ROUTE_PATH]: {
+        [IDENT_ADMIN]: {},
+        [IDENT_SECRETARY]: {},
+        [IDENT_COMMON]: {}
+    },
+    [INVITE_ROUTE_PATH]: {
         [IDENT_ADMIN]: {},
         [IDENT_SECRETARY]: {},
         [IDENT_COMMON]: {}

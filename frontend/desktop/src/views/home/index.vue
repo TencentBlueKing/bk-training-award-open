@@ -7,6 +7,7 @@
                     :key="nav.title"
                     :style="nav.style"
                     @click="headerTrigger(...nav.routerParams())"
+                    :description="nav.description"
                 >
                     <span>{{ nav.title }}</span>
                 </header-nav>
@@ -62,15 +63,25 @@
         data (self) {
             return {
                 headerNavList: [
-                    { style: 'background: var(--gradient-orange-red);', title: '我的小组', routerParams: () => [self.$store.state['ROUTE_TABLE']['GROUP_MANAGER_ROUTE_PATH']] },
+                    { style: 'background: var(--gradient-orange-red);', description: '在这里你可以查看你的小组成员', title: '我的小组', routerParams: () => [self.$store.state['ROUTE_TABLE']['GROUP_MANAGER_ROUTE_PATH']] },
                     { style: 'background: var(--gradient-blue);',
+                      description: '您能在这里为您创建的小组创建奖项',
                       title: '创建奖项',
                       routerParams: () => [self.$store.state['ROUTE_TABLE']['AWARD_FORM_ROUTE_PATH'], {
                           query: { type: 'create' }
                       }] },
-                    { style: 'background: var(--gradient-orange-pink);', title: '我的申请', routerParams: () => [self.$store.state['ROUTE_TABLE']['MYAPPLY_ROUTE_PATH']] },
-                    { style: 'background: var(--gradient-green);', title: '奖项列表', routerParams: () => [self.$store.state['ROUTE_TABLE']['AWARD_MANAGER_ROUTE_PATH']] },
-                    { style: 'background: var(--gradient-purple);', title: '审批记录', routerParams: () => [self.$store.state['ROUTE_TABLE']['MYCHECK_ROUTE_PATH']] }
+                    { style: 'background: var(--gradient-orange-pink);',
+                      description: '您能查看到您的申请信息，以及申请状态',
+                      title: '我的申请',
+                      routerParams: () => [self.$store.state['ROUTE_TABLE']['MYAPPLY_ROUTE_PATH']] },
+                    { style: 'background: var(--gradient-green);',
+                      description: '您能看到您之前创建的奖项',
+                      title: '奖项列表',
+                      routerParams: () => [self.$store.state['ROUTE_TABLE']['AWARD_MANAGER_ROUTE_PATH']] },
+                    { style: 'background: var(--gradient-purple);',
+                      description: '您能看到您为他人审批的奖项记录',
+                      title: '审批记录',
+                      routerParams: () => [self.$store.state['ROUTE_TABLE']['MYCHECK_ROUTE_PATH']] }
                 ],
                 workbenchTabItems: [
                     {
