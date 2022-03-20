@@ -3,105 +3,35 @@
         <top-back></top-back>
         <div class="header-controller-panel mt15 mb20">
             <select-search
-                style="width: var(--xs)"
+                style="width: calc(2*118px + 1*8px);font-size: 15px;"
                 behavior="simplicity"
+                placeholder="请选择小组"
+                :value.sync="$bus.curGlobalGroupId"
+                type="group"
+                :id-key="'group_id'"
+                :multiple="false"
+                @change="handleInit()"
             ></select-search>
         </div>
         <tabs class="mt15"
             :tab-items="checkTabItems"
-            v-model="curSelectedTable"
+            v-model="workbench"
         >
-            <bk-table class="mt10"
-                :pagination="pagination"
-                @page-change="handleChangePage($event)"
-                @page-limit-change="handleChangeLimit($event)"
-                :data="tableData"
+            <bk-select slot="right-controller"
+                style="width: calc(2*118px + 1*8px);font-size: 15px;"
+                v-model="approvalType"
+                ext-cls="select-custom"
+                ext-popover-cls="select-popover-custom"
+                :searchable="true"
+                :clearable="false"
             >
-                <bk-table-column label="序号"
-                    type="index"
-                    width="60"
-                    fixed="left"
-                ></bk-table-column>
-                <bk-table-column label="奖项名称">
-                    <template slot-scope="props">
-                        <!-- 建议可跳转 但是这个依赖于获取详情后的页面信息接口，暂时没有 -->
-                        <span>{{ props.row['award_name'] }}</span>
-                    </template>
-                </bk-table-column>
-                <bk-table-column label="申请人">
-                    <template slot-scope="props">
-                        <span v-for="(username,applicationUser) in props.row['application_users'] || []"
-                            :key="username"
-                        >
-                            {{ applicationUser }}({{ username }})
-                        </span>
-                    </template>
-                </bk-table-column>
-                <bk-table-column label="申请时间" prop="application_time"></bk-table-column>
-                <bk-table-column label="申请理由" prop="application_reason"></bk-table-column>
-
-                <bk-table-column label="当前审批轮次">
-                    <template slot-scope="props">
-                        第 {{ props.row['approval_turn'] + 1 }} 轮
-                    </template>
-                </bk-table-column>
-                <bk-table-column label="申请附件">
-                    <template slot-scope="props">
-                        <bk-button
-                            @click="toAttachFilePreview(props.row['application_attachments'])"
-                            :text="true"
-                        >
-                            查看附件
-                        </bk-button>
-                    </template>
-                </bk-table-column>
-
-                <bk-table-column label="评审状态"
-                    :align="'center'"
-                    :header-align="'center'"
-                >
-                    <template slot-scope="props">
-                        <span :class="['status',props.row.approval_state_en]">
-                            {{ props.row.approval_state_cn }}
-                        </span>
-                    </template>
-                </bk-table-column>
-                <bk-table-column label="操作"
-                    width="150"
-                    fixed="right"
-                >
-                    <template slot-scope="props">
-                        <bk-button :class="['mr10',props.row['approval_state_en']]"
-                            theme="primary"
-                            v-show="props.row['approval_state'] === config['award_approval_state_controller']['review_pending']"
-                            :text="true"
-                            @click="toCheck(props.row,
-                                            config['button_controller_action']['pass'],
-                                            '通过' + props.row['application_users_list'][0]
-                                                + props.row['application_users_list'].length
-                                                + '人的申请')"
-                        >
-                            通过
-                        </bk-button>
-                        <bk-button :class="['mr10',props.row['approval_state_en']]"
-                            theme="primary"
-                            :text="true"
-                            v-show="props.row['approval_state'] === config['award_approval_state_controller']['review_pending']"
-                            @click="toCheck(props.row,
-                                            config['button_controller_action']['no_pass'],
-                                            '退回' + props.row['application_users_list'][0]
-                                                + props.row['application_users_list'].length
-                                                + '人的申请')"
-                        >
-                            打回
-                        </bk-button>
-                        <span class="text-gray" style="cursor:pointer;"
-                            v-show="props.row['approval_state'] !== config['award_approval_state_controller']['review_pending']">
-                            --
-                        </span>
-                    </template>
-                </bk-table-column>
-            </bk-table>
+                <bk-option id="group" name="小组审批"> </bk-option>
+                <bk-option id="award" name="奖项审批"> </bk-option>
+            </bk-select>
+            <template>
+                <!-- 这里取了一下巧，后续改着可能会难受，但是问题应该不大 -->
+                <component :is="curComponentName" :ref="curComponentName"></component>
+            </template>
         </tabs>
         <bk-dialog v-model="approvalForm.editing"
             :header-position="'left'"
@@ -136,19 +66,21 @@
         </bk-dialog>
     </div>
 </template>
-
 <script>
     import { getApproval, postApproval } from '@/api/service/apply-service'
     import {
         APPLY_APPROVAL_STATE_EN_MAP,
-        APPLY_APPROVAL_STATE_MAP,
-        REVIEW_NOT_PASSED,
-        REVIEW_PASSED,
-        REVIEW_PENDING
+        APPLY_APPROVAL_STATE_MAP
     } from '@/constants'
     import moment from 'moment'
 
     export default {
+        components: {
+            AwardPendingApproval: () => import('./table/award-pending-approval'),
+            AwardEndedApproval: () => import('./table/award-ended-approval'),
+            GroupPendingApproval: () => import('./table/group-pending-approval'),
+            GroupEndedApproval: () => import('./table/group-ended-approval')
+        },
         data () {
             return {
                 remoteData: [],
@@ -158,19 +90,6 @@
                     limit: 10,
                     award_name: [],
                     department_name: []
-                },
-                config: {
-                    award_approval_state_controller: {
-                        pass: REVIEW_PASSED,
-                        no_pass: REVIEW_NOT_PASSED,
-                        review_pending: REVIEW_PENDING
-                    },
-                    button_controller_action: {
-                        pass: REVIEW_PASSED,
-                        no_pass: REVIEW_NOT_PASSED,
-                        review_pending: REVIEW_PENDING
-
-                    }
                 },
                 approvalForm: {
                     tips: '',
@@ -185,8 +104,9 @@
                 tmpAttachFiles: [],
                 // S 弹框控制区域
                 // Tab 栏
-                curSelectedTable: '',
-                checkTabItems: [
+                workbench: 'pending-approval',
+                approvalType: 'award',
+                checkTabItemsTemplate: [
                     {
                         'tab-name': '待审批',
                         'tab-key': 'pending-approval'
@@ -210,6 +130,12 @@
                         approval_state_en: APPLY_APPROVAL_STATE_EN_MAP[item['approval_state']]
                     }
                 }) ?? []
+            },
+            curComponentName (self) {
+                return `${self.approvalType}-${self.workbench}`
+            },
+            checkTabItems (self) {
+                return self.checkTabItemsTemplate
             }
         },
         created () {
@@ -220,7 +146,8 @@
              * 初始化数据的接口
              * */
             handleInit () {
-                this.handleGetPageData()
+                const curTable = this.curComponentName
+                this.$refs[curTable]?.handleInit()
             },
             handleChangePage (curren) {
                 this.pagination.current = curren

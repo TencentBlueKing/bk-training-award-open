@@ -49,7 +49,6 @@
                     return this.defaultKey || this.tabItems?.[0]?.['tab-key']
                 }
             }
-
         },
         data (self) {
             return {}
@@ -57,7 +56,6 @@
         methods: {
             tabClick (tabItem) {
                 if (this.curTab === tabItem['tab-key']) return
-                this.curTab = tabItem['tab-key']
                 this.$emit('tab-click', tabItem['tab-key'])
             }
         }

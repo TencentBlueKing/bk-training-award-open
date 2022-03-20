@@ -17,7 +17,7 @@
 
 <script>
     export default {
-        name: 'pending-approval',
+        name: 'group-pending-approval',
         data () {
             return {
                 pendingApprovalRemoteData: [{}]

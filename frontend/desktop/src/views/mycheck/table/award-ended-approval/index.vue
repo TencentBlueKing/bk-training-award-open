@@ -22,7 +22,7 @@
 
 <script>
     export default {
-        name: 'ended-approval',
+        name: 'award-ended-approval',
         data () {
             return {
                 endedApprovalRemoteData: [{}],

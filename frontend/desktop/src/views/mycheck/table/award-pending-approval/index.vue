@@ -17,7 +17,7 @@
 
 <script>
     export default {
-        name: 'pending-approval',
+        name: 'award-pending-approval',
         data () {
             return {
                 pendingApprovalRemoteData: [{}]

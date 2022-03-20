@@ -1,5 +1,5 @@
 <template>
-    <self-table :data="endedApprovalData" :loading="loading">
+    <self-table :data="ingReviewData" :loading="loading">
         <bk-table-column type="index" label="序号" width="60"></bk-table-column>
         <bk-table-column label="奖项名称" prop="ip"></bk-table-column>
         <bk-table-column label="奖项开始时间" prop="source"></bk-table-column>
@@ -25,13 +25,13 @@
         name: 'ended-approval',
         data () {
             return {
-                endedApprovalRemoteData: [{}],
+                ingReviewRemoteData: [{}],
                 loading: false
             }
         },
         computed: {
-            endedApprovalData (self) {
-                return self.endedApprovalRemoteData
+            ingReviewData (self) {
+                return self.ingReviewRemoteData
             }
         },
         mounted () {
@@ -39,7 +39,6 @@
         },
         methods: {
             handleInit () {
-                console.log('getData')
             },
             handleGetDetail () {
             }
