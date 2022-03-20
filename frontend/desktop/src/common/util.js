@@ -371,10 +371,10 @@ export function checkRequired (message) {
  * 利用 UTC 的日期和时间是通过 Z 分割
  *
  * @param {date|object|string} date
- * @returns moment.Moment
+ * @returns string
  * */
 export function formatDate (date) {
-    return moment(date)
+    return moment(date).format('YYYY-MM-DD hh:mm')
 }
 /**
  * 清除 cookie

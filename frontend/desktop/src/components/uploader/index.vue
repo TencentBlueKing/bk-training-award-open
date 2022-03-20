@@ -8,13 +8,21 @@
         @on-exceed="handleUploadExceed(limit,attachFiles.length)"
         :ext-cls="$attrs['ext-cls']"
         :multiple="$attrs['multiple']"
-        :disabled="$attrs['disabled']"
         @on-success="handleSuccess"
         :handle-res-code="handleUploadFileRes"
         :header="[
             { name: 'X-CSRFToken',value: cookie }
         ]"
+        :class="{
+            disabled: $attrs['disabled'],
+            readonly: $attrs['readonly']
+        }"
+        v-if="!($attrs['readonly'] && attachFiles.length < 1)"
     ></bk-upload>
+    <empty v-else
+        style="border: solid 1px #C4C6CC;"
+    >
+    </empty>
 </template>
 <script>
     import cookie from 'cookie'
@@ -90,3 +98,25 @@
         }
     }
 </script>
+<style>
+  
+  .disabled {
+    &::after {
+      content: "";
+      z-index: 1000;
+      width: 100%;
+      height: 100%;
+      position: absolute;
+      top: 0;
+      user-select: none;
+      cursor: not-allowed;
+      background-color: #FAFBFD;
+      opacity: 20%;
+    }
+  }
+  .readonly {
+    .file-wrapper {
+          display: none !important;
+    }
+  }
+</style>

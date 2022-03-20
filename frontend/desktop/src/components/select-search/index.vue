@@ -60,7 +60,7 @@
             },
             clearable: {
                 type: Boolean,
-                default: () => true
+                default: () => false
             }
         },
         data (self) {
@@ -158,7 +158,6 @@
                     this.loading = false
                     return
                 }
-                console.log('asd', this.$bus.curGlobalGroupId)
                 return getGroupUser({ groupId: this.$bus.curGlobalGroupId }).then(response => {
                     if (!response.data) {
                         this.messageWarn('出错啦')

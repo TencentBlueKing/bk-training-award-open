@@ -16,18 +16,26 @@
         <div class="form-container" v-if="$bus.isCurGroupAdmin">
             <bk-form form-type="vertical"
                 ref="award-form"
+                :rules="awardFormRules"
+                :model="awardForm"
             >
                 <bk-container :col="12">
                     <bk-row class="mt15 mb15">
                         <bk-col :span="6">
-                            <bk-form-item label="奖项名称" required>
+                            <bk-form-item label="奖项名称"
+                                :required="true"
+                                :property="'award_name'"
+                            >
                                 <bk-input placeholder="请输入奖项名称"
                                     v-model="awardForm['award_name']"
                                 ></bk-input>
                             </bk-form-item>
                         </bk-col>
                         <bk-col :span="6">
-                            <bk-form-item label="奖项申请顾问" required>
+                            <bk-form-item label="奖项申请顾问"
+                                :required="true"
+                                :property="'award_consultant'"
+                            >
                                 <select-search :multiple="false"
                                     :id-key="'username'"
                                     placeholder="请选择申请顾问"
@@ -38,7 +46,10 @@
                     </bk-row>
                     <bk-row class="mt15 mb15">
                         <bk-col :span="6">
-                            <bk-form-item label="申请要求" required>
+                            <bk-form-item label="申请要求"
+                                :required="true"
+                                :property="'award_demand'"
+                            >
                                 <bk-input placeholder="请输入255个字符以内"
                                     :type="'textarea'"
                                     :rows="3"
@@ -48,21 +59,31 @@
                             </bk-form-item>
                         </bk-col>
                         <bk-col :span="6">
-                            <bk-form-item label="奖项描述" required>
+                            <bk-form-item label="奖项描述"
+                                :required="true"
+                                :property="'award_description'"
+                            >
                                 <bk-input placeholder="请输入255个字符以内"
                                     :type="'textarea'"
                                     :rows="3"
-                                    :maxlength="255"></bk-input>
+                                    :maxlength="255"
+                                    v-model="awardForm['award_description']"
+                                ></bk-input>
                             </bk-form-item>
                         </bk-col>
                     </bk-row>
                     <bk-row class="mt15 mb15">
                         <bk-col :span="6">
-                            <bk-form-item label="开放申请时间" required>
-                                <bk-date-picker v-model="awardFormStartEndTime" :placeholder="'选择日期时间范围'"
+                            <bk-form-item label="开放申请时间"
+                                :required="true"
+                                :property="'end_time'"
+                                :enter-mode="true"
+                            >
+                                <bk-date-picker :placeholder="'选择日期时间范围'"
                                     :type="'datetimerange'"
                                     style="width: 100%;"
                                     format="yyyy-MM-DD hh:mm"
+                                    v-model="awardFormStartEndTime"
                                 ></bk-date-picker>
                             </bk-form-item>
                         </bk-col>
@@ -136,25 +157,22 @@
     import { formatDate } from '@/common/util'
     import { AWARD_LEVEL_MAP } from '@/constants'
     import { postAwards, putAward } from '@/api/service/award-service'
+    import moment from 'moment'
 
     /**
      * 全局临时叠加的唯一值
      * */
     let uuid = 0
+    function clearUUID () {
+        uuid = null
+    }
 
     export default {
         name: 'new-award-form',
         components: {
             SelectSearch: () => import('@/components/select-search')
         },
-        data () {
-            const checkToMustItem = (message) => {
-                return {
-                    required: true,
-                    message,
-                    trigger: 'blur'
-                }
-            }
+        data (self) {
             /**
              * 合法性校验
              * */
@@ -170,37 +188,77 @@
                     end_time: null,
                     award_description: '',
                     award_level: '',
-                    award_department_fullname: '',
                     award_department_id: '',
-                    award_attach_image: [],
-                    award_image: '',
-
+                    award_department_fullname: '',
+                    award_reviewers: '',
                     reviewers: [{
                         uuid: uuid++,
                         value: []
                     }]
                 },
-                rules: Object.freeze({
+                awardFormRules: Object.freeze({
                     award_name: [
-                        checkToMustItem('请输入奖项名称')
+                        {
+                            message: '请填写奖项名',
+                            required: true,
+                            trigger: 'blur'
+                        }
                     ],
                     award_consultant: [
-                        checkToMustItem('请选择接口人')
+                        {
+                            message: '请选择咨询人',
+                            required: true,
+                            trigger: 'blur'
+                        }
                     ],
-                    start_time: [
-                        checkToMustItem('请输入开始时间')
+                    award_demand: [
+                        {
+                            message: '请填写奖项需求',
+                            required: true,
+                            trigger: 'blur'
+                        }
                     ],
                     end_time: [
-                        checkToMustItem('请输入截止时间')
+                        {
+                            message: '请补充奖项时间',
+                            trigger: 'blur',
+                            validator () {
+                                return self.awardForm['end_time']
+                            }
+                        },
+                        {
+                            message: '截止时间应该比现在更晚',
+                            trigger: 'blur',
+                            validator () {
+                                const selectedTime = moment(self.awardForm['end_time'])
+                                const nowTime = moment()
+                                console.log(selectedTime.format('YYYY-MM-DD hh:mm:ss'))
+                                console.log(nowTime.format('YYYY-MM-DD hh:mm:ss'))
+                                return nowTime.diff(selectedTime, 'seconds')
+                            }
+                        }
+                       
                     ],
                     award_description: [
-                        checkToMustItem('请输入奖项描述信息')
+                        {
+                            message: '请填写奖项描述',
+                            required: true,
+                            trigger: 'blur'
+                        }
                     ],
-                    award_level: [
-                        checkToMustItem('请选择奖项等级信息')
-                    ],
-                    award_image: [
-                        checkToMustItem('请传入图片')
+                    reviewers: [
+                        {
+                            message: '请选择评审人',
+                            required: true,
+                            trigger: 'blur'
+                        },
+                        {
+                            message: '请选择评审人',
+                            validator () {
+                                return self.awardForm['reviewers']?.[0]?.value
+                            },
+                            trigger: 'blur'
+                        }
                     ]
                 }),
                 awardLevels: AWARD_LEVEL_MAP,
@@ -226,7 +284,7 @@
                         'button-theme': 'success',
                         'confirm-func': this.handleConfirmAddNewAward,
                         'cancel-func': () => {
-                            this.$router.back()
+                            this.$router.go(-1)
                         }
                     }
                 }
@@ -234,7 +292,7 @@
         },
         computed: {
             formType (self) {
-                return self.$route.query['type']
+                return self.$route.query['type'] || 'create'
             },
             groupInfo: {
                 get (self) {
@@ -246,22 +304,20 @@
                 }
             },
             awardFormStartEndTime: {
-                get (self) {
-                    return [self.awardForm.start_time, self.awardForm.end_time]
-                },
                 set (newValue) {
-                    this.awardForm.start_time = newValue[0]
-                    this.awardForm.end_time = newValue[1]
+                    if (newValue.every(item => item)) {
+                        this.awardForm.start_time = newValue[0]
+                        this.awardForm.end_time = newValue[1]
+                    }
                 }
             }
         },
-        created () {
+        beforeCreate () {
             uuid = 0
-            this.$once('hook:beforeDestroy', () => {
-                // 清除全局临时叠加得变量
-                uuid = null
-            })
-
+            this.$once('hook:deactivated', clearUUID)
+            this.$once('hook:beforeDestroy', clearUUID)
+        },
+        created () {
             this.handleInit()
         },
         methods: {
@@ -271,25 +327,21 @@
             handleInit () {
 
             },
-
             /**
              * 用于检查表单信息
              * */
             validator () {
-                return new Promise((resolve) => {
-                    const awardForm = this.awardForm
-                    let flag = true
-
-                    this.$refs['award-form'].validate().then(res => {
-                        if (!(awardForm['reviewers'] && awardForm['reviewers'][0].value.length)) {
-                            this.messageWarn('至少有一级评审人')
-                            flag = false
-                        }
-                        return resolve(flag)
-                    }).catch(_ => {
+                const awardForm = this.awardForm
+                let flag = true
+                return this.$refs['award-form'].validate().then(res => {
+                    if (!(awardForm['reviewers'] && awardForm['reviewers'][0].value.length)) {
+                        this.messageWarn('至少有一级评审人')
                         flag = false
-                        return resolve(flag)
-                    })
+                    }
+                    awardForm['award_reviewers'] = awardForm['reviewers'].map(item => item.value)
+                    return Promise.resolve(flag)
+                }).catch(_ => {
+                    return Promise.resolve(false)
                 })
             },
             /**
@@ -299,10 +351,14 @@
                 const valid = await this.validator()
                 if (valid) {
                     const awardForm = this.awardForm
-
+    
                     awardForm.start_time = formatDate(awardForm.start_time).format('YYYY-MM-DD hh:mm')
                     awardForm.end_time = formatDate(awardForm.end_time).format('YYYY-MM-DD hh:mm')
-
+                  
+                    this.awardForm['award_consultant_displayname'] = this.$bus.curGroupUsers.find(item => item['username'] === awardForm['award_consultant'])['display_name']
+                    this.awardForm['award_department_id'] = this.$bus.curGlobalGroupId
+                    this.awardForm['award_department_fullname'] = this.$bus.curGlobalSelectedGroup['full_name']
+                  
                     return awardForm
                 }
                 return null

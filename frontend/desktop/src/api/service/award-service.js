@@ -119,3 +119,7 @@ export function putAward (awardId, {
         end_time
     })
 }
+
+export function getAwardById (id) {
+    return http.get(`/awards/${id}/`)
+}
