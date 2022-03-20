@@ -1,6 +1,6 @@
-from awards_apply.models import Images
 from awards_apply.utils.const import (object_not_exist_error, param_error,
                                       success_code)
+from awards_apply.utils.upload_file_handler import upload_file_handler
 from django.conf import settings
 from django.core.files.storage import default_storage
 from django.http import FileResponse, JsonResponse
@@ -10,12 +10,10 @@ from django.views.decorators.http import require_GET, require_POST
 @require_POST
 def upload(request):
     """上传文件"""
-    file = request.FILES.get("upload_file", None)
+    file = request.FILES.get("upload_file")
     if not file:
         return JsonResponse(param_error("file"))
-    file_info = Images.objects.create(image=file)
-    file_info = file_info.image
-    print(settings.MEDIA_URL)
+    file_info = upload_file_handler(file)
     return JsonResponse(success_code({
         "path": settings.MEDIA_URL + file_info.name,
         "name": file.name,

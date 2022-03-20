@@ -9,23 +9,25 @@ class Awards(models.Model):
     award_name = models.CharField(max_length=128, verbose_name="奖项名称")
     award_level = models.CharField(max_length=128, verbose_name="奖项级别")
     award_description = models.CharField(max_length=512, verbose_name="奖项描述")
+    award_department_id = models.IntegerField(verbose_name="奖项所属部门id")
     award_department_fullname = models.CharField(
         max_length=50, verbose_name="奖项所属部门full_name"
     )
     award_reviewers = JSONField(verbose_name="奖项评委", default=list)
     award_consultant = models.CharField(max_length=128, verbose_name="奖项顾问")
+    award_consultant_displayname = models.CharField(max_length=100, verbose_name="顾问真实姓名")
+    award_demand = models.CharField(max_length=1000, verbose_name="奖项说明")
     award_image = models.CharField(max_length=1000, verbose_name='图片地址')
     create_time = models.DateTimeField(auto_now_add=True, verbose_name="创建时间")
     update_time = models.DateTimeField(auto_now=True, verbose_name="更新时间")
     start_time = models.DateTimeField(verbose_name="开始申请时间")
     end_time = models.DateTimeField(verbose_name="截止申请时间")
     APPROVAL_STATE = [
-        (0, "未开始"),
-        (1, "已开始"),
-        (2, "已结束"),
+        (0, "评审中"),
+        (1, "已结束"),
     ]
     approval_state = models.IntegerField(
-        choices=APPROVAL_STATE, default=3, verbose_name="评审状态"
+        choices=APPROVAL_STATE, default=0, verbose_name="奖项状态"
     )
 
 
@@ -64,10 +66,10 @@ class AwardApplicationRecord(models.Model):
     approval_text = models.TextField(verbose_name="评审评语", null=False, default='')
 
 
-class Images(models.Model):
-    image = models.ImageField(upload_to='images', blank=True, null=True)
-    create_time = models.DateTimeField(auto_now_add=True)
-
-    class Meta:
-        # 根据创建时间进行排序
-        ordering = ["-create_time"]
+# class Images(models.Model):
+#     image = models.ImageField(upload_to='images', blank=True, null=True)
+#     create_time = models.DateTimeField(auto_now_add=True)
+#
+#     class Meta:
+#         # 根据创建时间进行排序
+#         ordering = ["-create_time"]
