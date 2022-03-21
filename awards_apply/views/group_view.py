@@ -58,8 +58,6 @@ class GroupView(APIView):
         else:
             return JsonResponse(false_code("未找到对应的组"))
 
-    # TODO 解散组
-
 
 class GroupUserView(APIView):
     # 获取小组的详细信息
@@ -158,33 +156,60 @@ class GroupManageView(APIView):
             group_applies.filter(status=status)
         return JsonResponse(success_code([apply.to_json() for apply in group_applies]))
 
-    # 审批入组请求
+    # 批量审批入组请求
     def post(self, request):
-        apply_id = request.data.get("apply_id")
+        apply_ids = request.data.get("apply_ids")
+        if not isinstance(apply_ids, list):
+            return JsonResponse(value_exception())
         status = request.data.get("is_allow")
         if status is None:
             return JsonResponse(value_exception())
         # 1: 通过，2: 未通过
         status = 1 if status else 2
+
+        # 尝试找到所有的申请
         try:
-            apply = GroupApply.objects.get(id=apply_id)
-            group = Group.objects.get(id=apply.group_id, secretary=request.user.username)
-        except (GroupApply.DoesNotExist, Group.DoesNotExist):
+            applications = GroupApply.objects.filter(id__in=apply_ids)
+        except GroupApply.DoesNotExist:
             return JsonResponse(false_code("未找到对应的申请"))
-        apply.status = status
-        apply.save()
+        # 如果存在无效的申请直接返回
+        if len(applications) != len(apply_ids):
+            return JsonResponse(false_code("存在无效的申请"))
+
+        # 如果存在无权限组对应的申请也直接返回
+        group_secretary = Group.objects.filter(id__in=applications.values_list("group_id", flat=True))\
+            .values_list("secretary", flat=True)
+        group_secretary = set(group_secretary)
+        if len(group_secretary) != 1 or group_secretary.pop() != request.user.username:
+            return JsonResponse(false_code("缺少权限"))
+
+        # 通过申请->将对应的用户添加到组员表中
+        if status:
+            new_members = []
+            for apply in applications:
+                new_members.append(GroupUser(
+                    username=apply.username,
+                    display_name=apply.display_name,
+                    group_id=apply.group_id
+                ))
+            GroupUser.objects.bulk_create(new_members)
+        applications.update(status=status, update_time=datetime.datetime.now())
         status = "通过" if status == 1 else "拒绝"
-        Notification.objects.create(
-            group_id=group.id,
-            group_name=group.full_name,
-            action_type=0,
-            action_target=apply.username,
-            action_username=request.user.username,
-            action_display_name=request.user.nickname,
-            message=f"{status}了您的入组申请"
-        )
-        msg = f"已{status}{apply.username}({apply.display_name})加入 {apply.group_name} 的申请"
-        return JsonResponse(success_code(None, msg))
+
+        # 创建消息通知
+        new_notifications = []
+        for apply in applications:
+            new_notifications.append(Notification(
+                group_id=apply.group_id,
+                group_name=apply.group_name,
+                action_type=0,
+                action_target=apply.username,
+                action_username=request.user.username,
+                action_display_name=request.user.nickname,
+                message=f"{status}了您的入组申请"
+            ))
+        Notification.objects.bulk_create(new_notifications)
+        return JsonResponse(success_code(None))
 
     # 转让组
     def put(self, request):
@@ -240,13 +265,13 @@ class GroupManageView(APIView):
             action_display_name=request.user.nickname,
             message="把你移出了组"
         )
-        return JsonResponse(success_code(None, f"已将{group_user.username}({group_user.display_name})移出{group.full_name}"))
+        return JsonResponse(
+            success_code(None, f"已将{group_user.username}({group_user.display_name})移出{group.full_name}"))
 
 
 class GroupAllView(APIView):
     # 获取所有未加入的组信息
     def get(self, request):
         username = request.user.username
-        groups = Group.objects.exclude(id__in=GroupUser.objects.filter(username=username).values_list("id", flat=True))
+        groups = Group.objects.exclude(id__in=GroupUser.objects.filter(username=username).values_list("group_id", flat=True))
         return JsonResponse(success_code([g.to_json() for g in groups]))
-
