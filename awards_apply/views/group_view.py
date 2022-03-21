@@ -137,6 +137,13 @@ class GroupManageView(APIView):
     # 获取所有的申请
     def get(self, request):
         group_id = request.GET.get("group_id")
+        status = request.GET.get("status")
+        if status is not None:
+            try:
+                status = int(status)
+            except ValueError:
+                status = None
+
         # 未传组id就获取当前用户所有的审批
         if group_id is None:
             group_ids = Group.objects.filter(secretary=request.user.username).values_list("id", flat=True)
@@ -147,6 +154,8 @@ class GroupManageView(APIView):
             except Group.DoesNotExist:
                 return JsonResponse(false_code("对应组不存在或没有权限"))
             group_applies = GroupApply.objects.filter(group_id=group_id)
+        if status is not None:
+            group_applies.filter(status=status)
         return JsonResponse(success_code([apply.to_json() for apply in group_applies]))
 
     # 审批入组请求
@@ -232,4 +241,12 @@ class GroupManageView(APIView):
             message="把你移出了组"
         )
         return JsonResponse(success_code(None, f"已将{group_user.username}({group_user.display_name})移出{group.full_name}"))
+
+
+class GroupAllView(APIView):
+    # 获取所有未加入的组信息
+    def get(self, request):
+        username = request.user.username
+        groups = Group.objects.exclude(id__in=GroupUser.objects.filter(username=username).values_list("id", flat=True))
+        return JsonResponse(success_code([g.to_json() for g in groups]))
 
