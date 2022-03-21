@@ -32,7 +32,12 @@ export const REVIEW_PASSED = 1
 export const REVIEW_NOT_PASSED = 2
 
 export const DRAFT = 3
-
+export const APPLY_STATE = {
+    'review_pending': REVIEW_PENDING,
+    'review_passed': REVIEW_PASSED,
+    'review_not_passed': REVIEW_NOT_PASSED,
+    'draft': DRAFT
+}
 export const APPLY_APPROVAL_STATE_MAP = {
     [REVIEW_PENDING]: '待评审',
     [REVIEW_PASSED]: '评审通过',
@@ -64,6 +69,7 @@ export const AWARD_LEVEL_EN_MAP = {
  * */
 
 export const GROUP_USERS_KEYNAME = 'user'
+export const SYS_KEYNAME = 'sys'
 export const GROUP_KEYNAME = 'group'
 export const BK_GROUP_KEYNAME = 'bk-group'
 export const GROUP_SECRETARY_KEYNAME = 'secretary'

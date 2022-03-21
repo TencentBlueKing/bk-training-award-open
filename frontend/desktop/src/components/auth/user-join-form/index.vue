@@ -10,9 +10,10 @@
         >
             <select-search placeholder="请选择需要加入的小组"
                 style="width: calc(2*118px + 8px)"
-                type="group"
+                type="sys_group"
                 :multiple="false"
                 :id-key="'group_id'"
+                :display-key="'full_name'"
                 :value.sync="form['group_id']"
             ></select-search>
         </bk-form-item>

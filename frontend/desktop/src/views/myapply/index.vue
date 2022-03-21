@@ -25,13 +25,6 @@
 </template>
 
 <script>
-    import { deleteRecord } from '@/api/service/award-service'
-    import { getRecord } from '@/api/service/apply-service'
-    import {
-        APPLY_APPROVAL_STATE_EN_MAP,
-        APPLY_APPROVAL_STATE_MAP
-    } from '@/constants'
-
     export default {
         components: {
             PendingApproval: () => import('@/views/myapply/table/pending-approval'),
@@ -42,11 +35,6 @@
             return {
                 userInfo: null,
                 data: [],
-                pagination: {
-                    current: 1,
-                    count: 0,
-                    limit: 10
-                },
                 remoteData: [],
                 isLoading: false,
 
@@ -67,72 +55,10 @@
             }
         },
         computed: {
-            tableData: {
-                get (self) {
-                    return self.remoteData?.map?.(rawData => {
-                        return {
-                            ...rawData['award_info'],
-                            ...rawData,
-                            approval_state_cn: APPLY_APPROVAL_STATE_MAP[rawData['approval_state']],
-                            approval_state_en: APPLY_APPROVAL_STATE_EN_MAP[rawData['approval_state']]
-                        }
-                    }) ?? []
-                }
-            },
-            approval_status_button_config (self) {
-                return self.config['approval_status_button']
-            }
         },
         methods: {
             handleInit (curSelectedTable = this.curSelectedTable) {
                 this.$refs[curSelectedTable]?.handleInit?.()
-            },
-            handlePageChange (current) {
-                this.pagination.current = current
-                return this.handleGetPageData()
-            },
-            handleLimitChange (limit) {
-                this.pagination.limit = limit
-                this.pagination.current = 1
-                return this.handleGetPageData()
-            },
-            /**
-             * 查询页面数据统一接口
-             * */
-            handleGetPageData (current = this.pagination.current, size = this.pagination.limit) {
-                this.isLoading = true
-                return getRecord(current, size).then(res => {
-                    this.remoteData = res.data['data']
-                }).finally(_ => {
-                    this.isLoading = false
-                })
-            },
-            /**
-             * 撤销申请
-             * */
-            handleToDelApply ({ id }) {
-                return deleteRecord(id).then(res => {
-                    this.messageSuccess('撤销成功')
-                    this.handleGetPageData()
-                })
-            },
-            /**
-             * 跳转草稿页面，重新申请
-             * */
-            handleToDetail () {
-
-            },
-            /**
-             * 重新发起申请
-             * */
-            handleToApply (curInfo) {
-                this.$router.push({
-                    name: 'detail',
-                    params: {
-                      ...curInfo,
-                      type: 'apply'
-                    }
-                })
             }
         }
     }

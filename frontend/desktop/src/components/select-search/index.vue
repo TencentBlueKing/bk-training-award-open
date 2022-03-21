@@ -23,9 +23,8 @@
 </template>
 
 <script>
-    import { getSecretaryDepartment } from '@/api/service/bk-service'
-    import { BK_GROUP_KEYNAME, GROUP_SECRETARY_KEYNAME, GROUP_USERS_KEYNAME } from '@/constants'
-    import { getGroupUser } from '@/api/service/group-service'
+    import { BK_GROUP_KEYNAME, GROUP_USERS_KEYNAME, SYS_KEYNAME } from '@/constants'
+    import { getGroupAll, getGroupUser } from '@/api/service/group-service'
 
     export default {
         name: 'select-search',
@@ -76,13 +75,13 @@
                         idKey: self.idKey || 'id',
                         displayKey: 'full_name'
                     },
-                    'bk-group': {
-                        func: self.handleGetBkGroup,
+                    'sys_group': {
+                        func: self.handleGetSysGroup,
                         idKey: self.idKey || 'id',
                         displayKey: 'full_name'
                     },
-                    'secretary': {
-                        func: self.handleGetSecretaryDepartment,
+                    'bk-group': {
+                        func: self.handleGetBkGroup,
                         idKey: self.idKey || 'id',
                         displayKey: 'full_name'
                     },
@@ -173,19 +172,24 @@
                     this.loading = false
                 })
             },
-            // 获取秘书可管理的组
-            handleGetSecretaryDepartment () {
-                return getSecretaryDepartment().then(response => {
-                    if (!response.data) {
-                        this.messageWarn('出错啦')
-                        this.loading = false
-                    }
-                    this.groupUsers = response.data
-                    this.$http.cache.set(GROUP_SECRETARY_KEYNAME, response.data)
-                })
-            },
             handleSetMySelfData () {
                 this.groupUsers = this.data
+            },
+            handleGetSysGroup () {
+                this.loading = true
+                const groupUsers = this.$http.cache.get(SYS_KEYNAME)
+                if (groupUsers) {
+                    this.groupUsers = groupUsers
+                    this.loading = false
+                    return
+                }
+                return getGroupAll().then(response => {
+                    console.log(response)
+                    this.groupUsers = response.data
+                    this.$http.cache.set(SYS_KEYNAME, response.data)
+                }).finally(_ => {
+                    this.loading = false
+                })
             }
 
         }

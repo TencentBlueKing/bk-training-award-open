@@ -71,9 +71,11 @@ export function postRecord (isDraft, applyForm) {
  * */
 export function deleteRecord (applyId) {
     console.log(applyId)
-    return http.put('record/', {
-        id: applyId
-    })
+    return http.delete('record/', {
+        data: {
+            id: applyId
+    
+        } })
 }
 /**
  * 删除奖项

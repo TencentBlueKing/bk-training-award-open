@@ -107,14 +107,6 @@
                     label="序号"
                     :width="80"
                 ></bk-table-column>
-                <bk-table-column
-                    label="用户名"
-                    :width="200"
-                >
-                    <template slot-scope="people">
-                        <span>{{ people.row['display_name'] }}</span>
-                    </template>
-                </bk-table-column>
 
                 <bk-table-column
                     label="姓名"
@@ -124,6 +116,15 @@
                         <span>{{ people.row['display_name'] }}</span>
                     </template>
                 </bk-table-column>
+                <bk-table-column
+                    label="用户名"
+                    :width="200"
+                >
+                    <template slot-scope="people">
+                        <span>{{ people.row['username'] }}</span>
+                    </template>
+                </bk-table-column>
+
                 <bk-table-column
                     label="手机号"
                 >

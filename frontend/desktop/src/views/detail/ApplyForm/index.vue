@@ -67,7 +67,7 @@
     </div>
 </template>
 <script>
-    import { GROUP_USERS_KEYNAME } from '@/constants'
+    import { GROUP_USERS_KEYNAME, MYAPPLY_ROUTE_PATH } from '@/constants'
     import { postRecord } from '@/api/service/award-service'
 
     export default {
@@ -121,10 +121,10 @@
             handleSetDefaultInfo () {
             },
             validator () {
-                if (!this.applyForm.application_attachments?.length) {
-                    this.messageWarn('请上传附件')
-                    throw new SyntaxError('请上传附件')
-                }
+                // if (!this.applyForm.application_attachments?.length) {
+                //     // this.messageWarn('请上传附件')
+                //     // throw new SyntaxError('请上传附件')
+                // }
                 return this.$refs['apply-form'].validate()
             },
             /**
@@ -143,7 +143,9 @@
                 await this.validator()
                 this.handleToDealWidthApply(false, applyForm).then(res => {
                     this.messageSuccess('申请成功')
-                    return this.$router.back()
+                    return this.$router.replace({
+                        name: MYAPPLY_ROUTE_PATH
+                    })
                 })
             },
             /**

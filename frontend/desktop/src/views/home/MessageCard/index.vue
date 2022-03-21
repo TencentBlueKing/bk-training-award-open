@@ -17,6 +17,8 @@
 </template>
 
 <script>
+    import { getGroupManage } from '@/api/service/message-service'
+
     export default {
         name: 'message-card',
         props: {
@@ -42,8 +44,19 @@
                 ]
             }
         },
+        created () {
+            this.handleInit()
+        },
         methods: {
-            handleClickTopButton () {}
+            handleClickTopButton () {},
+            handleInit () {
+                Promise.all([
+                    this.handleGetGroupManage()
+                ])
+            },
+            handleGetGroupManage () {
+                return getGroupManage()
+            }
         }
     }
 </script>

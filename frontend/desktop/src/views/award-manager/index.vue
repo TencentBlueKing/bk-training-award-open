@@ -14,11 +14,25 @@
                 @change="handleInit()"
             ></select-search>
         </div>
-        <tabs class="mt15" :tab-items="awardListTabItems" v-model="workbench">
+        <tabs class="mt15"
+            :tab-items="awardListTabItems"
+            v-model="workbench"
+            v-if="$bus.isCurGroupAdmin"
+        >
             <template>
                 <component :is="workbench" :ref="workbench"></component>
             </template>
         </tabs>
+        <empty v-else>
+            <div slot="description">
+                <p class="mb20">不好意思，您不是该组管理员~</p>
+                请联系本组（{{ $bus.curGlobalSelectedGroup['full_name'] }}）管理员: <span
+                    style="color: #cc1111"
+                >
+                    {{ $bus.curGlobalSelectedGroup['secretary_display_name_for_dispaly'] }}
+                </span>
+            </div>
+        </empty>
         <!-- /表格按钮区域 -->
 
         <!-- 弹出区域 -->
