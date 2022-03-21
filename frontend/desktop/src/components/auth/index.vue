@@ -136,16 +136,22 @@
             },
             createGroup (params) {
                 return postGroup(params).then(res => {
-                    this.messageSuccess('创建成功,请尽情使用本系统')
+                    this.messageSuccess('创建成功！')
                     this.isShow = false
                     this.$bus.groupList.push(res.data)
+                    if (this.isNewer) {
+                        this.$router.go(0)
+                    }
                 })
             },
             fromBkGroup (params) {
                 return postGroup(params).then(res => {
-                    this.messageSuccess('创建成功,请尽情使用本系统')
+                    this.messageSuccess('加入成功！')
                     this.isShow = false
                     this.$bus.groupList.push(res.data)
+                    if (this.isNewer) {
+                        this.$router.go(0)
+                    }
                 })
             }
         }

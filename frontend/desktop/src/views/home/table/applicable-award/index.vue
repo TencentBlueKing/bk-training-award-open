@@ -10,9 +10,9 @@
         <bk-table-column label="奖项名称" prop="award_name"></bk-table-column>
         <bk-table-column label="所属小组">
             <template slot-scope="awards">
-                <bk-tag theme="success" :title="awards['row']['award_department_fullname']">
+                <span :title="awards['row']['award_department_fullname']">
                     {{ awards.row['award_department_fullname']}}
-                </bk-tag>
+                </span>
             </template>
         </bk-table-column>
         <bk-table-column label="截止申请时间" :width="200">

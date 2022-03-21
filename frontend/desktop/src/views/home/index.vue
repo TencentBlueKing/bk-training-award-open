@@ -14,7 +14,7 @@
             </div>
         </div>
         <div class="footer-panel">
-            <tabs style="width: calc(5*118px + 4*8px);"
+            <tabs style="width: calc(8*118px + 7*8px);"
                 :tab-items="workbenchTabItems"
                 v-model="workbenchCurIndex"
             >
@@ -47,7 +47,6 @@
     </div>
 </template>
 <script>
-    import { getGroupManage } from '@/api/service/message-service'
 
     export default {
         name: 'Home',
@@ -63,24 +62,27 @@
         data (self) {
             return {
                 headerNavList: [
-                    { style: 'background: var(--gradient-orange-red);', description: '在这里你可以查看你的小组成员', title: '我的小组', routerParams: () => [self.$store.state['ROUTE_TABLE']['GROUP_MANAGER_ROUTE_PATH']] },
+                    { style: 'background: var(--gradient-orange-red);',
+                      description: '创建小组、成员管理',
+                      title: '我的小组',
+                      routerParams: () => [self.$store.state['ROUTE_TABLE']['GROUP_MANAGER_ROUTE_PATH']] },
                     { style: 'background: var(--gradient-blue);',
-                      description: '您能在这里为您创建的小组创建奖项',
+                      description: '为您的小组创建奖项',
                       title: '创建奖项',
                       routerParams: () => [self.$store.state['ROUTE_TABLE']['AWARD_FORM_ROUTE_PATH'], {
                           query: { type: 'create' }
                       }] },
                     { style: 'background: var(--gradient-orange-pink);',
-                      description: '您能查看到您的申请信息，以及申请状态',
+                      description: '查看申请信息及申请状态',
                       title: '我的申请',
                       routerParams: () => [self.$store.state['ROUTE_TABLE']['MYAPPLY_ROUTE_PATH']] },
                     { style: 'background: var(--gradient-green);',
-                      description: '您能看到您之前创建的奖项',
+                      description: '查看创建的奖项',
                       title: '奖项列表',
                       routerParams: () => [self.$store.state['ROUTE_TABLE']['AWARD_MANAGER_ROUTE_PATH']] },
                     { style: 'background: var(--gradient-purple);',
-                      description: '您能看到您为他人审批的奖项记录',
-                      title: '审批记录',
+                      description: '审批入组、审批奖项以及审批记录',
+                      title: '我的审批',
                       routerParams: () => [self.$store.state['ROUTE_TABLE']['MYCHECK_ROUTE_PATH']] }
                 ],
                 workbenchTabItems: [
@@ -127,12 +129,6 @@
         },
         methods: {
             handleInit () {
-                Promise.all([
-                    this.handleGetGroupManage()
-                ])
-            },
-            handleGetGroupManage () {
-                return getGroupManage()
             },
             headerTrigger (routeName, config = {}) {
                 this.$router.push(Object.assign({
@@ -141,7 +137,7 @@
             },
             handleAllAns (messageList) {
                 if (!messageList.length) {
-                    this.messageWarn('消息这么空,既然世界这么大,不如去看看?')
+                    this.messageWarn('消息记录为空')
                 }
             }
             /**
@@ -179,13 +175,12 @@
   .footer-panel {
     min-height: 50%;
     display: flex;
-    flex: 1;
     justify-content: space-around;
     width: inherit;
 
     .controller-panel {
       height: 385px;
-      width: 802px;
+      width: 900px;
       background-color: #FFFFFF;
       border-radius: 20px;
       box-shadow: 0 4px 90px rgba(163, 171, 185, 0.24);
@@ -197,10 +192,9 @@
       border-radius: 20px;
       box-shadow: 0 4px 90px rgba(163, 171, 185, 0.24);
     }
-
     .cartoon {
-      width: 391px;
-
+      width: 280px;
+      transform: translateY(69px);
     }
   }
 }

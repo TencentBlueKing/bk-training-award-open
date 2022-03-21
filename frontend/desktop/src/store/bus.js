@@ -24,6 +24,7 @@ export const bus = new Vue({
                 const map = {}
                 const groups = self.groupList
                 groups?.forEach(group => {
+                    group['secretary_display_name_for_dispaly'] = group['secretary'] + '（' + group['secretary_display_name'] + '）'
                     map[group['group_id']] = group
                 })
                 return map?.[self.curGlobalGroupId] || {}

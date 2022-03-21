@@ -73,7 +73,7 @@
                         </bk-col>
                     </bk-row>
                     <bk-row class="mt15 mb15">
-                        <bk-col :span="6">
+                        <bk-col :span="7">
                             <bk-form-item label="开放申请时间"
                                 :required="true"
                                 :property="'end_time'"
@@ -82,7 +82,7 @@
                                 <bk-date-picker :placeholder="'选择日期时间范围'"
                                     :type="'datetimerange'"
                                     style="width: 100%;"
-                                    format="yyyy-MM-DD hh:mm"
+                                    format="yyyy-MM-dd HH:mm"
                                     v-model="awardFormStartEndTime"
                                 ></bk-date-picker>
                             </bk-form-item>
@@ -148,7 +148,9 @@
             <div slot="description">
                 <p class="mb20">不好意思，您不是该组管理员~</p>
                 请联系本组（{{ $bus.curGlobalSelectedGroup['full_name'] }}）管理员: <span
-                    style="color: #cc1111"> {{ $bus.curGlobalSelectedGroup['secretary'] }} </span>
+                    style="color: #cc1111">
+                    {{$bus.curGlobalSelectedGroup['secretary_display_name_for_dispaly'] }}
+                </span>
             </div>
         </empty>
     </div>
@@ -163,6 +165,7 @@
      * 全局临时叠加的唯一值
      * */
     let uuid = 0
+
     function clearUUID () {
         uuid = null
     }
@@ -218,6 +221,7 @@
                             trigger: 'blur'
                         }
                     ],
+
                     end_time: [
                         {
                             message: '请补充奖项时间',
@@ -232,12 +236,10 @@
                             validator () {
                                 const selectedTime = moment(self.awardForm['end_time'])
                                 const nowTime = moment()
-                                console.log(selectedTime.format('YYYY-MM-DD hh:mm:ss'))
-                                console.log(nowTime.format('YYYY-MM-DD hh:mm:ss'))
                                 return nowTime.diff(selectedTime, 'seconds')
                             }
                         }
-                       
+
                     ],
                     award_description: [
                         {
@@ -351,14 +353,14 @@
                 const valid = await this.validator()
                 if (valid) {
                     const awardForm = this.awardForm
-    
+
                     awardForm.start_time = formatDate(awardForm.start_time)
                     awardForm.end_time = formatDate(awardForm.end_time)
-                  
+
                     this.awardForm['award_consultant_displayname'] = this.$bus.curGroupUsers.find(item => item['username'] === awardForm['award_consultant'])['display_name']
                     this.awardForm['award_department_id'] = this.$bus.curGlobalGroupId
                     this.awardForm['award_department_fullname'] = this.$bus.curGlobalSelectedGroup['full_name']
-                  
+
                     return awardForm
                 }
                 return null
@@ -425,7 +427,7 @@
                         type: 'edit'
                     },
                     params: {
-                     ...this.$route.params
+          ...this.$route.params
                     }
                 })
             }

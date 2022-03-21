@@ -138,3 +138,6 @@ export function getGroupApproval ({ page, size, group_id, approval_status }) {
         }
     })
 }
+export function getGroupAll () {
+    return http.get('/group_all/', {}, { fromCache: true })
+}

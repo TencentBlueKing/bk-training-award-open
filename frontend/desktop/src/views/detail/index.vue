@@ -5,7 +5,7 @@
         <!-- 待审批悬浮窗-->
         <div :class="['approval-list']" v-if="formType === 'approval'">
             <div class="tip-button" @click="trigglePanel" v-waves>
-                {{panelCutOut ? '展开' : '收起'}}
+                {{ panelCutOut ? '展开' : '收起' }}
             </div>
             <div :class="['approval-content',{
                 'not_active': panelCutOut
@@ -19,17 +19,24 @@
                 </tabs>
             </div>
         </div>
-        <div class="form-panel">
-            <DetailInfo class="detail" ref="award-detail"></DetailInfo>
-            <!-- /详情部分 -->
 
-            <!-- 编辑部分 -->
-            <ApplyForm class="form"
-                v-if="isShowApplyForm"
-                ref="applyForm"
-                :id="applyForm['id']"
-            ></ApplyForm>
+        <div class="board">
+
+            <div class="form-panel">
+
+                <DetailInfo class="detail" ref="award-detail"></DetailInfo>
+                <!-- /详情部分 -->
+
+                <!-- 编辑部分 -->
+                <ApplyForm class="form"
+                    v-if="isShowApplyForm"
+                    ref="applyForm"
+                    :id="applyForm['id']"
+                ></ApplyForm>
+            </div>
             <!-- /编辑部分 -->
+            <bk-steps class="mt20 pt20 pl20 pr20"></bk-steps>
+
         </div>
         <!-- 底部按钮组 -->
         <div class="tc w100  mt15" v-if="$route.query['type'] === 'approval'">
@@ -58,7 +65,7 @@
 
             <!-- /用于审批的按钮 -->
         </div>
-        <!-- /底部按钮组 -->
+    <!-- /底部按钮组 -->
     </div>
 </template>
 <script>
@@ -124,8 +131,10 @@
             trigglePanel () {
                 this.panelCutOut = !this.panelCutOut
             },
-            handleToPaasApproval () {},
-            handleToRejectApproval () {}
+            handleToPaasApproval () {
+            },
+            handleToRejectApproval () {
+            }
         }
     }
 </script>
@@ -134,35 +143,40 @@
   width: 80%;
   margin: 0 auto;
 
-  .form-panel {
-    background-color: #FFFFFF;
+  .board {
 
-    display: flex;
-    flex-direction: row;
-    justify-content: center;
-    flex: 1;
-
+    margin: 0 auto;
     padding: 20px 0 0 20px;
     width: 1024px;
     height: 544px;
 
+    background-color: #FFFFFF;
     box-shadow: 0 4px 4px rgba(0, 0, 0, 0.25);
-    border-radius: 20px;
-    margin: 0 auto;
+      border-radius: 20px;
 
-    .detail {
-      width: 45%;
+    .form-panel {
+
+      display: flex;
+      flex-direction: row;
+      justify-content: center;
+      flex: 1;
+
+      .detail {
+        width: 45%;
+      }
+
+      .form {
+        width: 45%;
+      }
     }
 
-    .form {
-      width: 45%;
-    }
   }
 
   .approval-list {
     position: absolute;
     overflow: hidden;
     left: 0;
+
     .tip-button {
       background-color: #FFFFFF;
       width: 3em;
@@ -170,9 +184,10 @@
       text-align: center;
       line-height: 3em;
       border-radius: 50%;
-      box-shadow: 0 0 1px 0  rgba(0,0,0,.4);
+      box-shadow: 0 0 1px 0 rgba(0, 0, 0, .4);
       cursor: pointer;
     }
+
     .approval-content {
 
       width: 200px;
@@ -187,8 +202,9 @@
 
   }
 }
+
 @keyframes disappear {
-  0%,100% {
+  0%, 100% {
     display: none;
   }
 }

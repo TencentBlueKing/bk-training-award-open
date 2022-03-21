@@ -130,7 +130,7 @@ const routes = setBaseRoutes([
         name: AWARD_FORM_ROUTE_PATH,
         component: AwardForm,
         meta: {
-            title: '奖项表单',
+            title: '创建奖项',
             is_hidden: true
         }
     },
