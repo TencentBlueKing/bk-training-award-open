@@ -56,6 +56,9 @@ class GroupUser(models.Model):
     display_name = models.CharField(max_length=128, verbose_name="组成员姓名")
     group_id = models.IntegerField(verbose_name="组id")
 
+    class Meta:
+        unique_together = ("group_id", "username")
+
     def __str__(self):
         return f"{self.group_id}组{self.username}({self.display_name})"
 
@@ -73,6 +76,9 @@ class GroupApply(TimeBasic):
     status = models.IntegerField(choices=APPLY_STATE, default=0, verbose_name="申请状态")
     approver = models.CharField(max_length=128, null=True, blank=True, verbose_name="审批人账号")
     approver_display_name = models.CharField(max_length=128, null=True, blank=True, verbose_name="审批人姓名")
+
+    class Meta:
+        unique_together = ("group_id", "username")
 
     def __str__(self):
         return f"{self.username}({self.display_name})申请加入 {self.group_name}: {self.get_status_display()}"
@@ -120,3 +126,11 @@ class Notification(TimeBasic):
             "create_time": self.create_time,
             "update_time": self.update_time
         }
+
+
+class GroupInvitation(TimeBasic):
+    group_id = models.IntegerField(verbose_name="组id")
+    username = models.CharField(max_length=128, verbose_name="受邀成员")
+
+    class Meta:
+        unique_together = ("group_id", "username")

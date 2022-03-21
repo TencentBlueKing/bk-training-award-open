@@ -8,7 +8,7 @@ from django.db import IntegrityError
 from django.http import JsonResponse
 from rest_framework.views import APIView
 
-from awards_apply.models import Group, GroupUser, GroupApply, Notification, User
+from awards_apply.models import Group, GroupUser, GroupApply, Notification, User, GroupInvitation
 from awards_apply.serializers.group_serializers import GroupSerializers
 from awards_apply.utils.const import success_code, false_code, value_exception
 from awards_apply.utils.user_info import copy_user_from_bk
@@ -64,7 +64,7 @@ class GroupUserView(APIView):
     def get(self, request):
         group_id = request.GET.get("group_id")
         try:
-            group = Group.objects.get(id=group_id)
+            Group.objects.get(id=group_id)
         except Group.DoesNotExist:
             return JsonResponse(false_code("不存在对应的组，请核对组id"))
         # 组员信息
@@ -275,3 +275,63 @@ class GroupAllView(APIView):
         username = request.user.username
         groups = Group.objects.exclude(id__in=GroupUser.objects.filter(username=username).values_list("group_id", flat=True))
         return JsonResponse(success_code([g.to_json() for g in groups]))
+
+
+class GroupInvite(APIView):
+    # 邀请组员
+    def post(self, request):
+        group_id = request.data.get("group_id")
+        new_member = request.data.get("new_member")
+
+        # 判断是否组秘书
+        try:
+            group = Group.objects.get(id=group_id, secretary=request.user.username)
+        except Group.DoesNotExist:
+            return JsonResponse(false_code("没有权限"))
+
+        # 获取新成员信息
+        try:
+            User.objects.get(username=new_member)
+            # 验证是否为组员
+            GroupUser.objects.get(group_id=group_id, username=new_member)
+            return JsonResponse(false_code("不可对组员发起邀请"))
+        except User.DoesNotExist:
+            copy_user_from_bk(request, new_member)
+        except GroupUser.DoesNotExist:
+            pass
+
+        # 添加邀请信息
+        GroupInvitation.objects.get_or_create(group_id=group_id, username=new_member)
+
+        # 添加通知信息
+        Notification.objects.create(
+            group_id=group_id,
+            group_name=group.full_name,
+            action_type=0,
+            action_target=new_member,
+            action_username=request.user.username,
+            action_display_name=request.user.nickname,
+            message="邀请你加入组"
+        )
+        return JsonResponse(success_code(None, "邀请用户入组成功"))
+
+    def put(self, request):
+        group_id = request.data.get("group_id")
+        is_agree = request.data.get("is_agree")
+        try:
+            is_agree = bool(is_agree)
+            GroupInvitation.objects.get(group_id=group_id, username=request.user.username).delete()
+        except ValueError:
+            return JsonResponse(value_exception())
+        except GroupInvitation.DoesNotExist:
+            return JsonResponse(false_code("无效的邀请"))
+        if is_agree:
+            GroupUser.objects.create(
+                group_id=group_id,
+                username=request.user.username,
+                display_name=request.user.nickname
+            )
+            is_agree = "同意"
+        else:
+            is_agree = "拒绝"
+        return JsonResponse(success_code(None, f"已{is_agree}该邀请"))
