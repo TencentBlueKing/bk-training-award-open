@@ -238,3 +238,10 @@ def finish_award(request, id):
         return JsonResponse(success_code(None))
     else :
         return JsonResponse(object_not_exist_error("奖项"))
+
+
+@api_view(["GET"])
+def award_application(request, id):
+    applications = AwardApplicationRecord.objects.filter(award_id=id)
+    serializers = AwardsRecordSerializers(applications, many=True)
+    return JsonResponse(success_code(serializers.data))

@@ -11,4 +11,4 @@ from awards_apply.views.secretary import SecretaryViewSet  # noqa
 from awards_apply.views.user import UserInfoView, UserView
 
 from awards_apply.views.award_view import ApplyedRecordView  # noqa; noqa
-from awards_apply.views.award_view import finish_award  # noqa; noqa
+from awards_apply.views.award_view import finish_award, award_application  # noqa; noqa
