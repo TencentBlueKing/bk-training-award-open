@@ -152,7 +152,8 @@ class RecordView(APIView):
         # 判断用户是否已经申请过该奖项
         if application:
             return JsonResponse(false_code("指定用户已申请过该奖项"))
-        record.update({"application_users": [request.user.username]})
+        record.update({"application_users": [{"username": request.user.username,
+                                              "display_name": request.user.nickname}]})
         award_record.create(record)
         return JsonResponse(success_code(None))
 
