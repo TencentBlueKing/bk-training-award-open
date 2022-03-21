@@ -48,6 +48,7 @@ class AwardsRecordSerializers(serializers.Serializer):
             id=validated_data["id"],
             defaults={
                 "award_id": validated_data["award_id"],
+                "award_department_id": validated_data["award_department_id"],
                 "application_reason": validated_data.get("application_reason", ""),
                 "application_users": validated_data["application_users"],
                 "application_attachments": validated_data.get("application_attachments", []),

@@ -153,8 +153,8 @@ class RecordView(APIView):
         if application:
             return JsonResponse(false_code("指定用户已申请过该奖项"))
         record.update({"application_users": [request.user.username]})
-        record = award_record.create(record)
-        return JsonResponse(success_code(record))
+        award_record.create(record)
+        return JsonResponse(success_code(None))
 
     def put(self, request):
         id = request.query_params.get("id")
