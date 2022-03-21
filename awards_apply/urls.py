@@ -24,6 +24,7 @@ urlpatterns = [
     url(r"^media/(?P<filename>.*)/$", views.download),
     url(r"^$", views.home),
     url(r"^awards/(?P<id>\d+)/$", views.get_award_by_id),
+    url(r"^award_application/(?P<id>\d+)/$", views.award_application),
     url(r"^application/(?P<id>\d+)/$", views.get_application_by_id),
     url(r"^awards/", views.AwardView.as_view()),
     url(r"^finish_award/(?P<id>\d+)/$", views.finish_award),
