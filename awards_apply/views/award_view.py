@@ -106,15 +106,15 @@ class RecordView(APIView):
     def get(self, request):
         """获取我的申请记录"""
         queryset = {
-            "1": ApprovalState.review_pending.value[0],
-            "2": ApprovalState.review_not_passed.value[0],
-            "3": ApprovalState.review_passed.value[0]
+            "1": [ApprovalState.review_pending.value[0], ApprovalState.review_pending.value[0]],
+            "2": [ApprovalState.review_not_passed.value[0]],
+            "3": [ApprovalState.review_passed.value[0]]
         }
         status = request.query_params["apply_status"]
         record = AwardApplicationRecord.objects.filter(
             application_users__contains={"username": request.user.username}).filter(
             award_department_id=request.query_params["group_id"]
-        ).filter(approval_state=queryset[status]).order_by("id")
+        ).filter(approval_state__in=queryset[status]).order_by("id")
         pagination = PagePagination()
         try:
             pager_roles = pagination.paginate_queryset(queryset=record, request=request, view=self)
