@@ -9,16 +9,10 @@
         <bk-table-column label="奖项开始时间" prop="source"></bk-table-column>
         <bk-table-column label="奖项截止时间" prop="status"></bk-table-column>
         <bk-table-column label="奖项咨询人" prop="create_time"></bk-table-column>
-        <bk-table-column label="评语">
+        <bk-table-column label="评语" :width="300">
             <template slot-scope="endedApprovals">
-                <bk-select :readonly="true">
-                    <bk-option>{{endedApprovals.row}}</bk-option>
-                </bk-select>
-            </template>
-        </bk-table-column>
-        <bk-table-column label="操作">
-            <template slot-scope="endedApprovals">
-                <bk-button @click="handleToGetDetail(endedApprovals.row)" :text="true"></bk-button>
+                <span v-bk-tooltips.light="endedApprovals.row['approval_text']"
+                >{{endedApprovals.row['approval_text']}}</span>
             </template>
         </bk-table-column>
     </self-table>

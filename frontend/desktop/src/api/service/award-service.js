@@ -100,6 +100,9 @@ export function deleteAward ({ awardId }) {
  * @param { string } award_reviewers
  * @param { string } start_time
  * @param { string } end_time
+ * @param award_department_id
+ * @param award_consultant_displayname
+ * @param award_demand
  * */
 export function putAward (awardId, {
     award_name,
@@ -110,7 +113,10 @@ export function putAward (awardId, {
     award_department_fullname,
     award_reviewers,
     start_time,
-    end_time
+    end_time,
+    award_department_id,
+    award_consultant_displayname,
+    award_demand
 }) {
     return http.put('awards/', {
         award_id: awardId,
@@ -122,10 +128,17 @@ export function putAward (awardId, {
         award_department_fullname,
         award_reviewers,
         start_time,
-        end_time
+        end_time,
+        award_department_id,
+        award_consultant_displayname,
+        award_demand
     })
 }
 
 export function getAwardById (id) {
     return http.get(`/awards/${id}/`)
+}
+
+export function postFinishAward (id) {
+    return http.post(`/finish_award/${id}/`)
 }

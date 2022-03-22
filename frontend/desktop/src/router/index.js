@@ -11,10 +11,10 @@ import http from '@/api'
 import preload from '@/common/preload'
 
 import {
+    AWARD_APPLICATION_DETAILS_ROUTE_PATH,
     AWARD_FORM_ROUTE_PATH,
     AWARD_MANAGER_ROUTE_PATH,
     BAD_404_ROUTE_PATH,
-    CANAWARDS_ROUTE_PATH,
     DETAIL_ROUTE_PATH,
     GROUP_MANAGER_ROUTE_PATH,
     HOME_ROUTE_PATH, INVITE_ROUTE_PATH,
@@ -41,11 +41,10 @@ const Myapply = () => import(/* webpackChunkName: 'myapply' */'@/views/myapply')
 const Mycheck = () => import(/* webpackChunkName: 'mycheck' */'@/views/mycheck')
 // 奖项细节
 const Detail = () => import(/* webpackChunkName: 'detail' */'@/views/detail')
-// 可申报奖项
-const Canawards = () => import(/* webpackChunkName: 'canawards' */'@/views/canawards')
-// 登陆成功后重定向
+// 邀请页面
 const Invite = () => import(/* webpackChunkName: 'invite' */'@/views/invite')
-// E 自定义页面组件
+
+const AwardApplicationDetails = () => import(/* webpackChunkName: 'invite' */'@/views/award-application-detail')
 
 function setBaseRoutes (otherRoutes) {
     return [
@@ -78,17 +77,6 @@ const routes = setBaseRoutes([
             title: '首页',
             icon: 'icon-home',
             order: 1
-        }
-    },
-    {
-        path: CANAWARDS_ROUTE_PATH,
-        name: CANAWARDS_ROUTE_PATH,
-        component: Canawards,
-        meta: {
-            parent_id: '奖项中心',
-            title: '可申请奖项',
-            icon: 'icon-star',
-            order: 2
         }
     },
     {
@@ -159,6 +147,14 @@ const routes = setBaseRoutes([
         component: Invite,
         meta: {
             title: '邀请链接'
+        }
+    },
+    {
+        path: AWARD_APPLICATION_DETAILS_ROUTE_PATH,
+        name: AWARD_APPLICATION_DETAILS_ROUTE_PATH,
+        component: AwardApplicationDetails,
+        meta: {
+            title: '奖项申请详情列表'
         }
     }
 ])

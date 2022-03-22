@@ -3,20 +3,28 @@
         <div class="message-content" v-show="messageData.length"
             v-bkloading="{ isLoading: loading ,title: '请稍等,正在为您安放数据' }"
         >
-            <message-card v-for="item in messageData" :key="item['id']" :message="item"></message-card>
+            <message-card v-for="(item,index) in messageData"
+                :key="item['id']"
+                :message="item"
+                @tool-click="handleRead(item,index)"
+            ></message-card>
         </div>
         <empty v-show="!messageData.length"></empty>
         <bk-pagination
-            small
+            :small="true"
+            v-show="pagination.count > 2"
             :current.sync="pagination.current"
-            :count.sync="pagination.count"
+            :count="pagination.count"
             :limit.sync="pagination.limit"
+            @limit-change="handleSetLimit()"
+            @change="handleInit()"
         />
     </div>
 </template>
 
 <script>
-    import { getMessage } from '@/api/service/message-service'
+    import { getMessage, putMessage } from '@/api/service/message-service'
+    import { formatUsernameAndDisplayName } from '@/common/util'
 
     export default {
         name: 'message-list',
@@ -36,7 +44,20 @@
         },
         computed: {
             messageData (self) {
-                return self.messageRemoteData
+                return self.messageRemoteData?.map(item => {
+                    return {
+                        msg_id: item['id'],
+                        group_id: item['group_id'],
+                        group_name: item['group_name'],
+                        action_type: item['action_type'],
+                        action_target: item['action_target'],
+                        action_username: item['action_username'],
+                        action_display_name: item['action_display_name'],
+                        action_display_name_for_display: formatUsernameAndDisplayName(item['action_username'], item['action_display_name']),
+                        message: item['message'],
+                        is_read: item['is_read']
+                    }
+                }) ?? []
             }
         },
         created () {
@@ -46,6 +67,10 @@
             handleInit () {
                 this.handleGetPageData()
             },
+            handleSetLimit () {
+                this.pagination.current = 1
+                return this.handleGetPageData()
+            },
             handleGetPageData (page = this.pagination.current, size = this.pagination.limit) {
                 if (this.loading) {
                     return
@@ -54,10 +79,16 @@
                 return getMessage({
                     page,
                     size
-                }).then(res => {
-                    console.log(res)
+                }).then(response => {
+                    this.messageRemoteData = response.data.data
+                    this.pagination.count = response.data.count
                 }).finally(_ => {
                     this.loading = false
+                })
+            },
+            handleRead ({ msg_id, message }, index) {
+                return putMessage({ msg_id }).then(response => {
+                    this.messageRemoteData[index]['is_read'] = true
                 })
             }
         }

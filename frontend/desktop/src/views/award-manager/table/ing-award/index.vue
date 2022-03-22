@@ -25,33 +25,18 @@
                 <span :title="ingAwards.row['award_consultant_displayname_for_display']">{{ ingAwards.row['award_consultant_displayname_for_display'] }}</span>
             </template>
         </bk-table-column>
-        <bk-table-column label="评审轮次" :width="300">
-            <template slot-scope="endedApprovals">
-                <bk-select
-                    :value="0"
-                    :clearable="false"
-                >
-                    <bk-option v-for="(item,index) in endedApprovals.row['award_reviewers']"
-                        :key="item"
-                        :name="'第' + (index + 1) + '轮:' + item.join(',')"
-                        :id="index"
-                        :title="'第' + (index + 1) + '轮:' + item.join(',')"
-                    ></bk-option>
-                </bk-select>
-            </template>
-        </bk-table-column>
-        <bk-table-column label="操作">
-            <template slot-scope="endedApprovals">
-                <bk-button @click="handleToGetDetail(endedApprovals.row)" :text="true">查看详情</bk-button>
-            </template>
-        </bk-table-column>
+        <!--        <bk-table-column label="操作">-->
+        <!--            <template slot-scope="endedApprovals">-->
+        <!--                <bk-button @click="handleToGetDetail(endedApprovals.row)" :text="true">查看详情</bk-button>-->
+        <!--            </template>-->
+        <!--        </bk-table-column>-->
     </self-table>
 </template>
 
 <script>
     import { tableMixins } from '@/views/mycheck/table/tableMixins'
     import { getAvailableAwards } from '@/api/service/award-service'
-    import { DETAIL_ROUTE_PATH, ING_AWARD } from '@/constants'
+    import { AWARD_FORM_ROUTE_PATH, AWARD_TYPE_DETAIL, AWARD_TYPE_ROUTE_KEY, ING_AWARD } from '@/constants'
     export default {
         name: 'ended-approval',
         mixins: [tableMixins],
@@ -110,9 +95,9 @@
             },
             handleToGetDetail (awardInfo) {
                 this.$router.push({
-                    name: DETAIL_ROUTE_PATH,
+                    name: AWARD_FORM_ROUTE_PATH,
                     query: {
-                        type: 'detail',
+                        [AWARD_TYPE_ROUTE_KEY]: AWARD_TYPE_DETAIL,
                         award_id: awardInfo['award_id']
                     }
                 })

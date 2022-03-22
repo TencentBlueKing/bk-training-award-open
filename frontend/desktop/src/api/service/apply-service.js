@@ -55,3 +55,6 @@ export function postApproval ({ id, action, approval_text }) {
 export function getApplicationById (applicationId) {
     return http.get(`/application/${applicationId}/`)
 }
+export function getAwardApplication (id) {
+    return http.get(`/award_application/${id}/`)
+}

@@ -25,7 +25,7 @@
                 <span :title="ingAwards.row['award_consultant_displayname_for_display']">{{ ingAwards.row['award_consultant_displayname_for_display'] }}</span>
             </template>
         </bk-table-column>
-        <bk-table-column label="评审轮次" :width="300">
+        <bk-table-column label="总评审轮次" :width="300">
             <template slot-scope="endedApprovals">
                 <bk-select
                     :value="0"
@@ -42,16 +42,30 @@
         </bk-table-column>
         <bk-table-column label="操作">
             <template slot-scope="endedApprovals">
-                <bk-button @click="handleToGetDetail(endedApprovals.row)" :text="true">查看详情</bk-button>
+                <!--                <bk-button @click="handleToGetDetail(endedApprovals.row)" :text="true">查看详情</bk-button>-->
+              
+                <bk-popconfirm trigger="click"
+                    @confirm="handleToOverAward(endedApprovals.row)"
+                    width="280">
+                    <div slot="content">
+                        <i class="bk-icon icon-info-circle-shape pr5 content-icon" style="color: #cc3333;"></i>
+                        <span class="content-text">将会提前结束奖项,未评审的将置为未通过
+                        </span>
+                    </div>
+                    <bk-button theme="danger"
+                        class="mr20 ml20 "
+                        :text="true"
+                    >结束奖项</bk-button>
+                </bk-popconfirm>
             </template>
         </bk-table-column>
     </self-table>
 </template>
 
 <script>
-    import { getAvailableAwards } from '@/api/service/award-service'
+    import { getAvailableAwards, postFinishAward } from '@/api/service/award-service'
     import { tableMixins } from '@/views/mycheck/table/tableMixins'
-    import { DETAIL_ROUTE_PATH, ING_REVIEW } from '@/constants'
+    import { AWARD_APPLICATION_DETAILS_ROUTE_PATH, ING_REVIEW } from '@/constants'
 
     export default {
         name: 'ended-approval',
@@ -108,12 +122,19 @@
                 })
             },
             handleToGetDetail (awardInfo) {
+                console.log(awardInfo)
                 this.$router.push({
-                    name: DETAIL_ROUTE_PATH,
+                    name: AWARD_APPLICATION_DETAILS_ROUTE_PATH,
                     query: {
-                        type: 'detail',
-                        award_id: awardInfo['award_id']
+                        award_id: awardInfo['award_id'],
+                        group_id: this.$bus.curGlobalGroupId
                     }
+                })
+            },
+            handleToOverAward (awardInfo) {
+                return postFinishAward(awardInfo['award_id']).then(response => {
+                    this.handleInit()
+                    this.messageSuccess('已成功终止奖项评审')
                 })
             }
 

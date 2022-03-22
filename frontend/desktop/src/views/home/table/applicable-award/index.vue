@@ -33,7 +33,7 @@
 </template>
 
 <script>
-    import { DETAIL_ROUTE_PATH } from '@/constants'
+    import { DETAIL_APPLY, DETAIL_ROUTE_PATH, DETAIL_TYPE_KEYNAME } from '@/constants'
     import { getAwards } from '@/api/service/award-service'
     import moment from 'moment'
 
@@ -78,7 +78,7 @@
                 this.$router.push({
                     name: DETAIL_ROUTE_PATH,
                     query: {
-                        type: 'apply',
+                        [DETAIL_TYPE_KEYNAME]: DETAIL_APPLY,
                         award_id: award['id']
                     }
                 })

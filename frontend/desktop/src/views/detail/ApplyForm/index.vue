@@ -1,13 +1,13 @@
 <template>
     <div class="apply-form-container">
-        <bk-divider align="center">申请奖项</bk-divider>
         <bk-form :label-width="90" class="form"
             :rules="applyFormRules"
             :model="applyForm"
             ref="apply-form"
+            style="height: 400px"
         >
-            <bk-form-item label="申请人" v-show="!config[$route.query['type']]['is_editor']">
-                <bk-input :disabled="!config[$route.query['type']]['is_editor']"></bk-input>
+            <bk-form-item label="申请人" v-show="!config[formType]['is_editor']">
+                <bk-input :disabled="!config[formType]['is_editor']" v-model="applyForm.application_users"></bk-input>
             </bk-form-item>
             <bk-form-item label="申请理由"
                 required="true"
@@ -19,21 +19,22 @@
                     :rows="3"
                     :maxlength="255"
                     v-model="applyForm['application_reason']"
-                    :disabled="!config[$route.query['type']]['is_editor']"
+                    :disabled="!config[formType]['is_editor']"
                 >
                 </bk-input>
             </bk-form-item>
             <bk-form-item label="申请材料"
-                required="true"
             >
                 <Uploader v-model="applyForm['application_attachments']"
                     :limit="2"
-                    :readonly="!config[$route.query['type']]['is_editor']"
+                    :readonly="!config[formType]['is_editor']"
+                    style="max-height: 300px;overflow-y: scroll;"
+                    class="mb20"
                 ></Uploader>
             </bk-form-item>
         </bk-form>
         <!-- 用于申请奖项的按钮 -->
-        <div class="button-item" v-show="!config[$route.query['type']]['hidden_button']">
+        <div class="button-item" v-show="!config[formType]['hidden_button']">
             <bk-button theme="danger"
                 class="mr10"
                 @click="$router.back()"
@@ -54,13 +55,13 @@
                 class="mr10"
                 @click="handleToSendApplyForm(applyForm)"
                 ext-cls="button-item"
-                v-if="$route.query['type'] === 'apply'"
+                v-if="formType === 'apply'"
             >
                 <bk-icon type="check-circle" />
                 <span>发起申请</span>
             </bk-button>
             <bk-button theme="warning"
-                v-else-if="$route.query['type'] === 'edit'"
+                v-else-if="formType === configType['draft_detail']"
                 class="mr10"
                 @click="handleToSendApplyForm(applyForm)"
                 ext-cls="button-item"
@@ -78,9 +79,18 @@
     </div>
 </template>
 <script>
-    import { GROUP_USERS_KEYNAME, MYAPPLY_ROUTE_PATH } from '@/constants'
+    import {
+        DETAIL_APPLY,
+        DETAIL_APPLY_DETAIL,
+        DETAIL_APPROVAL_DETAIL,
+        DETAIL_DRAFT_DETAIL,
+        DETAIL_TYPE_KEYNAME,
+        GROUP_USERS_KEYNAME,
+        MYAPPLY_ROUTE_PATH
+    } from '@/constants'
     import { postRecord } from '@/api/service/award-service'
     import { getApplicationById } from '@/api/service/apply-service'
+    import { formatUsernameAndDisplayName } from '@/common/util'
 
     export default {
         name: 'apply-form',
@@ -91,38 +101,44 @@
         data (self) {
             return {
                 config: {
-                    apply: {
+                    [DETAIL_APPLY]: {
                         hidden_button: false,
                         is_editor: true,
                         init () {
                         }
                     },
-                    apply_detail: {
-                        hidden_button: false,
-                        is_editor: true,
-                        init () {
-                            getApplicationById(self.$route.query['record_id']).then(response => {
-                                console.log(response)
-                            })
-                        }
-                    },
-                    draft_detail: {
-                        hidden_button: false,
-                        is_editor: true,
-                        init () {
-                        }
-                    },
-                    approval_detail: {
+                    [DETAIL_APPLY_DETAIL]: {
                         hidden_button: true,
                         is_editor: false,
                         init () {
+                            self.handleGetRecord()
+                        }
+                    },
+                    [DETAIL_DRAFT_DETAIL]: {
+                        hidden_button: false,
+                        is_editor: true,
+                        init () {
+                        }
+                    },
+                    [DETAIL_APPROVAL_DETAIL]: {
+                        hidden_button: true,
+                        is_editor: false,
+                        init () {
+                            self.handleGetRecord()
                         }
                     }
+                },
+                configType: {
+                    apply: DETAIL_APPLY,
+                    apply_detail: DETAIL_APPLY_DETAIL,
+                    draft_detail: DETAIL_DRAFT_DETAIL,
+                    approval_detail: DETAIL_APPROVAL_DETAIL
                 },
                 applyForm: {
                     /**
                      * 申请理由
                      * */
+                    application_users: '',
                     application_reason: '',
                     /**
                      * 申请附件列表
@@ -147,7 +163,11 @@
             },
             award (self) {
                 return self.awardDetail()
+            },
+            formType (self) {
+                return self.$route[DETAIL_TYPE_KEYNAME] || DETAIL_APPLY
             }
+          
         },
         created () {
             this.handleInit()
@@ -157,7 +177,7 @@
              * 初始化函数
              * */
             handleInit () {
-                this.config[this.$route.query['type']]?.init()
+                this.config[this.$route.query[DETAIL_TYPE_KEYNAME]]?.init()
             },
             handleSetDefaultInfo () {
               
@@ -203,6 +223,17 @@
                 const department = value['departments'].map(item => item['full_name'])
                 const awardDepartmentFullname = this.$route.params['award_department_fullname']
                 return department.includes(awardDepartmentFullname)
+            },
+            handleGetRecord () {
+                return getApplicationById(this.$route.query['record_id']).then(response => {
+                    const reponseData = response.data
+                    this.applyForm.application_users = formatUsernameAndDisplayName(
+                        reponseData.application_users[0]['username'],
+                        reponseData.application_users[0]['display_name']
+                    )
+                    this.applyForm.application_reason = reponseData.application_reason
+                    this.applyForm.application_attachments = reponseData.application_attachments
+                })
             }
         }
     }

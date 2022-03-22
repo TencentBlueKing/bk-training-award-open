@@ -28,9 +28,7 @@
         mixins: [tableMixins],
         data () {
             return {
-                pendingApprovalRemoteData: [
-                    
-                ]
+                pendingApprovalRemoteData: []
             }
         },
         computed: {
