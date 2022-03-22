@@ -22,6 +22,7 @@ class GroupView(APIView):
         groups_info = Group.objects.filter(id__in=groups)
         return JsonResponse(success_code([g.to_json() for g in groups_info]))
 
+    # 创建小组
     def post(self, request, *args, **kwargs):
         group_info = {
             "full_name": request.data["group_name"],
@@ -45,6 +46,7 @@ class GroupView(APIView):
         else:
             return JsonResponse(value_exception())
 
+    # 修改组名字
     def put(self, request):
         group_id = request.data.get("group_id")
         group_name = request.data.get("group_name")
@@ -153,7 +155,7 @@ class GroupManageView(APIView):
                 return JsonResponse(false_code("对应组不存在或没有权限"))
             group_applies = GroupApply.objects.filter(group_id=group_id)
         if status is not None:
-            group_applies.filter(status=status)
+            group_applies = group_applies.filter(status=status)
         return JsonResponse(success_code([apply.to_json() for apply in group_applies]))
 
     # 批量审批入组请求
@@ -161,12 +163,9 @@ class GroupManageView(APIView):
         apply_ids = request.data.get("apply_ids")
         if not isinstance(apply_ids, list):
             return JsonResponse(value_exception())
-        status = request.data.get("is_allow")
-        if status is None:
+        is_allow = request.data.get("is_allow")
+        if is_allow is None:
             return JsonResponse(value_exception())
-        # 1: 通过，2: 未通过
-        status = 1 if status else 2
-
         # 尝试找到所有的申请
         try:
             applications = GroupApply.objects.filter(id__in=apply_ids)
@@ -184,7 +183,7 @@ class GroupManageView(APIView):
             return JsonResponse(false_code("缺少权限"))
 
         # 通过申请->将对应的用户添加到组员表中
-        if status:
+        if is_allow:
             new_members = []
             for apply in applications:
                 new_members.append(GroupUser(
@@ -193,8 +192,11 @@ class GroupManageView(APIView):
                     group_id=apply.group_id
                 ))
             GroupUser.objects.bulk_create(new_members)
+
+        # 1: 通过，2: 未通过
+        status = 1 if is_allow else 2
         applications.update(status=status, update_time=datetime.datetime.now())
-        status = "通过" if status == 1 else "拒绝"
+        status = "通过" if is_allow else "拒绝"
 
         # 创建消息通知
         new_notifications = []

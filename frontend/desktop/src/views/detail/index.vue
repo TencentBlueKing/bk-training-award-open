@@ -35,8 +35,8 @@
                 ></ApplyForm>
             </div>
             <!-- /编辑部分 -->
-            <bk-steps class="mt20 pt20 pl20 pr20"></bk-steps>
-
+            <bk-steps class="mt20 pt20 pl20 pr20" v-if="$route.query['type'] === 'edit'" :steps="applicationSteps2" size="small"></bk-steps>
+            <bk-steps class="mt20 pt20 pl20 pr20" v-else :steps="applicationSteps" size="small"></bk-steps>
         </div>
         <!-- 底部按钮组 -->
         <div class="tc w100  mt15" v-if="$route.query['type'] === 'approval'">
@@ -96,6 +96,36 @@
                 isShow: false,
                 applyForm: {},
                 panelCutOut: false,
+                applicationSteps: [
+                    {
+                        title: '奖项申请',
+                        icon: 1,
+                        name: 'apply'
+                    },
+                    {
+                        title: '奖项审批',
+                        icon: 2
+                    },
+                    {
+                        title: '得知审批结果',
+                        icon: 'success'
+                    }
+                ],
+                applicationSteps2: [
+                    {
+                        title: '修改草稿',
+                        icon: 1,
+                        name: 'apply'
+                    },
+                    {
+                        title: '发起申请',
+                        icon: 2
+                    },
+                    {
+                        title: '奖项审批',
+                        icon: 'success'
+                    }
+                ],
                 approvalTabItems: [
                     {
                         'tab-name': '审批列表',
@@ -109,15 +139,7 @@
              * 用于判断是否为编辑型表格
              * */
             isShowApplyForm () {
-                return ['apply', 'edit'].includes(this.formType)
-            },
-            /**
-             * 主要用于拼接一些比如 id 的信息 此类默认信息
-             * */
-            defaultInfo () {
-                return {
-                    award_id: this.$route.query['award_id']
-                }
+                return ['apply', 'edit', 'apply_detail'].includes(this.formType)
             }
         },
         created () {
@@ -132,8 +154,16 @@
                 this.panelCutOut = !this.panelCutOut
             },
             handleToPaasApproval () {
+
             },
             handleToRejectApproval () {
+              
+            },
+            handleBatchPassApproval () {
+              
+            },
+            handleBatchRejectApproval () {
+              
             }
         }
     }

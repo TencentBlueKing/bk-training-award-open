@@ -5,9 +5,8 @@
         @page-change="handleInit()"
     >
         <bk-table-column type="index" label="序号" width="60"></bk-table-column>
-        <bk-table-column label="奖项名称" prop="ip"></bk-table-column>
-        <bk-table-column label="奖项开始时间" prop="source"></bk-table-column>
-        <bk-table-column label="奖项截止时间" prop="status"></bk-table-column>
+        <bk-table-column label="申请用户" prop="display_name_for_display"></bk-table-column>
+        <bk-table-column label="申请时间" prop="create_time"></bk-table-column>
         <bk-table-column label="奖项咨询人" prop="create_time"></bk-table-column>
         <bk-table-column label="操作">
             <template slot-scope="approvals">
@@ -17,14 +16,16 @@
                 >
                     通过
                 </bk-button>
-                <bk-popconfirm trigger="click" :width="280">
+                <bk-popconfirm trigger="click" :width="280"
+                    @confirm="handleRejectGroupUser(approvals.row)"
+                >
                     <div slot="content">
                         <div class="demo-custom">
-                            <i class="bk-icon icon-info-circle-shape pr5 content-icon color-danger"></i>
+                            <i class="bk-icon icon-info-circle-shape pr5 content-icon color-danger" style="color:red;"></i>
                             <span class="content-text">确认拒绝该用户的申请？</span>
                         </div>
                     </div>
-                    <bk-button @click="handleRejectGroupUser(approvals.row)"
+                    <bk-button
                         theme="danger"
                         :text="true"
                         class="mr10 ml10"
@@ -39,8 +40,10 @@
 
 <script>
     import { tableMixins } from '@/views/mycheck/table/tableMixins'
-    import { getGroupApproval, postGroupManage } from '@/api/service/group-service'
+    import { getGroupManage, postGroupManage } from '@/api/service/group-service'
     import { GROUP_PENDING_APPROVAL } from '@/constants'
+    import { formatUsernameAndDisplayName } from '@/common/util'
+
     export default {
         name: 'group-pending-approval',
         mixins: [tableMixins],
@@ -51,7 +54,19 @@
         },
         computed: {
             pendingApprovalData (self) {
-                return self.pendingApprovalRemoteData
+                return self.pendingApprovalRemoteData?.map(item => {
+                    return {
+                        apply_id: item['apply_id'],
+                        group_id: item['group_id'],
+                        group_name: item['group_name'],
+                        username: item['username'],
+                        display_name: item['display_name'],
+                        display_name_for_display: formatUsernameAndDisplayName(item['username'], item['display_name']),
+                        status: item['status'],
+                        create_time: item['create_time'],
+                        update_time: item['update_time']
+                    }
+                }) ?? []
             }
         },
         mounted () {
@@ -63,42 +78,40 @@
                     this.handleGetGroupPendingApproval()
                 ])
             },
-            handleGetGroupPendingApproval (page = this.pagination.curren, size = this.pagination.limit) {
+            handleGetGroupPendingApproval () {
                 if (this.loading) return
                 this.loading = true
                 const params = {
-                    page,
-                    size,
                     group_id: this.$bus.curGlobalGroupId,
-                    approval_state: GROUP_PENDING_APPROVAL
+                    status: GROUP_PENDING_APPROVAL
                 }
-                return getGroupApproval(params).then(response => {
-                    const groupApprovals = response.data
-                    console.log(groupApprovals)
+                return getGroupManage(params).then(response => {
+                    this.pendingApprovalRemoteData = response.data
                 }).finally(_ => {
                     this.loading = false
                 })
             },
             handleToPassGroupUser (applyInfo) {
+                console.log('applyInfo', applyInfo)
                 const params = {
-                    apply_id: applyInfo['applyId'],
+                    apply_ids: [applyInfo['apply_id']],
                     is_allow: true
                 }
-                this.handlePostGroupManage([params])
+                this.handlePostGroupManage(params, `已同意用户：${applyInfo['display_name_for_display']}加入${applyInfo['group_name']}`)
             },
             handleRejectGroupUser (applyInfo) {
                 const params = {
-                    apply_id: applyInfo['applyId'],
+                    apply_ids: [applyInfo['apply_id']],
                     is_allow: false
                 }
-                this.handlePostGroupManage([params])
+                this.handlePostGroupManage(params, `已拒绝用户：${applyInfo['display_name_for_display']}加入${applyInfo['group_name']}`)
             },
             /**
              * 处理记录的统一入口
              * */
-            handlePostGroupManage (dealArr) {
+            handlePostGroupManage (dealArr, tips) {
                 return postGroupManage(dealArr).then(response => {
-                    console.log(response)
+                    this.messageSuccess(tips)
                 }).finally(_ => {
                   
                 })

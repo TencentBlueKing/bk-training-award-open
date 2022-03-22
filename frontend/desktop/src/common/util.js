@@ -390,3 +390,7 @@ export function clearAllCookie () {
     }
     console.log(document.cookie)
 }
+
+export function formatUsernameAndDisplayName (username, displayName) {
+    return `${username}（${displayName}）`
+}
