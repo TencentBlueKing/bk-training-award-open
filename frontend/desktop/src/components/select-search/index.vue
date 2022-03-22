@@ -25,6 +25,7 @@
 <script>
     import { BK_GROUP_KEYNAME, GROUP_USERS_KEYNAME, SYS_KEYNAME } from '@/constants'
     import { getGroupAll, getGroupUser } from '@/api/service/group-service'
+    import { formatUsernameAndDisplayName } from '@/common/util'
 
     export default {
         name: 'select-search',
@@ -55,7 +56,7 @@
             },
             filterFn: {
                 type: Function,
-                default: () => true
+                default: () => () => true
             },
             clearable: {
                 type: Boolean,
@@ -102,14 +103,27 @@
                 const list = self.groupUsers?.filter?.(item => {
                     return item[config[type]['displayKey']]
                 }).filter(self.filterFn) ?? []
+
+                if (list && !self.value && !self.multiple) {
+                    self.handleChange(list[0]?.[config[type]['idKey']] || '')
+                }
                 if (type === 'group') {
                     return self.$bus.groupList
                 }
-                if (list && !self.value && !self.multiple) {
-                    console.log(list[0]?.[config[type]['idKey']])
-                    self.handleChange(list[0]?.[config[type]['idKey']] || '')
+                if (type === 'self') {
+                    return self.data
                 }
                 return list
+            }
+        },
+        watch: {
+            '$bus.curGlobalGroupId': {
+                handler (newValue, oldValue) {
+                    if (newValue !== oldValue) {
+                        this.handleInit()
+                    }
+                },
+                immediate: true
             }
         },
         created () {
@@ -164,7 +178,7 @@
                         return
                     }
                     this.groupUsers = response.data.map(item => {
-                        item['display_name_for_display'] = `${item['username']}(${item['display_name']})`
+                        item['display_name_for_display'] = formatUsernameAndDisplayName(item['username'], item['display_name'])
                         return item
                     })
                     this.$http.cache.set(GROUP_USERS_KEYNAME + groupId, response.data)

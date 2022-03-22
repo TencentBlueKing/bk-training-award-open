@@ -18,7 +18,7 @@
         mixins: [tableMixins],
         data () {
             return {
-                endedApprovalRemoteData: [{}],
+                endedApprovalRemoteData: [],
                 loading: false
             }
         },

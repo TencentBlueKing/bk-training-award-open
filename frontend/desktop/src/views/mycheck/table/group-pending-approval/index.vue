@@ -92,7 +92,6 @@
                 })
             },
             handleToPassGroupUser (applyInfo) {
-                console.log('applyInfo', applyInfo)
                 const params = {
                     apply_ids: [applyInfo['apply_id']],
                     is_allow: true
@@ -112,8 +111,7 @@
             handlePostGroupManage (dealArr, tips) {
                 return postGroupManage(dealArr).then(response => {
                     this.messageSuccess(tips)
-                }).finally(_ => {
-                  
+                    this.handleInit()
                 })
             }
         }

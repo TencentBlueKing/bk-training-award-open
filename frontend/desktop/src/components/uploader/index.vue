@@ -18,6 +18,7 @@
             readonly: $attrs['readonly']
         }"
         v-if="!($attrs['readonly'] && attachFiles.length < 1)"
+        :size="100"
     ></bk-upload>
     <empty v-else
         style="border: solid 1px #C4C6CC;"
@@ -99,7 +100,11 @@
     }
 </script>
 <style>
-  
+
+    .file-wrapper {
+      max-height: 200px;
+      overflow-y: scroll;
+    }
   .disabled {
     &::after {
       content: "";

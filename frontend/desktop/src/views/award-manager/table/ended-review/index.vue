@@ -5,22 +5,11 @@
         @page-change="handleInit()"
     >
         <bk-table-column type="index" label="序号" width="60"></bk-table-column>
-        <bk-table-column label="奖项名称" prop="ip"></bk-table-column>
-        <bk-table-column label="奖项开始时间" prop="source"></bk-table-column>
-        <bk-table-column label="奖项截止时间" prop="status"></bk-table-column>
-        <bk-table-column label="奖项咨询人" prop="create_time"></bk-table-column>
-        <bk-table-column label="评语">
-            <template slot-scope="endedApprovals">
-                <bk-select :readonly="true">
-                    <bk-option>{{endedApprovals.row}}</bk-option>
-                </bk-select>
-            </template>
-        </bk-table-column>
-        <bk-table-column label="操作">
-            <template slot-scope="endedApprovals">
-                <bk-button @click="handleGetDetail(endedApprovals.row)" :text="true"></bk-button>
-            </template>
-        </bk-table-column>
+        <bk-table-column label="奖项名称" prop="award_name"></bk-table-column>
+        <bk-table-column label="奖项开始时间" prop="start_time"></bk-table-column>
+        <bk-table-column label="奖项截止时间" prop="end_time"></bk-table-column>
+        <bk-table-column label="奖项咨询人" prop="award_consultant_displayname_for_display"></bk-table-column>
+
     </self-table>
 </template>
 
@@ -33,13 +22,29 @@
         mixins: [tableMixins],
         data () {
             return {
-                endedReviewRemoteData: [{}],
+                endedReviewRemoteData: [],
                 loading: false
             }
         },
         computed: {
             endedReviewData (self) {
-                return self.endedReviewRemoteData
+                return self.endedReviewRemoteData.map(award => {
+                    return {
+                        award_id: award['id'],
+                        award_name: award['award_name'],
+                        award_description: award['award_description'],
+                        award_department_fullname: award['award_department_fullname'],
+                        award_department_id: award['award_department_id'],
+                        award_reviewers: award['award_reviewers'],
+                        award_consultant: award['award_consultant'],
+                        award_consultant_displayname: award['award_consultant_displayname'],
+                        award_consultant_displayname_for_display: award['award_consultant'] + '（' + award['award_consultant_displayname'] + '）',
+                        award_demand: award['award_demand'],
+                        start_time: award['start_time'],
+                        end_time: award['end_time'],
+                        approval_state: award['approval_state']
+                    }
+                }) ?? []
             }
         },
         mounted () {
@@ -67,10 +72,7 @@
                 }).finally(_ => {
                     this.loading = false
                 })
-            },
-            handleGetDetail () {
             }
-
         }
 
     }

@@ -42,8 +42,7 @@
         </bk-table-column>
         <bk-table-column label="操作">
             <template slot-scope="endedApprovals">
-                <bk-button class="mr10" @click="handleToGetDetail(endedApprovals.row)" :text="true">查看详情</bk-button>
-                <bk-button class="mr10 ml10" @click="handleToGetDetail(endedApprovals.row)" :text="true">编辑奖项</bk-button>
+                <bk-button @click="handleToEditAward(endedApprovals.row)" :text="true">编辑奖项</bk-button>
             </template>
         </bk-table-column>
     </self-table>
@@ -52,7 +51,7 @@
 <script>
     import { tableMixins } from '@/views/mycheck/table/tableMixins'
     import { getAvailableAwards } from '@/api/service/award-service'
-    import { DETAIL_ROUTE_PATH, PENDING_START } from '@/constants'
+    import { AWARD_FORM_ROUTE_PATH, AWARD_TYPE_EDIT, AWARD_TYPE_ROUTE_KEY, PENDING_START } from '@/constants'
 
     export default {
         name: 'pending-start',
@@ -109,16 +108,15 @@
                     this.loading = false
                 })
             },
-            handleToGetDetail (awardInfo) {
+            handleToEditAward (awardInfo) {
                 this.$router.push({
-                    name: DETAIL_ROUTE_PATH,
+                    name: AWARD_FORM_ROUTE_PATH,
                     query: {
-                        type: 'detail',
+                        [AWARD_TYPE_ROUTE_KEY]: AWARD_TYPE_EDIT,
                         award_id: awardInfo['award_id']
                     }
                 })
             }
-
         }
 
     }

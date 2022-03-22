@@ -106,8 +106,10 @@ export function postGroupManage ({
  * */
 export function putGroupManage ({ username, group_id }) {
     return http.delete('/group_manage/', {
-        group_id,
-        new_secretary: username
+        data: {
+            group_id,
+            new_secretary: username
+        }
     })
 }
 
@@ -145,6 +147,7 @@ export function getGroupManage ({ group_id, status }) {
         }
     })
 }
+
 export function getGroupAll () {
     return http.get('/group_all/', {}, { fromCache: true })
 }

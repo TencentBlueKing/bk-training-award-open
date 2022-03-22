@@ -49,19 +49,6 @@
             >
             </bk-input>
         </bk-dialog>
-        <bk-dialog v-model="isPreviewAttachFiles">
-            <ul class="file-list">
-                <li v-for="(file,fileIdx) in tmpAttachFiles" :key="file.url"
-                    class="mt5 file-item"
-                >
-                    <bk-link :href="file.path"
-                        theme="primary"
-                    >
-                        {{ fileIdx + 1 }} {{ file.name }}
-                    </bk-link>
-                </li>
-            </ul>
-        </bk-dialog>
     </div>
 </template>
 <script>

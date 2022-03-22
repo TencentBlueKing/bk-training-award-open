@@ -1,5 +1,4 @@
 /* 常量表 */
-
 /**
  * 奖项申请状态
  * */
@@ -97,6 +96,7 @@ export const ENDED_APPROVAL = 3
 
 export const GROUP_MANAGER_ROUTE_PATH = 'group-manager'
 export const AWARD_MANAGER_ROUTE_PATH = 'award-manager'
+
 // S 奖项路由中的状态量
 export const PENDING_START = 1
 export const ING_AWARD = 2
@@ -105,15 +105,34 @@ export const ENDED_REVIEW = 4
 // E 奖项路由中的状态量
 
 export const AWARD_FORM_ROUTE_PATH = 'award-form'
+// S 奖项表单的 类型
+export const AWARD_TYPE_ROUTE_KEY = 'award-form-type'
+export const AWARD_TYPE_CREATE = 'create'
+export const AWARD_TYPE_EDIT = 'edit'
+export const AWARD_TYPE_DETAIL = 'detail'
+// E 奖项表单的 类型
+
 export const MYCHECK_ROUTE_PATH = 'mycheck'
 // S
-export const GROUP_PENDING_APPROVAL = 1
-export const GROUP_ENDED_APPROVAL = 2
+export const GROUP_PENDING_APPROVAL = 0
+export const GROUP_ENDED_APPROVAL = 1
 // E
 export const DETAIL_ROUTE_PATH = 'detail'
+// S 详情路由中的类型
+export const DETAIL_TYPE_KEYNAME = 'detail_type'
+export const DETAIL_APPLY = 'apply'
+export const DETAIL_EDIT = 'edit'
+export const DETAIL_APPLY_DETAIL = 'apply_detail'
+export const DETAIL_DRAFT_DETAIL = 'draft_detail'
+export const DETAIL_APPROVAL_DETAIL = 'approval_detail'
+// E 详情路由中的类型
 export const BAD_404_ROUTE_PATH = '404'
 export const LOGIN_SUCCESS_ROUTE_PATH = '/account/login_success'
 export const INVITE_ROUTE_PATH = 'invite'
+export const AWARD_APPLICATION_DETAILS_ROUTE_PATH = 'award_application_detail'
+// S 奖项详情路由中的一些类型管理
+
+// E 奖项详情路由中的一些类型管理
 
 export const POWER_CONTROLLER = {
     [HOME_ROUTE_PATH]: {
@@ -175,8 +194,15 @@ export const POWER_CONTROLLER = {
         [IDENT_ADMIN]: {},
         [IDENT_SECRETARY]: {},
         [IDENT_COMMON]: {}
+    },
+    [AWARD_APPLICATION_DETAILS_ROUTE_PATH]: {
+        [IDENT_ADMIN]: {},
+        [IDENT_SECRETARY]: {},
+        [IDENT_COMMON]: {}
+
     }
 }
+// 放到全局做页面核对用的
 export const ROUTE_TABLE = {
     HOME_ROUTE_PATH,
     CANAWARDS_ROUTE_PATH,
@@ -187,7 +213,9 @@ export const ROUTE_TABLE = {
     MYCHECK_ROUTE_PATH,
     DETAIL_ROUTE_PATH,
     BAD_404_ROUTE_PATH,
-    LOGIN_SUCCESS_ROUTE_PATH
+    LOGIN_SUCCESS_ROUTE_PATH,
+    INVITE_ROUTE_PATH,
+    AWARD_APPLICATION_DETAILS_ROUTE_PATH
 }
 
 // 事件集

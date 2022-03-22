@@ -1,23 +1,27 @@
 <template>
     <div class="message-card">
-        <div class="message-header">
-            <span> 2021-03-11 08:00</span>
-            <bk-link theme="danger" @click="handleClickTopButton($event)" underline>标记已读</bk-link>
-        </div>
         <div class="message-content">
-            <bk-tag effect="filled"
-                style="background-color: #0E7AE2;color: white"
-            >
-                {{ message['group_name'] || 'undefined'}}
-            </bk-tag>
-            <bk-link theme="primary"> {{ message['action_user'] || 'undefined' }}( {{ message['action_display_name'] || 'undefined' }})</bk-link>
+            <bk-badge :dot="true" :visible="!message['is_read']" theme="danger">
+                <span class="pl10 pr10" style="background-color: #0E7AE2;color: white;">
+                    {{ message['group_name'] }}
+                </span>
+            </bk-badge>
+            <bk-link theme="primary" v-bk-copy="message['action_display_name_for_display']"> {{ message['action_display_name_for_display'] }}</bk-link>
             {{ message['message'] }}
+        </div>
+
+        <div class="mt20 message-header">
+            <bk-link theme="danger" @click="handleClickTopButton($event)"
+                :underline="true"
+                v-show="!message['is_read']"
+            >
+                标记已读
+            </bk-link>
         </div>
     </div>
 </template>
 
 <script>
-    import { getGroupManage } from '@/api/service/message-service'
 
     export default {
         name: 'message-card',
@@ -45,17 +49,10 @@
             }
         },
         created () {
-            this.handleInit()
         },
         methods: {
-            handleClickTopButton () {},
-            handleInit () {
-                Promise.all([
-                    this.handleGetGroupManage()
-                ])
-            },
-            handleGetGroupManage () {
-                return getGroupManage()
+            handleClickTopButton () {
+                this.$emit('tool-click')
             }
         }
     }
@@ -69,8 +66,9 @@
 
   .message-header {
     display: flex;
-    justify-content: space-between;
+    justify-content: flex-end;
     margin-bottom: 12px;
+
   }
 
   background: #FFFFFF;

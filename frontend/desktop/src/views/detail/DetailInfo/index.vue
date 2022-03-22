@@ -1,81 +1,123 @@
 <template>
     <div class="detail-form-container">
-        <bk-divider align="center">基本信息</bk-divider>
-        <bk-form :label-width="140"
-            form-type="horizontal"
-            ext-cls="detail-form"
-        >
-            <bk-form-item label="奖项名">
-                <bk-input v-model="awardForm['award_name']"
-                    :disabled="true"
-                    style="width: auto"
-                    placeholder="奖项名"
-                    ext-cls="detail-input"
-                    :title="awardForm['award_name']"
-                ></bk-input>
-            </bk-form-item>
-            <bk-form-item label="所属组织">
-                <bk-input v-model="awardForm['award_department_fullname']"
-                    :disabled="true"
-                    style="width: auto"
-                    placeholder="所属组织"
-                    ext-cls="detail-input"
-                    :title="awardForm['award_department_fullname']"
-                ></bk-input>
-            </bk-form-item>
-            <bk-form-item label="接口人">
-                <bk-input v-model="awardForm['award_consultant_displayname']"
-                    ext-cls="detail-input"
-                    style="width: auto"
-                    placeholder="接口人"
-                    :disabled="true"
-                    :title="awardForm['award_consultant_displayname']"
-                >
-                </bk-input>
-            </bk-form-item>
-            <!--            <bk-form-item label="奖项级别">-->
-            <!--                <bk-input v-model="awardForm['award_level']"-->
-            <!--                    :disabled="true"-->
-            <!--                    placeholder="奖项级别"-->
-            <!--                    ext-cls="detail-input"-->
-            <!--                ></bk-input>-->
-            <!--            </bk-form-item>-->
-            <bk-form-item label="开放申请时间段"
-                :label-width="140"
+        <bk-container :col="12">
+            <bk-row class="mt15">
+
+                <bk-col :span="6">
+                    <span>奖项名称:</span>
+                    <bk-input v-model="awardForm['award_name']"
+                        :disabled="true"
+                        style="width: auto"
+                        placeholder="奖项名"
+                        ext-cls="detail-input"
+                        :title="awardForm['award_name']"
+                    ></bk-input>
+                </bk-col>
+
+                <bk-col :span="6">
+                    <span>接口人:</span>
+                    <bk-input v-model="awardForm['award_consultant_displayname']"
+                        ext-cls="detail-input"
+                        placeholder="接口人"
+                        style="width: auto"
+                        :disabled="true"
+                        :title="awardForm['award_consultant_displayname']"
+                    >
+                    </bk-input>
+                </bk-col>
+            </bk-row>
+            <bk-row class="mt15">
+
+                <bk-col :span="6">
+                    <span>所属组织:</span>
+                    <bk-input v-model="awardForm['award_department_fullname']"
+                        :disabled="true"
+                        placeholder="所属组织"
+                        style="width: auto"
+                        ext-cls="detail-input"
+                        :title="awardForm['award_department_fullname']"
+                    ></bk-input>
+                </bk-col>
+            </bk-row>
+            <bk-row class="mt15">
+                <bk-col :span="6">
+                    <span>奖项要求:</span>
+                </bk-col>
+                <bk-col :span="6">
+                    <span>奖项描述:</span>
+                </bk-col>
+            </bk-row>
+            <bk-row class="mt15">
+                <bk-col :span="6">
+                    <bk-input
+                        :type="'textarea'"
+                        :rows="3"
+                        v-model="awardForm['award_demand']"
+                        :disabled="true"
+                        placeholder="奖项要求"
+                        ext-cls="detail-input"
+                        style="width: calc(2*118px + 8px)"
+                        :title="awardForm['award_demand']"
+                    ></bk-input>
+                </bk-col>
+                <bk-col :span="6">
+                    <bk-input
+                        :type="'textarea'"
+                        :rows="3"
+                        v-model="awardForm['award_description']"
+                        :disabled="true"
+                        placeholder="奖项描述"
+                        ext-cls="detail-input"
+                        style="width: calc(2*118px + 8px)"
+                        :title="awardForm['award_description']"
+                    ></bk-input>
+                </bk-col>
+            </bk-row>
+
+            <bk-row class="mt15">
+                <bk-col :span="12">
+                    <span>开放申请时间段:</span>
+                </bk-col>
+            </bk-row>
+            <bk-row class="mt15">
+                <bk-col :span="6">
+                    <bk-input v-model="awardForm['time_range']"
+                        :disabled="true"
+                        placeholder="开放申请时间段"
+                        ext-cls="detail-input"
+                        style="width: calc(2*118px + 8px)"
+                        :title="awardForm['time_range']"
+                    ></bk-input>
+                </bk-col>
+            </bk-row>
+            <bk-row class="mt15">
+                <bk-col :span="12">
+                    <span class="title"> 审批轮次: 1.xxx 2.xxx</span>
+                </bk-col>
+            </bk-row>
+            <bk-row class="review-container mt15"
             >
-                <bk-input v-model="awardForm['time_range']"
-                    :disabled="true"
-                    placeholder="开放申请时间段"
-                    ext-cls="detail-input"
-                    style="width: calc(2*118px + 8px)"
-                    :title="awardForm['time_range']"
-                ></bk-input>
-            </bk-form-item>
-            <bk-form-item label="奖项描述">
-                <bk-input
-                    :type="'textarea'"
-                    :rows="3"
-                    v-model="awardForm['award_demand']"
-                    :disabled="true"
-                    placeholder="奖项要求"
-                    ext-cls="detail-input"
-                    style="width: calc(2*118px + 8px)"
-                    :title="awardForm['award_demand']"
-                ></bk-input>
-            </bk-form-item>
-            <bk-form-item label="奖项要求">
-                <bk-input
-                    :type="'textarea'"
-                    :rows="3"
-                    v-model="awardForm['award_description']"
-                    :disabled="true"
-                    placeholder="奖项描述"
-                    ext-cls="detail-input"
-                    style="width: calc(2*118px + 8px)"
-                    :title="awardForm['award_description']"
-                ></bk-input>
-            </bk-form-item>
-        </bk-form>
+                <bk-col :span="12">
+                    <ul class="reviewer-list">
+                        <li v-for="(item,index) in awardForm['reviewers']"
+                            :key="item.uuid"
+                            class="item mb15"
+                        >
+                            <span class="mr10"> 第 {{ index + 1 }} 轮</span>
+                            <select-search
+                                :value.sync="item.value"
+                                placeholder="请选择评审人"
+                                :disabled="true"
+                                :id-key="'username'"
+                                :title="item.value.join(',')"
+                            >
+                            </select-search>
+                        </li>
+                    </ul>
+                </bk-col>
+            </bk-row>
+
+        </bk-container>
     </div>
 </template>
 
@@ -83,9 +125,10 @@
 
     import { getAwardById } from '@/api/service/award-service'
     import { formatDate } from '@/common/util'
+
+    let uuid = 0
     export default {
         name: 'detail-info',
-        components: { },
         data () {
             return {
                 awardForm: {
@@ -121,7 +164,13 @@
                         const detail = awardDetail.data
                         try {
                             detail['time_range'] = `${formatDate(detail['start_time'])}~${formatDate(detail['end_time'])}`
-
+                            console.log(detail['award_reviewers'])
+                            detail['reviewers'] = detail['award_reviewers'].map(item => {
+                                return {
+                                    uuid: uuid++,
+                                    value: item
+                                }
+                            })
                             detail['award_consultant_displayname'] = `${detail['award_consultant']}（${detail['award_consultant_displayname']}）`
                         } catch (e) {
                             console.error(e)
@@ -135,7 +184,27 @@
 </script>
 
 <style scoped>
-    .detail-form-container {
-      padding: 2px;
+.detail-form-container {
+  padding: 2px;
+}
+
+.review-container {
+  overflow-y: scroll;
+  height: 200px;
+
+   &::-webkit-scrollbar {
+        width: 4px;
     }
+    &::-webkit-scrollbar-thumb {
+        height: 5px;
+        border-radius: 2px;
+        background-color: #e6e9ea;
+    }
+  .reviewer-list {
+    .item {
+      display: flex;
+      align-items: center;
+    }
+  }
+}
 </style>

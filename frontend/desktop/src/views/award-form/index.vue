@@ -36,7 +36,8 @@
                                 :required="true"
                                 :property="'award_consultant'"
                             >
-                                <select-search :multiple="false"
+                                <select-search
+                                    :multiple="false"
                                     :id-key="'username'"
                                     placeholder="请选择申请顾问"
                                     :value.sync="awardForm['award_consultant']"
@@ -139,7 +140,8 @@
                     </bk-button>
                     <bk-button :theme="config[formType]['button-theme']" class="mr10 ml10"
                         @click="config[formType]['confirm-func']()"
-                    >确认新增
+                    >
+                        {{config[formType]['button-title']}}
                     </bk-button>
                 </div>
             </bk-form>
@@ -156,9 +158,9 @@
     </div>
 </template>
 <script>
-    import { formatDate } from '@/common/util'
-    import { AWARD_LEVEL_MAP, AWARD_MANAGER_ROUTE_PATH } from '@/constants'
-    import { postAwards, putAward } from '@/api/service/award-service'
+    import { formatDate, formatUsernameAndDisplayName } from '@/common/util'
+    import { AWARD_LEVEL_MAP, AWARD_MANAGER_ROUTE_PATH, AWARD_TYPE_EDIT, AWARD_TYPE_ROUTE_KEY } from '@/constants'
+    import { getAwardById, postAwards, putAward } from '@/api/service/award-service'
     import moment from 'moment'
 
     /**
@@ -174,6 +176,12 @@
         name: 'new-award-form',
         components: {
             SelectSearch: () => import('@/components/select-search')
+        },
+        props: {
+            awardFormType: {
+                type: String,
+                default: 'create'
+            }
         },
         data (self) {
             /**
@@ -264,7 +272,6 @@
                     ]
                 }),
                 awardLevels: AWARD_LEVEL_MAP,
-
                 submitLoading: false,
                 config: {
                     edit: {
@@ -275,7 +282,7 @@
                         'confirm-func': this.handleConfirmModifyAward,
                         'cancel-func': () => {
                             this.$router.replace({
-                                name: 'award-manager'
+                                name: AWARD_MANAGER_ROUTE_PATH
                             })
                         }
                     },
@@ -294,7 +301,7 @@
         },
         computed: {
             formType (self) {
-                return self.$route.query['type'] || 'create'
+                return self.$route.query[AWARD_TYPE_ROUTE_KEY] || 'create'
             },
             groupInfo: {
                 get (self) {
@@ -306,6 +313,9 @@
                 }
             },
             awardFormStartEndTime: {
+                get (self) {
+                    return [self.awardForm.start_time, self.awardForm.end_time]
+                },
                 set (newValue) {
                     if (newValue.every(item => item)) {
                         this.awardForm.start_time = newValue[0]
@@ -327,7 +337,32 @@
              * 初始化信息
              * */
             handleInit () {
-
+                if ((this.formType === AWARD_TYPE_EDIT)
+                    && this.$route.query['award_id']
+                ) {
+                    this.handleGetAwardDetailById(this.$route.query['award_id'])
+                    this.$bus.headerName = '编辑奖项'
+                }
+            },
+            handleGetAwardDetailById (awardId) {
+                if (awardId) {
+                    return getAwardById(awardId).then(awardDetail => {
+                        const detail = awardDetail.data
+                        try {
+                            detail['award_consultant_displayname'] = formatUsernameAndDisplayName(detail['award_consultant'], detail['award_consultant_displayname'])
+                            detail['reviewers'] = detail['reviewers'] = detail['award_reviewers'].map(item => {
+                                return {
+                                    uuid: uuid++,
+                                    value: item
+                                }
+                            })
+                            this.$bus.curGlobalGroupId = detail['award_department_id']
+                        } catch (e) {
+                            console.error(e)
+                        }
+                        this.awardForm = detail
+                    })
+                }
             },
             /**
              * 用于检查表单信息
@@ -360,7 +395,6 @@
                     this.awardForm['award_consultant_displayname'] = this.$bus.curGroupUsers.find(item => item['username'] === awardForm['award_consultant'])['display_name']
                     this.awardForm['award_department_id'] = this.$bus.curGlobalGroupId
                     this.awardForm['award_department_fullname'] = this.$bus.curGlobalSelectedGroup['full_name']
-
                     return awardForm
                 }
                 return null
@@ -412,23 +446,13 @@
                 if (!form) return null
                 if (this.submitLoading) return null
                 this.submitLoading = true
-                return putAward(this.$route.params['id'], form).then(_ => {
+
+                return putAward(this.$route.query['award_id'], form).then(_ => {
                     this.messageSuccess('修改成功')
                 }).catch(_ => {
                     this.messageWarn('修改失败')
                 }).finally(_ => {
                     this.submitLoading = false
-                })
-            },
-            toModify () {
-                return this.$router.push({
-                    name: 'award-form',
-                    query: {
-                        type: 'edit'
-                    },
-                    params: {
-          ...this.$route.params
-                    }
                 })
             }
         }

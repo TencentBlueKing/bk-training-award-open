@@ -15,7 +15,9 @@ export const bus = new Vue({
     data () {
         return {
             curGlobalGroupId: '',
-            groupList: []
+            groupList: [],
+            // header 状态
+            headerName: ''
         }
     },
     computed: {

@@ -31,7 +31,7 @@
                     :underline="true"
                     @click="handleAllAns($refs['message-list'])"
                 >
-                    一键已读
+                    <!--                    一键已读-->
                 </bk-link>
                 <template>
                     <message-list ref="message-list"></message-list>
@@ -47,6 +47,8 @@
     </div>
 </template>
 <script>
+
+    import { AWARD_TYPE_CREATE, AWARD_TYPE_ROUTE_KEY } from '@/constants'
 
     export default {
         name: 'Home',
@@ -70,7 +72,7 @@
                       description: '为您的小组创建奖项',
                       title: '创建奖项',
                       routerParams: () => [self.$store.state['ROUTE_TABLE']['AWARD_FORM_ROUTE_PATH'], {
-                          query: { type: 'create' }
+                          query: { [AWARD_TYPE_ROUTE_KEY]: AWARD_TYPE_CREATE }
                       }] },
                     { style: 'background: var(--gradient-orange-pink);',
                       description: '查看申请信息及申请状态',

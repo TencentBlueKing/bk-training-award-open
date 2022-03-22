@@ -13,7 +13,7 @@
                 <div class="monitor-navigation-header">
                     <ol class="header-nav">
                         <bk-breadcrumb>
-                            <bk-breadcrumb-item style="color: white;">{{ header.name }}</bk-breadcrumb-item>
+                            <bk-breadcrumb-item style="color: white;">{{ $bus.headerName }}</bk-breadcrumb-item>
                         </bk-breadcrumb>
                     </ol>
                 </div>
@@ -75,11 +75,11 @@
             }
         },
         computed: {
-    ...mapGetters(['mainContentLoading', 'user']),
-    userTopMenu (self) {
-      const ident = self.$store.getters.ident
-      return self.userMenu.list.filter(item => item.path && !POWER_CONTROLLER[item.path][ident]['header-button-hidden'])
-    }
+            ...mapGetters(['mainContentLoading', 'user']),
+            userTopMenu (self) {
+              const ident = self.$store.getters.ident
+              return self.userMenu.list.filter(item => item.path && !POWER_CONTROLLER[item.path][ident]['header-button-hidden'])
+            }
         },
         watch: {
             '$route.name': {
@@ -91,7 +91,7 @@
             '$route.meta': {
                 immediate: true,
                 handler (newValue) {
-                    this.header.name = newValue.title || ''
+                    this.$bus.headerName = newValue.title || ''
                     document.title = '奖项申报系统-' + newValue.title
                 }
             }
@@ -131,7 +131,15 @@
 @import "@/css/mixins/scroll.css";
 
 * {
-  @mixin scroller #e6e9ea 2px;
+
+   &::-webkit-scrollbar {
+        width: 4px;
+    }
+    &::-webkit-scrollbar-thumb {
+        height: 5px;
+        border-radius: 2px;
+        background-color: #e6e9ea;
+    }
 }
 
 .bk-navigation-title .title-desc {

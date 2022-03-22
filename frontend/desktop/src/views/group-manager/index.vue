@@ -79,11 +79,11 @@
 
                     </div>
                     <ul class="more-action" slot="dropdown-content">
-                        <bk-button class="mb10"
-                            v-bk-copy="inviteLink"
-                            :text="true"
-                        >邀请入组
-                        </bk-button>
+                        <!--                        <bk-button class="mb10"-->
+                        <!--                            v-bk-copy="inviteLink"-->
+                        <!--                            :text="true"-->
+                        <!--                        >邀请入组-->
+                        <!--                        </bk-button>-->
                         <bk-button class="mb10"
                             @click="toTransferGroup()"
                             v-if="$bus.isCurGroupAdmin"
@@ -258,7 +258,7 @@
                 }) ?? []
             },
             inviteLink (self) {
-                return `${window.location.origin}/invite?group_id=${self.$bus.curGlobalGroupId}`
+                return `${window.location.origin + window.location.pathname}/invite?group_id=${self.$bus.curGlobalGroupId}`
             }
         },
         created () {
@@ -346,17 +346,19 @@
             },
             async transferValidator () {
                 const transferValidator = this.$refs['transfer-form']
-                return transferValidator.validate().then((res) => {
-                    console.log(res)
-                })
+                return transferValidator.validate()
             },
             async handleTransferCurGroup () {
                 const validator = await this.transferValidator()
                 if (!validator) {
                     return
                 }
+                console.log(validator)
                 const params = this.transferForm
-                const action = await putGroupManage(params).then(_ => {
+                const action = await putGroupManage({
+                    group_id: this.$bus.curGlobalGroupId,
+                    username: params['target_username']
+                }).then(_ => {
                     this.$store.dispatch('userInfo')
                     this.$bus.handleGetGroupList()
                     return true

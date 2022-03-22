@@ -3,7 +3,7 @@
         <top-back></top-back>
 
         <!-- 待审批悬浮窗-->
-        <div :class="['approval-list']" v-if="formType === 'approval'">
+        <div :class="['approval-list']" v-if="formType === pageType['approval']">
             <div class="tip-button" @click="trigglePanel" v-waves>
                 {{ panelCutOut ? '展开' : '收起' }}
             </div>
@@ -22,29 +22,31 @@
 
         <div class="board">
 
+            <!-- /编辑部分 -->
+            <div>
+                <bk-divider style="width: 100%"></bk-divider>
+            </div>
             <div class="form-panel">
+                <DetailInfo class="detail" ref="award-detail" type="award_detail"></DetailInfo>
 
-                <DetailInfo class="detail" ref="award-detail"></DetailInfo>
                 <!-- /详情部分 -->
 
                 <!-- 编辑部分 -->
                 <ApplyForm class="form"
-                    v-if="isShowApplyForm"
-                    ref="applyForm"
-                    :id="applyForm['id']"
+                    ref="apply-form"
                 ></ApplyForm>
             </div>
-            <!-- /编辑部分 -->
-            <bk-steps class="mt20 pt20 pl20 pr20" v-if="$route.query['type'] === 'edit'" :steps="applicationSteps2" size="small"></bk-steps>
-            <bk-steps class="mt20 pt20 pl20 pr20" v-else :steps="applicationSteps" size="small"></bk-steps>
         </div>
         <!-- 底部按钮组 -->
-        <div class="tc w100  mt15" v-if="$route.query['type'] === 'approval'">
+        <div class="tc w100  mt15" v-if="formType === pageType['approval_detail']">
             <!-- 用于申请奖项的按钮 -->
             <div class="button-item">
                 <bk-button theme="danger"
                     class="mr20 ml20"
-                    @click="handleToPaasApproval()"
+                    @click="toApproval(
+                        '拒绝' + $refs['apply-form'].applyForm.application_users + '的申请',
+                        approvalType['not_pass']
+                    )"
                     ext-cls="button-item"
                 >
                     <bk-icon type="close-circle" />
@@ -52,7 +54,10 @@
                 </bk-button>
                 <bk-button theme="success"
                     class="mr20 ml20"
-                    @click="handleToRejectApproval()"
+                    @click="toApproval(
+                        '通过' + $refs['apply-form'].applyForm.application_users + '的申请',
+                        approvalType['pass']
+                    )"
                     ext-cls="button-item"
                 >
                     <span>通过</span>
@@ -65,10 +70,43 @@
 
             <!-- /用于审批的按钮 -->
         </div>
-    <!-- /底部按钮组 -->
+        <!-- /底部按钮组 -->
+        <bk-dialog v-model="approvalForm.approvalVisible"
+            :header-position="'left'"
+            :loading="approvalForm.approvalLoading"
+            @confirm="handlePostApproval(approvalForm)"
+            :title="approvalForm.approvalTips">
+            <bk-form ref="approval-form"
+                :rules="approvalFormRules"
+                :model="approvalForm"
+            >
+                <bk-form-item :property="'approvalText'"
+                    :required="true"
+                    :label-width="80"
+                    label="评语"
+                >
+                    <bk-input v-model="approvalForm.approvalText"
+                        :placeholder="'请输入不超过255字的评语'"
+                        :type="'textarea'"
+                        :rows="3"
+                        :maxlength="255"
+                    ></bk-input>
+                </bk-form-item>
+            </bk-form>
+        </bk-dialog>
     </div>
 </template>
 <script>
+    import {
+        DETAIL_APPLY,
+        DETAIL_APPLY_DETAIL,
+        DETAIL_APPROVAL_DETAIL,
+        DETAIL_DRAFT_DETAIL,
+        DETAIL_EDIT,
+        DETAIL_TYPE_KEYNAME
+    } from '@/constants'
+    import { postApproval } from '@/api/service/apply-service'
+
     export default {
         name: 'detail',
         components: {
@@ -86,52 +124,46 @@
         provide () {
             return {
                 awardDetail: () => {
-                    return this.$refs['award-detail'].awardForm
+                    return this.$refs['award-detail'].awardForm || {}
                 }
             }
         },
         data () {
             return {
-                formType: 'detail',
                 isShow: false,
                 applyForm: {},
                 panelCutOut: false,
-                applicationSteps: [
-                    {
-                        title: '奖项申请',
-                        icon: 1,
-                        name: 'apply'
-                    },
-                    {
-                        title: '奖项审批',
-                        icon: 2
-                    },
-                    {
-                        title: '得知审批结果',
-                        icon: 'success'
-                    }
-                ],
-                applicationSteps2: [
-                    {
-                        title: '修改草稿',
-                        icon: 1,
-                        name: 'apply'
-                    },
-                    {
-                        title: '发起申请',
-                        icon: 2
-                    },
-                    {
-                        title: '奖项审批',
-                        icon: 'success'
-                    }
-                ],
+                pageType: {
+                    'apply': DETAIL_APPLY,
+                    'apply_detail': DETAIL_APPLY_DETAIL,
+                    'draft_detail': DETAIL_DRAFT_DETAIL,
+                    'approval_detail': DETAIL_APPROVAL_DETAIL
+                },
+                approvalForm: {
+                    approvalVisible: false,
+                    approvalLoading: false,
+                    approvalText: '',
+                    approvalTips: ''
+                },
+                approvalFormRules: Object.freeze({
+                    approvalText: [
+                        {
+                            required: true,
+                            message: '请填写评语',
+                            trigger: 'blur'
+                        }
+                    ]
+                }),
                 approvalTabItems: [
                     {
                         'tab-name': '审批列表',
                         'tab-key': 'approval-list'
                     }
-                ]
+                ],
+                approvalType: {
+                    pass: 1,
+                    not_pass: 0
+                }
             }
         },
         computed: {
@@ -139,7 +171,10 @@
              * 用于判断是否为编辑型表格
              * */
             isShowApplyForm () {
-                return ['apply', 'edit', 'apply_detail'].includes(this.formType)
+                return [DETAIL_APPLY, DETAIL_EDIT, DETAIL_DRAFT_DETAIL].includes(this.formType)
+            },
+            formType (self) {
+                return self.$route.query[DETAIL_TYPE_KEYNAME] || 'detail'
             }
         },
         created () {
@@ -148,22 +183,28 @@
         methods: {
             handleInit () {
                 this.applyForm = this.$route.params
-                this.formType = this.$route.query['type']
             },
             trigglePanel () {
                 this.panelCutOut = !this.panelCutOut
             },
-            handleToPaasApproval () {
-
+            toApproval (tips, type) {
+                this.approvalForm.approvalTips = tips
+                this.approvalForm.approvalVisible = true
+                this.approvalForm.action = type
             },
-            handleToRejectApproval () {
-              
-            },
-            handleBatchPassApproval () {
-              
-            },
-            handleBatchRejectApproval () {
-              
+            async handlePostApproval ({ approvalTips, approvalText, action }) {
+                await this.$refs['approval-form'].validate()
+                const id = this.$route.query['apply_id']
+                this.approvalForm.approvalLoading = true
+                return postApproval({
+                    id,
+                    action,
+                    approval_text: approvalText
+                }).then(_ => {
+                    this.messageSuccess(approvalTips)
+                    this.approvalForm.approvalVisible = false
+                    this.approvalForm.approvalLoading = false
+                })
             }
         }
     }
@@ -175,14 +216,13 @@
 
   .board {
 
-    margin: 0 auto;
-    padding: 20px 0 0 20px;
-    width: 1024px;
-    height: 544px;
+    margin: 20px auto;
+    padding: 20px;
+    width: 80%;
 
     background-color: #FFFFFF;
     box-shadow: 0 4px 4px rgba(0, 0, 0, 0.25);
-      border-radius: 20px;
+    border-radius: 20px;
 
     .form-panel {
 
