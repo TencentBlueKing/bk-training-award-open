@@ -1,10 +1,8 @@
-from awards_apply.utils.const import (object_not_exist_error, param_error,
-                                      success_code)
+from awards_apply.utils.const import param_error, success_code
 from awards_apply.utils.upload_file_handler import upload_file_handler
 from bkstorages.backends.bkrepo import BKRepoStorage
-from django.conf import settings
-from django.http import FileResponse, JsonResponse
-from django.views.decorators.http import require_GET, require_POST
+from django.http import JsonResponse
+from django.views.decorators.http import require_POST
 
 default_storage = BKRepoStorage()
 
@@ -16,22 +14,4 @@ def upload(request):
     if not file:
         return JsonResponse(param_error("upload_file"))
     file_info = upload_file_handler(file)
-    return JsonResponse(success_code({
-        "path": settings.MEDIA_URL + file_info.name,
-        "name": file.name,
-        "size": file_info.size,
-        'root': settings.MEDIA_URL
-    }))
-
-
-@require_GET
-def download(request, filename):
-    """下载文件"""
-    try:
-        file = default_storage.open(settings.MEDIA_URL + filename)
-    except FileNotFoundError:
-        return JsonResponse(object_not_exist_error("file"))
-    else:
-        origin_filename = request.query_params.get("filename")
-        return FileResponse(file, as_attachment=True, filename=origin_filename if origin_filename else
-                            filename)
+    return JsonResponse(success_code(file_info))
