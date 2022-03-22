@@ -60,6 +60,7 @@ class AwardView(APIView):
         award.save()
         print(GroupUser.objects.filter(group_id=request.data["award_department_id"]).values_list("username"))
         # 创建消息
+        # 1.通知组成员
         messages = [{
             "group_id": request.data["award_department_id"],
             "group_name": request.data["award_department_fullname"],

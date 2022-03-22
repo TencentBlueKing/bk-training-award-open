@@ -21,7 +21,6 @@ urlpatterns = [
         views.SecretaryViewSet.as_view({"put": "update"}),
     ),
     url(r"^upload/$", views.upload),
-    url(r"^media/(?P<filename>.*)/$", views.download),
     url(r"^$", views.home),
     url(r"^awards/(?P<id>\d+)/$", views.get_award_by_id),
     url(r"^award_application/(?P<id>\d+)/$", views.award_application),
