@@ -58,7 +58,6 @@ class AwardView(APIView):
         if award.is_valid() is False:
             return JsonResponse(false_code(award.errors))
         award.save()
-        print(GroupUser.objects.filter(group_id=request.data["award_department_id"]).values_list("username"))
         # 创建消息
         # 1.通知组成员
         messages = [{
@@ -74,6 +73,18 @@ class AwardView(APIView):
         for item in messages:
             message = Notification(**item)
             message.save()
+        # 2.通知审批人
+        for index, item in enumerate(request.data["award_reviewers"]):
+            for username in item:
+                Notification.objects.create(**{
+                    "group_id": request.data["award_department_id"],
+                    "group_name": request.data["award_department_fullname"],
+                    "action_type": 0,
+                    "action_username": request.user.username,
+                    "action_display_name": request.user.nickname,
+                    "action_target": username,
+                    "message": "指派了你为奖项" + request.data["award_name"] + "第" + str(index + 1) + "轮审批人"
+                })
         return JsonResponse(success_code(award.data))
 
     def put(self, request, *args, **kwargs):
@@ -235,6 +246,19 @@ def finish_award(request, id):
             award.save()
             AwardApplicationRecord.objects.filter(award_id=award.id).update(
                 approval_state=ApprovalState.review_not_passed.value[0])
+            messages = [{
+                "group_id": award.award_department_id,
+                "group_name": award.award_name,
+                "action_type": 1,
+                "action_username": request.user.username,
+                "action_display_name": request.user.nickname,
+                "action_target": username[0],
+                "message": "奖项已结束"
+            } for username in GroupUser.objects.filter(
+                group_id=award.award_department_id).values_list("username")]
+            for item in messages:
+                message = Notification(**item)
+                message.save()
         return JsonResponse(success_code(None))
     else :
         return JsonResponse(object_not_exist_error("奖项"))
