@@ -18,7 +18,7 @@
                 <bk-button class="mr10"
                     theme="primary"
                     :text="true"
-                    @click="handleToGetDetail(application.row,$refs['expand'])"
+                    @click="handleToGetDetail(application.row)"
                 >
                     详情
                 </bk-button>
@@ -86,6 +86,7 @@
                     })
                     return {
                         approval_id: item['id'],
+                        record_id: item['id'],
                         approval_state: item['approval_state'],
                         application_reason: item['application_reason'],
                         application_time: formatDate(item['application_time']),
@@ -157,7 +158,7 @@
                 this.$router.push({
                     name: DETAIL_ROUTE_PATH,
                     query: {
-                        type: 'detail',
+                        type: 'apply_detail',
                         award_id: recordInfo['award_id'],
                         record_id: recordInfo['record_id']
                     }

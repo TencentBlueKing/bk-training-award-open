@@ -6,8 +6,8 @@
             :model="applyForm"
             ref="apply-form"
         >
-            <bk-form-item label="申请人" v-if="false">
-                <bk-input></bk-input>
+            <bk-form-item label="申请人" v-show="!config[$route.query['type']]['is_editor']">
+                <bk-input :disabled="!config[$route.query['type']]['is_editor']"></bk-input>
             </bk-form-item>
             <bk-form-item label="申请理由"
                 required="true"
@@ -19,6 +19,7 @@
                     :rows="3"
                     :maxlength="255"
                     v-model="applyForm['application_reason']"
+                    :disabled="!config[$route.query['type']]['is_editor']"
                 >
                 </bk-input>
             </bk-form-item>
@@ -27,13 +28,13 @@
             >
                 <Uploader v-model="applyForm['application_attachments']"
                     :limit="2"
-                    :readonly="false"
+                    :readonly="!config[$route.query['type']]['is_editor']"
                 ></Uploader>
             </bk-form-item>
         </bk-form>
         <!-- 用于申请奖项的按钮 -->
-        <div class="button-item" v-if="$route.query['type'] !== 'approval'">
-            <bk-button theme="warning"
+        <div class="button-item" v-show="!config[$route.query['type']]['hidden_button']">
+            <bk-button theme="danger"
                 class="mr10"
                 @click="$router.back()"
                 ext-cls="button-item"
@@ -53,9 +54,19 @@
                 class="mr10"
                 @click="handleToSendApplyForm(applyForm)"
                 ext-cls="button-item"
+                v-if="$route.query['type'] === 'apply'"
             >
                 <bk-icon type="check-circle" />
                 <span>发起申请</span>
+            </bk-button>
+            <bk-button theme="warning"
+                v-else-if="$route.query['type'] === 'edit'"
+                class="mr10"
+                @click="handleToSendApplyForm(applyForm)"
+                ext-cls="button-item"
+            >
+                <bk-icon type="check-circle" />
+                <span>重新申请</span>
             </bk-button>
             <!-- /用于申请奖项的按钮 -->
 
@@ -69,6 +80,7 @@
 <script>
     import { GROUP_USERS_KEYNAME, MYAPPLY_ROUTE_PATH } from '@/constants'
     import { postRecord } from '@/api/service/award-service'
+    import { getApplicationById } from '@/api/service/apply-service'
 
     export default {
         name: 'apply-form',
@@ -78,6 +90,35 @@
         inject: ['awardDetail'],
         data (self) {
             return {
+                config: {
+                    apply: {
+                        hidden_button: false,
+                        is_editor: true,
+                        init () {
+                        }
+                    },
+                    apply_detail: {
+                        hidden_button: false,
+                        is_editor: true,
+                        init () {
+                            getApplicationById(self.$route.query['record_id']).then(response => {
+                                console.log(response)
+                            })
+                        }
+                    },
+                    draft_detail: {
+                        hidden_button: false,
+                        is_editor: true,
+                        init () {
+                        }
+                    },
+                    approval_detail: {
+                        hidden_button: true,
+                        is_editor: false,
+                        init () {
+                        }
+                    }
+                },
                 applyForm: {
                     /**
                      * 申请理由
@@ -116,15 +157,12 @@
              * 初始化函数
              * */
             handleInit () {
-                this.handleSetDefaultInfo()
+                this.config[this.$route.query['type']]?.init()
             },
             handleSetDefaultInfo () {
+              
             },
             validator () {
-                // if (!this.applyForm.application_attachments?.length) {
-                //     // this.messageWarn('请上传附件')
-                //     // throw new SyntaxError('请上传附件')
-                // }
                 return this.$refs['apply-form'].validate()
             },
             /**

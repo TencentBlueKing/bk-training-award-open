@@ -91,14 +91,12 @@ export function deleteGroupManage ({ username, group_id }) {
  * @param is_allow
  * */
 export function postGroupManage ({
-    apply_id,
+    apply_ids,
     is_allow
 }) {
     return http.post('/group_manage/', {
-        data: {
-            apply_id,
-            is_allow
-        }
+        apply_ids,
+        is_allow
     })
 }
 
@@ -135,6 +133,15 @@ export function getGroupApproval ({ page, size, group_id, approval_status }) {
             size,
             group_id,
             approval_status
+        }
+    })
+}
+
+export function getGroupManage ({ group_id, status }) {
+    return http.get('/group_manage/', {
+        params: {
+            group_id,
+            status
         }
     })
 }

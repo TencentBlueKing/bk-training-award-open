@@ -51,3 +51,7 @@ export function postApproval ({ id, action, approval_text }) {
         approval_text
     })
 }
+
+export function getApplicationById (applicationId) {
+    return http.get(`/application/${applicationId}/`)
+}
