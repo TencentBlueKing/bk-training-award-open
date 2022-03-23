@@ -4,14 +4,14 @@
 # @Remarks  : 组相关操作
 import datetime
 
+from awards_apply.models import (
+    Group, GroupApply, GroupInvitation, GroupUser, Notification, User)
+from awards_apply.serializers.group_serializers import GroupSerializers
+from awards_apply.utils.const import false_code, success_code, value_exception
+from awards_apply.utils.user_info import copy_user_from_bk
 from django.db import IntegrityError
 from django.http import JsonResponse
 from rest_framework.views import APIView
-
-from awards_apply.models import Group, GroupUser, GroupApply, Notification, User, GroupInvitation
-from awards_apply.serializers.group_serializers import GroupSerializers
-from awards_apply.utils.const import success_code, false_code, value_exception
-from awards_apply.utils.user_info import copy_user_from_bk
 
 
 class GroupView(APIView):
@@ -277,7 +277,8 @@ class GroupAllView(APIView):
     # 获取所有未加入的组信息
     def get(self, request):
         username = request.user.username
-        groups = Group.objects.exclude(id__in=GroupUser.objects.filter(username=username).values_list("group_id", flat=True))
+        groups = Group.objects.exclude(id__in=GroupUser.objects.filter(
+            username=username).values_list("group_id", flat=True))
         return JsonResponse(success_code([g.to_json() for g in groups]))
 
 
