@@ -15,3 +15,5 @@ class NotificationSerializers(serializers.Serializer):
     action_display_name = serializers.CharField(max_length=128)
     message = serializers.CharField(max_length=128)
     is_read = serializers.BooleanField(default=False)
+    create_time = serializers.DateTimeField()
+    update_time = serializers.DateTimeField()

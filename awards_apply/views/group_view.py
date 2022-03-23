@@ -87,8 +87,18 @@ class GroupUserView(APIView):
         except GroupUser.DoesNotExist:
             # 找不到说明未加入组，可以进行申请
             pass
+        # 检查是否已经申请过加入组
+        try:
+            GroupApply.objects.get(
+                group_id=group_id,
+                username=request.user.username,
+                status=0
+            )
+            return JsonResponse(success_code(None, "您已申请过加入该组，无需重复申请"))
+        except GroupApply.DoesNotExist:
+            pass
         # 创建入组申请
-        GroupApply.objects.get_or_create(
+        GroupApply.objects.create(
             group_id=group_id,
             group_name=group.full_name,
             username=request.user.username,
