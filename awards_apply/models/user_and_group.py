@@ -77,9 +77,6 @@ class GroupApply(TimeBasic):
     approver = models.CharField(max_length=128, null=True, blank=True, verbose_name="审批人账号")
     approver_display_name = models.CharField(max_length=128, null=True, blank=True, verbose_name="审批人姓名")
 
-    class Meta:
-        unique_together = ("group_id", "username")
-
     def __str__(self):
         return f"{self.username}({self.display_name})申请加入 {self.group_name}: {self.get_status_display()}"
 
