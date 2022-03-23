@@ -274,10 +274,6 @@
                     ]
                 )
             },
-            // 弹出框控制区域
-            toAddNewGroup (toAddNewGroup) {
-                toAddNewGroup.show()
-            },
             toRemoveUser (target) {
                 const { username } = target
                 const params = {
@@ -316,6 +312,7 @@
                 const params = {
                     groupId: curGlobalGroupId
                 }
+                if (!curGlobalGroupId) return
                 return getGroupUser(params).then(res => {
                     this.remoteData = res.data
                 }).finally(_ => {
@@ -334,7 +331,6 @@
             toInviteUser () {
 
             },
-
             toOutCurGroup () {
                 this.isOutCurGroup = true
             },
@@ -347,7 +343,6 @@
                 if (!validator) {
                     return
                 }
-                console.log(validator)
                 const params = this.transferForm
                 const action = await putGroupManage({
                     group_id: this.$bus.curGlobalGroupId,
@@ -371,7 +366,7 @@
                     this.messageSuccess('退出成功')
                     setTimeout(() => {
                         // 如果成了新用户需要强制刷新,不然弹框冲突
-                        window.location.href = ''
+                        this.$router.go(-1)
                     }, 100)
                     return false
                 })

@@ -389,6 +389,7 @@
                 if (valid) {
                     const awardForm = this.awardForm
 
+                    console.log(awardForm.end_time, awardForm.start_time)
                     awardForm.start_time = formatDate(awardForm.start_time)
                     awardForm.end_time = formatDate(awardForm.end_time)
 

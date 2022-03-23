@@ -36,7 +36,7 @@
 <script>
 
     import { getGroupManage, postGroupManage } from '@/api/service/group-service'
-    import { formatUsernameAndDisplayName } from '@/common/util'
+    import { formatUsernameAndDisplayName, formatDate } from '@/common/util'
     import { GROUP_PENDING_APPROVAL } from '@/constants'
 
     export default {
@@ -63,8 +63,8 @@
                         display_name: item['display_name'],
                         display_name_for_display: formatUsernameAndDisplayName(item['username'], item['display_name']),
                         status: item['status'],
-                        create_time: item['create_time'],
-                        update_time: item['update_time']
+                        create_time: formatDate(item['create_time']),
+                        update_time: formatDate(item['update_time'])
                     }
                 }) ?? []
             }
@@ -73,8 +73,6 @@
             this.handleInit()
         },
         methods: {
-            toApprovalGroupJoin () {
-            },
             handleInit () {
                 this.handleGetPageData(this.pagination)
             },
@@ -85,14 +83,12 @@
                 }
                 this.loading = true
                 return getGroupManage({ page, size, status: GROUP_PENDING_APPROVAL }).then((response) => {
-                    console.log(response)
                     this.groupApprovalRemoteData = response.data
                 }).finally(_ => {
                     this.loading = false
                 })
             },
             handleToPassGroupUser (applyInfo) {
-                console.log('applyInfo', applyInfo)
                 const params = {
                     apply_ids: [applyInfo['apply_id']],
                     is_allow: true

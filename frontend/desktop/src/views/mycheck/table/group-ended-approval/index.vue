@@ -3,7 +3,7 @@
         <bk-table-column type="index" label="序号" width="60"></bk-table-column>
         <bk-table-column label="申请人" prop="display_name_for_display"></bk-table-column>
         <bk-table-column label="申请时间" prop="create_time"></bk-table-column>
-        <bk-table-column label="审批时间" prop="update_time"></bk-table-column>
+        <bk-table-column label="审批通过时间" prop="update_time"></bk-table-column>
     </self-table>
 </template>
 
@@ -11,7 +11,7 @@
     import { GROUP_ENDED_APPROVAL } from '@/constants'
     import { getGroupManage } from '@/api/service/group-service'
     import { tableMixins } from '@/views/mycheck/table/tableMixins'
-    import { formatUsernameAndDisplayName } from '@/common/util'
+    import { formatDate, formatUsernameAndDisplayName } from '@/common/util'
 
     export default {
         name: 'group-ended-approval',
@@ -33,8 +33,8 @@
                         display_name: item['display_name'],
                         display_name_for_display: formatUsernameAndDisplayName(item['username'], item['display_name']),
                         status: item['status'],
-                        create_time: item['create_time'],
-                        update_time: item['update_time']
+                        create_time: formatDate(item['create_time']),
+                        update_time: formatDate(item['update_time'])
                     }
                 })
             }

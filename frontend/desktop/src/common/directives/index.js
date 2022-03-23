@@ -1,3 +1,4 @@
+import Vue from 'vue'
 import waves from './waves'
 
 const install = function (Vue) {
@@ -10,4 +11,5 @@ if (window.Vue) {
 }
 
 waves.install = install
-export default waves
+
+Vue.use(waves)

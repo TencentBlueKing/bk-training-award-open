@@ -12,21 +12,13 @@ import store from '@/store'
 import { injectCSRFTokenToHeaders } from '@/api'
 import auth from '@/common/auth'
 import Img403 from '@/images/403.png'
-import Exception from '@/components/exception'
 import { bus } from '@/store/bus'
+// 蓝鲸组件库
 import '@/common/bkmagic'
-
+// 自定义的一些全局组件
+import '@/common/self-components'
 // 一些自定义的组件或者指令
-import waves from '@/common/directives'
-Vue.use(waves)
-
-Vue.component('top-back', () => import('@/components/top-back'))
-Vue.component('tabs', () => import('@/components/Tabs'))
-Vue.component('self-table', () => import('@/components/self-table'))
-Vue.component('select-search', () => import('@/components/select-search'))
-Vue.component('empty', () => import('@/components/empty'))
-
-Vue.component('app-exception', Exception)
+import '@/common/directives'
 
 auth.requestCurrentUser().then(user => {
     injectCSRFTokenToHeaders()

@@ -374,7 +374,8 @@ export function checkRequired (message) {
  * @returns string
  * */
 export function formatDate (date) {
-    return moment(date).format('YYYY-MM-DD hh:mm')
+    console.log(date)
+    return moment(date).format('YYYY-MM-DD HH:mm')
 }
 /**
  * 清除 cookie
