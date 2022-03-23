@@ -1,10 +1,7 @@
 <template>
     <div class="group-manager-container">
-        <bk-dialog v-model="transferMyGroup"
-            :render-directive="'if'"
-            :mask-close="false"
-            :header-position="'left'"
-            :confirm-fn="handleTransferCurGroup"
+        <self-dialog v-model="transferMyGroup"
+            @confirm="handleOutCurGroup"
         >
             <bk-form :label-width="100"
                 ref="transfer-form"
@@ -34,12 +31,9 @@
                     ></select-search>
                 </bk-form-item>
             </bk-form>
-        </bk-dialog>
-        <bk-dialog v-model="isOutCurGroup"
-            :render-directive="'if'"
-            :mask-close="false"
-            :header-position="'left'"
-            :confirm-fn="handleOutCurGroup"
+        </self-dialog>
+        <self-dialog v-model="isOutCurGroup"
+            @confirm="handleOutCurGroup"
         >
             <bk-form :label-width="100"
                 :rules="outCurGroupFormRules"
@@ -53,7 +47,7 @@
                     ></bk-input>
                 </bk-form-item>
             </bk-form>
-        </bk-dialog>
+        </self-dialog>
         <!--      弹框区-->
         <top-back></top-back>
         <!--      偏上操作栏-->
@@ -348,29 +342,24 @@
                     group_id: this.$bus.curGlobalGroupId,
                     username: params['target_username']
                 }).then(_ => {
+                    this.transferMyGroup = true
                     this.messageSuccess('转让组 ' + this.$bus.curGlobalSelectedGroup['full_name'] + ' 给' + params['target_username'] + '成功')
                     setTimeout(() => this.$router.go(0), 100)
                     return true
                 })
                 return action
             },
-            async handleOutCurGroup () {
+            handleOutCurGroup () {
                 const curGroupName = this.$bus.curGlobalGroupId
                 const params = {
                     group_id: curGroupName
                 }
-                const action = await deleteGroupUser(params).then(_ => {
-                    this.$store.dispatch('userInfo')
-                    return true
-                }).catch(_ => {
+                return deleteGroupUser(params).then(_ => {
                     this.messageSuccess('退出成功')
-                    setTimeout(() => {
-                        // 如果成了新用户需要强制刷新,不然弹框冲突
-                        this.$router.go(-1)
-                    }, 100)
-                    return false
+                    this.isOutCurGroup = false
+                    setTimeout(() => this.$router.go(0), 100)
+                    return true
                 })
-                return action
             }
         }
     }
