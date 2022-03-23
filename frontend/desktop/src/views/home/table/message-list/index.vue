@@ -101,7 +101,7 @@
   .message-content {
     height: 100%;
     max-height: 400px;
-    overflow: scroll;
+    overflow-y: scroll;
   }
 }
 </style>

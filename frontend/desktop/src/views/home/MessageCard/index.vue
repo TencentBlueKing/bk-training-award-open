@@ -63,17 +63,18 @@
   display: flex;
   flex-direction: column;
   padding: 10px;
+  justify-content: center;
+  align-items: center;
 
   .message-header {
-    display: flex;
-    justify-content: flex-end;
+    width: 100%;
+    text-align: right;
     margin-bottom: 12px;
-
   }
 
   background: #FFFFFF;
   border: 1px solid #F5F7FA;
-  box-sizing: border-box;
+  box-sizing: content-box;
   box-shadow: 0 0 4px rgba(0, 0, 0, 0.25);
 }
 </style>

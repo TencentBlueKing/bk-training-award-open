@@ -10,7 +10,7 @@
                 <bk-input :disabled="!config[formType]['is_editor']" v-model="applyForm.application_users"></bk-input>
             </bk-form-item>
             <bk-form-item label="申请理由"
-                required="true"
+                :required="true"
                 :property="'application_reason'"
             >
                 <bk-input
@@ -55,13 +55,16 @@
                 class="mr10"
                 @click="handleToSendApplyForm(applyForm)"
                 ext-cls="button-item"
-                v-if="formType === 'apply'"
+                v-if="[configType.typeTable['DETAIL_APPLY']].includes(formType)"
             >
                 <bk-icon type="check-circle" />
                 <span>发起申请</span>
             </bk-button>
             <bk-button theme="warning"
-                v-else-if="formType === configType['draft_detail']"
+                v-else-if="[
+                    configType.typeTable['DETAIL_DRAFT_DETAIL'],
+                    configType.typeTable['DETAIL_EDIT']
+                ].includes( formType)"
                 class="mr10"
                 @click="handleToSendApplyForm(applyForm)"
                 ext-cls="button-item"
@@ -83,7 +86,7 @@
         DETAIL_APPLY,
         DETAIL_APPLY_DETAIL,
         DETAIL_APPROVAL_DETAIL,
-        DETAIL_DRAFT_DETAIL,
+        DETAIL_DRAFT_DETAIL, DETAIL_EDIT,
         DETAIL_TYPE_KEYNAME,
         GROUP_USERS_KEYNAME,
         MYAPPLY_DRAFT_TAB_KEYNAME,
@@ -110,6 +113,13 @@
                         init () {
                         }
                     },
+                    [DETAIL_EDIT]: {
+                        hidden_button: false,
+                        is_editor: true,
+                        init () {
+                            self.handleGetRecord()
+                        }
+                    },
                     [DETAIL_APPLY_DETAIL]: {
                         hidden_button: true,
                         is_editor: false,
@@ -132,10 +142,18 @@
                     }
                 },
                 configType: {
-                    apply: DETAIL_APPLY,
-                    apply_detail: DETAIL_APPLY_DETAIL,
-                    draft_detail: DETAIL_DRAFT_DETAIL,
-                    approval_detail: DETAIL_APPROVAL_DETAIL
+                    typeTable: {
+                        DETAIL_APPLY,
+                        DETAIL_EDIT,
+                        DETAIL_APPLY_DETAIL,
+                        DETAIL_DRAFT_DETAIL,
+                        DETAIL_APPROVAL_DETAIL
+                    },
+                    [DETAIL_APPLY]: DETAIL_APPLY,
+                    [DETAIL_EDIT]: DETAIL_EDIT,
+                    [DETAIL_APPLY_DETAIL]: DETAIL_APPLY_DETAIL,
+                    [DETAIL_DRAFT_DETAIL]: DETAIL_DRAFT_DETAIL,
+                    [DETAIL_APPROVAL_DETAIL]: DETAIL_APPROVAL_DETAIL
                 },
                 applyForm: {
                     /**

@@ -13,6 +13,21 @@
                 <span v-bk-tooltips.light="application.row['application_reason']"> {{application.row['application_reason']}}</span>
             </template>
         </bk-table-column>
+        <bk-table-column label="当前评审轮次" :width="300">
+            <template slot-scope="endedApprovals">
+                <bk-select
+                    :value="endedApprovals.row['approval_turn']"
+                    :clearable="false"
+                >
+                    <bk-option v-for="(item,index) in endedApprovals.row['award_reviewers']"
+                        :key="item.uuid"
+                        :name="'第' + (index + 1) + '轮:' + item.join(',')"
+                        :id="index"
+                        :title="'第' + (index + 1) + '轮:' + item.join(',')"
+                    ></bk-option>
+                </bk-select>
+            </template>
+        </bk-table-column>
         <bk-table-column label="操作" :width="250">
             <template slot-scope="application">
                 <bk-button class="mr10"
@@ -51,11 +66,18 @@
 </template>
 
 <script>
-    import { APPLY_STATE, DETAIL_APPLY_DETAIL, DETAIL_ROUTE_PATH, DETAIL_TYPE_KEYNAME, MYAPPLY_PENDING_APPLY } from '@/constants'
+    import {
+        APPLY_STATE, DETAIL_APPLY_DETAIL,
+        DETAIL_EDIT,
+        DETAIL_ROUTE_PATH,
+        DETAIL_TYPE_KEYNAME,
+        MYAPPLY_ENDED_APPROVAL
+    } from '@/constants'
     import { getRecord } from '@/api/service/apply-service'
     import { applyTableMixins } from '@/views/myapply/table/mixins'
     import { formatDate } from '@/common/util'
     import { deleteRecord } from '@/api/service/award-service'
+    import uuid from '@/common/uuid'
 
     export default {
         name: 'pending-approval',
@@ -72,6 +94,7 @@
                     const awardInfo = item['award_info'] ?? {}
                     const awardReviewersSteps = awardInfo['award_reviewers'].map((item, index) => {
                         return {
+                            uuid: uuid.get(),
                             title: '审批流程',
                             icon: index + 1,
                             description: item.join(',')
@@ -81,6 +104,7 @@
                         approval_id: item['id'],
                         record_id: item['id'],
                         approval_state: item['approval_state'],
+                        approval_turn: item['approval_turn'],
                         application_reason: item['application_reason'],
                         application_time: formatDate(item['application_time']),
                         award_id: item['award_id'],
@@ -114,7 +138,8 @@
                     page,
                     size,
                     group_id: this.$bus.curGlobalGroupId,
-                    apply_status: MYAPPLY_PENDING_APPLY
+                    // apply_status: MYAPPLY_PENDING_APPLY
+                    apply_status: MYAPPLY_ENDED_APPROVAL
                 }
                 if (this.loading) return
                 this.loading = true
@@ -141,7 +166,7 @@
                 this.$router.push({
                     name: DETAIL_ROUTE_PATH,
                     query: {
-                        type: 'edit',
+                        [DETAIL_TYPE_KEYNAME]: DETAIL_EDIT,
                         award_id: recordInfo['award_id'],
                         record_id: recordInfo['record_id']
                     }
