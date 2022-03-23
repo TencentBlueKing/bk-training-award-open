@@ -1,5 +1,5 @@
-from awards_apply.models import (ApprovalState, AwardApplicationRecord, Awards,
-                                 GroupUser, Notification)
+from awards_apply.models import (
+    ApprovalState, AwardApplicationRecord, Awards, GroupUser, Notification)
 from awards_apply.serializers.award_serializers import (
     AwardsRecordSerializers, AwardsSerializers)
 from awards_apply.utils.const import (false_code, object_not_exist_error,

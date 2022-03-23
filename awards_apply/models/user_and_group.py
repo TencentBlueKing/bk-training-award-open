@@ -65,7 +65,7 @@ class GroupUser(models.Model):
 
 class GroupApply(TimeBasic):
     group_id = models.IntegerField(verbose_name="组id")
-    group_name = models.CharField(max_length=128, unique=True, verbose_name="组名字")
+    group_name = models.CharField(max_length=128, verbose_name="组名字")
     username = models.CharField(max_length=128, verbose_name="组成员账号")
     display_name = models.CharField(max_length=128, verbose_name="组成员姓名")
     APPLY_STATE = [

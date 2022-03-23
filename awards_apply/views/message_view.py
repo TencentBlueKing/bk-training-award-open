@@ -4,14 +4,15 @@
 # @Remarks  : 消息处理
 import datetime
 
+from awards_apply.models import Notification
+from awards_apply.serializers.notification_serializer import \
+    NotificationSerializers
+from awards_apply.utils.const import (false_code, page_num_exception,
+                                      success_code)
+from awards_apply.utils.pagination import PagePagination
 from django.http import JsonResponse
 from rest_framework.exceptions import NotFound
 from rest_framework.views import APIView
-
-from awards_apply.models import Notification
-from awards_apply.serializers.notification_serializer import NotificationSerializers
-from awards_apply.utils.const import success_code, false_code, page_num_exception, value_exception
-from awards_apply.utils.pagination import PagePagination
 
 
 class MessageView(APIView):
