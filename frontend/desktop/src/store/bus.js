@@ -50,8 +50,8 @@ export const bus = new Vue({
             if (groupUsers) {
                 this.curGlobalGroupId = groupUsers[0]['group_id']
             }
-            return getGroup(config).then(async response => {
-                await http.cache.set(GROUP_KEYNAME, response.data)
+            return getGroup(config).then(response => {
+                http.cache.set(GROUP_KEYNAME, response.data)
                 this.curGlobalGroupId = response.data[0]['group_id']
                 this.groupList = response.data
                 return Promise.resolve(response.data)

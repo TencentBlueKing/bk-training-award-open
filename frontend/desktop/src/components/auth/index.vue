@@ -130,7 +130,6 @@
             },
             joinGroup (params) {
                 return postGroupUser(params).then(res => {
-                    this.isShow = false
                     this.messageSuccess('申请加入成功，请耐心等待审批')
                 })
             },

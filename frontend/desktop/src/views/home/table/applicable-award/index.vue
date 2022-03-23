@@ -33,8 +33,8 @@
 </template>
 
 <script>
-    import { DETAIL_APPLY, DETAIL_ROUTE_PATH, DETAIL_TYPE_KEYNAME } from '@/constants'
-    import { getAwards } from '@/api/service/award-service'
+    import { DETAIL_APPLY, DETAIL_ROUTE_PATH, DETAIL_TYPE_KEYNAME, ING_AWARD } from '@/constants'
+    import { getAvailableAwards } from '@/api/service/award-service'
     import moment from 'moment'
 
     export default {
@@ -91,11 +91,13 @@
                     return
                 }
                 this.loading = true
-              
-                return getAwards({ page, size }).then(({ data }) => {
-                    console.log(data)
+                return getAvailableAwards({
+                    page,
+                    size,
+                    award_status: ING_AWARD
+                }).then(({ data }) => {
                     this.pagination.count = data?.count
-                    this.applicationableAwardRemoteList = data?.data
+                    this.applicationableAwardRemoteList = data?.results
                 }).finally(_ => {
                     this.loading = false
                 })
