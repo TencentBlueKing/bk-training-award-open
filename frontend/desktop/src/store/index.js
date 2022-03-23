@@ -139,6 +139,7 @@ const store = new Vuex.Store({
             }).then(userData => {
                 if (userData['is_newer']) {
                     bus.$emit(APP_AUTH_NEWER, true)
+                    bus.isNewer = true
                 }
                 return Promise.resolve(userData)
             })

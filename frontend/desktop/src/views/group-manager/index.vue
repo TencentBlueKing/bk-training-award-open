@@ -1,8 +1,22 @@
 <template>
     <div class="group-manager-container">
         <self-dialog v-model="transferMyGroup"
-            @confirm="handleOutCurGroup"
+            @confirm="handleTransferCurGroup"
         >
+            <div slot="title">
+                <p style="font-size: 18px">
+                    移交小组
+                    <a v-bk-tooltips.click="{
+                        content: '请再次输入小组名（' + $bus.curGlobalSelectedGroup['full_name'] + '）以确认移交',
+                        showOnInit: true,
+                        trigger: 'click',
+                        theme: 'light',
+                        placements: ['top']
+                    }" class="bk-text-primary mr15">
+                        <i class="bk-icon icon-question-circle-shape"></i>
+                    </a>
+                </p>
+            </div>
             <bk-form :label-width="100"
                 ref="transfer-form"
                 :rules="transferFormRules"
@@ -14,6 +28,7 @@
                 >
                     <bk-input v-model="transferForm['full_name']"
                         :placeholder="'请再次输入小组名（' + $bus.curGlobalSelectedGroup['full_name'] + '）以确认移交'"
+                        @click="$refs['popover'].showHandler()"
                     ></bk-input>
                 </bk-form-item>
                 <bk-form-item label="移交对象"

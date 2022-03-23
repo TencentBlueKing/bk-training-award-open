@@ -33,7 +33,7 @@ $card-width:  330px;
 $card-height: 137px;
 
 .header-nav {
-  width: $card-width;
+  min-width: $card-width;
   height: $card-height;
   margin: auto 20px;
   background: linear-gradient(90deg, #ff512f, #dd2476);

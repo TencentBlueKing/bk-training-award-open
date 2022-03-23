@@ -19,7 +19,7 @@
 </template>
 
 <script>
-    import { DETAIL_ROUTE_PATH, ENDED_APPROVAL } from '@/constants'
+    import { DETAIL_ROUTE_PATH, MYAPPLY_ENDED_APPROVAL } from '@/constants'
     import { getRecord } from '@/api/service/apply-service'
     import { applyTableMixins } from '@/views/myapply/table/mixins'
 
@@ -50,7 +50,7 @@
                     page,
                     size,
                     group_id: this.$bus.curGlobalGroupId,
-                    apply_status: ENDED_APPROVAL
+                    apply_status: MYAPPLY_ENDED_APPROVAL
                 }
                 if (this.loading) return
                 this.loading = true

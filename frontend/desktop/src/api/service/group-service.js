@@ -112,5 +112,5 @@ export function getGroupManage ({ group_id, status }) {
  * 获取所有的小组
  * */
 export function getGroupAll () {
-    return http.get('/group_all/', {}, { fromCache: true })
+    return http.get('/group_all/', {}, { canNewer: true, fromCache: true })
 }

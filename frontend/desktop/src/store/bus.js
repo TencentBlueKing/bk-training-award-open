@@ -17,7 +17,8 @@ export const bus = new Vue({
             curGlobalGroupId: '',
             groupList: [],
             // header 状态
-            headerName: ''
+            headerName: '',
+            isNewer: false
         }
     },
     computed: {
@@ -48,11 +49,11 @@ export const bus = new Vue({
         handleGetGroupList (config = {}) {
             const groupUsers = http.cache.get(GROUP_KEYNAME)
             if (groupUsers) {
-                this.curGlobalGroupId = groupUsers[0]['group_id']
+                this.curGlobalGroupId = groupUsers?.[0]?.['group_id']
             }
             return getGroup(config).then(response => {
                 http.cache.set(GROUP_KEYNAME, response.data)
-                this.curGlobalGroupId = response.data[0]['group_id']
+                this.curGlobalGroupId = response.data?.[0]?.['group_id']
                 this.groupList = response.data
                 return Promise.resolve(response.data)
             })

@@ -31,7 +31,7 @@
 </template>
 
 <script>
-    import { DETAIL_ROUTE_PATH, ING_APPROVAL } from '@/constants'
+    import { DETAIL_ROUTE_PATH, MYAPPLY_ING_APPROVAL } from '@/constants'
     import { getRecord } from '@/api/service/apply-service'
     import { applyTableMixins } from '@/views/myapply/table/mixins'
     export default {
@@ -82,7 +82,7 @@
                     page,
                     size,
                     group_id: this.$bus.curGlobalGroupId,
-                    apply_status: ING_APPROVAL
+                    apply_status: MYAPPLY_ING_APPROVAL
                 }
                 if (this.loading) return
                 this.loading = true

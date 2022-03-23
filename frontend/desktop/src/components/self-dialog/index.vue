@@ -8,8 +8,9 @@
         :mask-close="false"
         :ok-text="$attrs['ok-text']"
         :cancel-text="$attrs['cancel-text']"
-        :title="$attrs['title']"
+        :title="!$slots['title'] || $attrs['title']"
     >
+        <slot name="title" slot="header"></slot>
         <slot></slot>
     </bk-dialog>
 </template>
@@ -34,15 +35,21 @@
         },
         methods: {
             confirm () {
-                this.$emit('confirm')
+                this.loading = true
+                this.$emit('confirm', () => {
+                    this.loading = false
+                })
             },
             cancel () {
-            
+
             }
         }
     }
 </script>
 
 <style scoped>
+.dialog-title {
+  position: relative;
 
+}
 </style>
