@@ -87,15 +87,14 @@ class GroupUserView(APIView):
         except GroupUser.DoesNotExist:
             # 找不到说明未加入组，可以进行申请
             pass
-        try:
-            GroupApply.objects.create(
-                group_id=group_id,
-                group_name=group.full_name,
-                username=request.user.username,
-                display_name=request.user.nickname
-            )
-        except IntegrityError:
-            return JsonResponse(false_code("您已申请过加入该组，请耐心等待组秘书审核"))
+        # 创建入组申请
+        GroupApply.objects.get_or_create(
+            group_id=group_id,
+            group_name=group.full_name,
+            username=request.user.username,
+            display_name=request.user.nickname,
+            status=0
+        )
 
         Notification.objects.create(
             group_id=group_id,
@@ -113,7 +112,7 @@ class GroupUserView(APIView):
         group_id = request.data.get("group_id")
         try:
             group = Group.objects.get(id=group_id)
-        except (Group.DoesNotExist, GroupUser.DoesNotExist):
+        except Group.DoesNotExist:
             return JsonResponse(false_code("不存在的组id"))
         if group.secretary == request.user.username:
             return JsonResponse(false_code("您是该组的秘书，请直接解散组"))
@@ -223,8 +222,11 @@ class GroupManageView(APIView):
         group_id = request.data.get("group_id")
         try:
             group = Group.objects.get(id=group_id, secretary=request.user.username)
+            GroupUser.objects.get(group_id=group_id, username=new_secretary)
         except Group.DoesNotExist:
             return JsonResponse(false_code("您没有对应组的权限"))
+        except GroupUser.DoesNotExist:
+            return JsonResponse(false_code("只能转让给组内成员"))
         # 尝试在项目用户表中查找新秘书，找不到去蓝鲸拉取
         try:
             user = User.objects.get(username=new_secretary)
