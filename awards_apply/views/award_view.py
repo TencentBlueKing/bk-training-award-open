@@ -5,7 +5,7 @@ from awards_apply.serializers.award_serializers import (
 from awards_apply.utils.const import (false_code, object_not_exist_error,
                                       page_num_exception, success_code,
                                       value_exception)
-from awards_apply.utils.pagination import PagePagination
+from awards_apply.utils.pagination import CommonPaginaation, PagePagination
 from django.core.paginator import EmptyPage
 from django.db import transaction
 from django.db.models import Q
@@ -46,13 +46,11 @@ class AwardView(APIView):
             return award_status[status].order_by('-create_time')
         department_id = request.query_params.get("group_id")
         if department_id:
-            valid_awards = Awards.objects.filter(award_department_id=department_id).exclude(
-                award_reviewers__contains=request.user.username)
+            valid_awards = Awards.objects.filter(award_department_id=department_id)
         else:
             departments_id = GroupUser.objects.filter(username=request.user.username).values_list("group_id")
             departments_id = [item[0] for item in departments_id]
-            valid_awards = Awards.objects.filter(award_department_id__in=departments_id).exclude(
-                award_reviewers__contains=request.user.username)
+            valid_awards = Awards.objects.filter(award_department_id__in=departments_id)
         valid_awards = get_queryset_by_status(request.query_params.get("award_status"), valid_awards)
         pagination = PagePagination()
         try:
@@ -248,3 +246,17 @@ def award_application(request, id):
     applications = AwardApplicationRecord.objects.filter(award_id=id)
     serializers = AwardsRecordSerializers(applications, many=True)
     return JsonResponse(success_code(serializers.data))
+
+
+@api_view(["GET"])
+def available_awards(request):
+    departments_id = GroupUser.objects.filter(username=request.user.username).values_list("group_id")
+    departments_id = [item[0] for item in departments_id]
+    awards = Awards.objects.filter(award_department_id__in=departments_id).filter(
+        approval_state=AwardsStatus["start"]
+    ).exclude(award_reviewers__contains=request.user.username).order_by("start_time")
+    page = CommonPaginaation()
+    queryset = page.paginate_queryset(awards, request)
+    serializer = AwardsSerializers(instance=queryset, many=True)
+    response = page.get_paginated_response(serializer.data)
+    return JsonResponse(success_code(response.data))
