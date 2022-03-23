@@ -19,7 +19,7 @@ class MessageView(APIView):
     # 获取自己所有的消息
     def get(self, request):
         username = request.user.username
-        msgs = Notification.objects.filter(action_target=username).order_by("-update_time")
+        msgs = Notification.objects.filter(action_target=username).order_by("is_read", "-update_time")
         pagination = PagePagination()
         try:
             pagination.page_size = int(request.GET.get("size", 10))

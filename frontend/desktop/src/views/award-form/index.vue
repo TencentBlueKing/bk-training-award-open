@@ -318,13 +318,18 @@
                 }
             },
             awardFormStartEndTime: {
-                get (self) {
-                    return [self.awardForm.start_time, self.awardForm.end_time]
+                get () {
+                    return [this.awardForm.start_time, this.awardForm.end_time]
                 },
                 set (newValue) {
                     if (newValue.every(item => item)) {
-                        this.awardForm.start_time = newValue[0]
-                        this.awardForm.end_time = newValue[1]
+                        if (moment(newValue[0]).diff(moment(newValue[1]), 'seconds') < 0) {
+                            this.awardForm.start_time = newValue[0]
+                            this.awardForm.end_time = newValue[1]
+                        } else {
+                            this.awardForm.start_time = newValue[1]
+                            this.awardForm.end_time = newValue[0]
+                        }
                     }
                 }
             }
@@ -393,8 +398,6 @@
                 const valid = await this.validator()
                 if (valid) {
                     const awardForm = this.awardForm
-
-                    console.log(awardForm.end_time, awardForm.start_time)
                     awardForm.start_time = formatDate(awardForm.start_time)
                     awardForm.end_time = formatDate(awardForm.end_time)
 
