@@ -26,6 +26,7 @@ urlpatterns = [
     url(r"^award_application/(?P<id>\d+)/$", views.award_application),
     url(r"^application/(?P<id>\d+)/$", views.get_application_by_id),
     url(r"^awards/", views.AwardView.as_view()),
+    url(r"^get_available_awards/", views.available_awards),
     url(r"^finish_award/(?P<id>\d+)/$", views.finish_award),
     url(r"^record/$", views.RecordView.as_view()),
     url(r"^get_applyed_awards/", views.ApplyedRecordView.as_view()),
