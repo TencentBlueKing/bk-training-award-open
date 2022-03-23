@@ -167,15 +167,10 @@
     } from '@/constants'
     import { getAwardById, postAwards, putAward } from '@/api/service/award-service'
     import moment from 'moment'
-
+    import { uuid } from '@/common/uuid'
     /**
      * 全局临时叠加的唯一值
      * */
-    let uuid = 0
-
-    function clearUUID () {
-        uuid = null
-    }
 
     export default {
         name: 'new-award-form',
@@ -208,7 +203,7 @@
                     award_department_fullname: '',
                     award_reviewers: '',
                     reviewers: [{
-                        uuid: uuid++,
+                        uuid: uuid.get(),
                         value: []
                     }]
                 },
@@ -335,9 +330,8 @@
             }
         },
         beforeCreate () {
-            uuid = 0
-            this.$once('hook:deactivated', clearUUID)
-            this.$once('hook:beforeDestroy', clearUUID)
+            this.$once('hook:deactivated', () => uuid.clear())
+            this.$once('hook:beforeDestroy', () => uuid.clear())
         },
         created () {
             this.handleInit()
@@ -359,10 +353,13 @@
                     return getAwardById(awardId).then(awardDetail => {
                         const detail = awardDetail.data
                         try {
-                            detail['award_consultant_displayname'] = formatUsernameAndDisplayName(detail['award_consultant'], detail['award_consultant_displayname'])
+                            detail['award_consultant_displayname'] = formatUsernameAndDisplayName(
+                                detail['award_consultant'],
+                                detail['award_consultant_displayname']
+                            )
                             detail['reviewers'] = detail['reviewers'] = detail['award_reviewers'].map(item => {
                                 return {
-                                    uuid: uuid++,
+                                    uuid: uuid.get(),
                                     value: item
                                 }
                             })
@@ -415,7 +412,7 @@
              * */
             addReviewer (reviewerList, event) {
                 reviewerList.push({
-                    uuid: uuid++,
+                    uuid: uuid.get(),
                     value: []
                 })
                 if (event.scrollHeight > event.clientHeight) {

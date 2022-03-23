@@ -7,7 +7,7 @@
                 <p style="font-size: 18px">
                     移交小组
                 </p>
-                <p style="font-size: 12px"> 请再次输入小组名 （<span class="bk-text-danger" v-bk-copy="$bus.curGlobalSelectedGroup['full_name']">{{ $bus.curGlobalSelectedGroup['full_name'] }}</span> ） 以确认移交</p>
+                <p style="font-size: 12px"> 请再次输入小组名 <span class="bk-text-danger" v-bk-copy="$bus.curGlobalSelectedGroup['full_name']">{{ $bus.curGlobalSelectedGroup['full_name'] }}</span> 以确认移交</p>
             </div>
             <bk-form :label-width="100"
                 ref="transfer-form"
@@ -46,7 +46,13 @@
                 <p style="font-size: 18px">
                     退出小组
                 </p>
-                <p style="font-size: 12px"> 请再次输入小组名 （<span class="bk-text-danger" v-bk-copy="$bus.curGlobalSelectedGroup['full_name']">{{ $bus.curGlobalSelectedGroup['full_name'] }}</span> ） 以确认移交</p>
+                <p style="font-size: 12px">
+                    请再次输入小组名
+                    <span class="bk-text-danger" v-bk-copy="$bus.curGlobalSelectedGroup['full_name']">
+                        {{ $bus.curGlobalSelectedGroup['full_name'] }}
+                    </span>
+                    以确认移交
+                </p>
             </div>
             <bk-form :label-width="100"
                 :rules="outCurGroupFormRules"

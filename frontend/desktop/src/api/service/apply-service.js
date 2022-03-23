@@ -46,7 +46,6 @@ export function getRecord ({ page, size, group_id, apply_status }) {
         params: {
             page,
             size,
-            group_id,
             apply_status
         }
     })
