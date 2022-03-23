@@ -50,7 +50,7 @@
 
 <script>
     import { tableMixins } from '@/views/mycheck/table/tableMixins'
-    import { getAvailableAwards } from '@/api/service/award-service'
+    import { getAwards } from '@/api/service/award-service'
     import { AWARD_FORM_ROUTE_PATH, AWARD_TYPE_EDIT, AWARD_TYPE_ROUTE_KEY, PENDING_START } from '@/constants'
 
     export default {
@@ -100,7 +100,7 @@
                     award_status: PENDING_START,
                     group_id: this.$bus.curGlobalGroupId
                 }
-                return getAvailableAwards(params).then(response => {
+                return getAwards(params).then(response => {
                     const pendingStartAwards = response.data
                     this.pagination.count = pendingStartAwards.count
                     this.pendingStartRemoteData = pendingStartAwards.data

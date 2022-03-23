@@ -63,7 +63,7 @@
 </template>
 
 <script>
-    import { getAvailableAwards, postFinishAward } from '@/api/service/award-service'
+    import { getAwards, postFinishAward } from '@/api/service/award-service'
     import { tableMixins } from '@/views/mycheck/table/tableMixins'
     import { AWARD_APPLICATION_DETAILS_ROUTE_PATH, ING_REVIEW } from '@/constants'
 
@@ -113,7 +113,7 @@
                     award_status: ING_REVIEW,
                     group_id: this.$bus.curGlobalGroupId
                 }
-                return getAvailableAwards(params).then(response => {
+                return getAwards(params).then(response => {
                     const pendingStartAwards = response.data
                     this.pagination.count = pendingStartAwards.count
                     this.ingReviewRemoteData = pendingStartAwards.data

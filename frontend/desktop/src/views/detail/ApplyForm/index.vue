@@ -165,7 +165,7 @@
                 return self.awardDetail()
             },
             formType (self) {
-                return self.$route[DETAIL_TYPE_KEYNAME] || DETAIL_APPLY
+                return self.$route.query[DETAIL_TYPE_KEYNAME] || DETAIL_APPLY
             }
           
         },

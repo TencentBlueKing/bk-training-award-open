@@ -53,7 +53,6 @@
                     submenuActive: false,
                     title: '奖项申报系统'
                 },
-                header: { name: '' },
                 message: {},
                 userMenu: {
                     list: [

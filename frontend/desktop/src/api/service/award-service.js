@@ -16,12 +16,21 @@ export function postAwards (fields) {
  * 获取奖项
  * @param { number } page
  * @param { number } size
+ * @param group_id
+ * @param award_status
  * */
-export function getAwards ({ page, size }) {
+export function getAwards ({
+    page,
+    size,
+    group_id,
+    award_status
+}) {
     return http.get('awards/', {
         params: {
             page,
-            size
+            size,
+            group_id,
+            award_status
         }
     })
 }
@@ -40,16 +49,6 @@ export function getAvailableAwards ({ page, size, award_status, group_id }) {
             award_status: award_status,
             group_id: group_id
         }
-    })
-}
-/**
- * 获取申请过的奖项
- * @param { number } page
- * @param { number } size
- * */
-export function getAppliedAwards (page, size) {
-    return http.get('get_applyed_awards/', {
-        params: { page, size }
     })
 }
 /**
@@ -76,17 +75,6 @@ export function deleteRecord (applyId) {
             id: applyId
     
         } })
-}
-/**
- * 删除奖项
- * @param { number } awardId
- * */
-export function deleteAward ({ awardId }) {
-    return http.delete('awards/', {
-        data: {
-            award_id: awardId
-        }
-    })
 }
 /**
  * 编辑奖项
@@ -135,10 +123,18 @@ export function putAward (awardId, {
     })
 }
 
+/**
+ * 撤销申请
+ * @param id
+ * */
 export function getAwardById (id) {
     return http.get(`/awards/${id}/`)
 }
 
+/**
+ * 结束奖项
+ * @param id
+ * */
 export function postFinishAward (id) {
     return http.post(`/finish_award/${id}/`)
 }

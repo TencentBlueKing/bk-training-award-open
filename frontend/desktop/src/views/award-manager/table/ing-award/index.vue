@@ -35,7 +35,7 @@
 
 <script>
     import { tableMixins } from '@/views/mycheck/table/tableMixins'
-    import { getAvailableAwards } from '@/api/service/award-service'
+    import { getAwards } from '@/api/service/award-service'
     import { AWARD_FORM_ROUTE_PATH, AWARD_TYPE_DETAIL, AWARD_TYPE_ROUTE_KEY, ING_AWARD } from '@/constants'
     export default {
         name: 'ended-approval',
@@ -85,7 +85,7 @@
                     award_status: ING_AWARD,
                     group_id: this.$bus.curGlobalGroupId
                 }
-                return getAvailableAwards(params).then(response => {
+                return getAwards(params).then(response => {
                     const pendingStartAwards = response.data
                     this.pagination.count = pendingStartAwards.count
                     this.ingAwardRemoteData = pendingStartAwards.data

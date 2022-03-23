@@ -16,7 +16,7 @@
 <script>
     import { tableMixins } from '@/views/mycheck/table/tableMixins'
     import { ENDED_REVIEW } from '@/constants'
-    import { getAvailableAwards } from '@/api/service/award-service'
+    import { getAwards } from '@/api/service/award-service'
     export default {
         name: 'ended-review',
         mixins: [tableMixins],
@@ -65,7 +65,7 @@
                     award_status: ENDED_REVIEW,
                     group_id: this.$bus.curGlobalGroupId
                 }
-                return getAvailableAwards(params).then(response => {
+                return getAwards(params).then(response => {
                     const endedReviewAwards = response.data
                     this.pagination.count = endedReviewAwards.count
                     this.endedReviewRemoteData = endedReviewAwards.data

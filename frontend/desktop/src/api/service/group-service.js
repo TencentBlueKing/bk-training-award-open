@@ -5,37 +5,6 @@
 import http from '@/api'
 
 /**
- * 创建组织的映射关系
- * @param { number } page
- * @param { number } size
- * */
-export function getSecretary (page, size) {
-    return http.get('/secretary/', {
-        page,
-        size
-    })
-}
-
-/**
- * 创建组织的映射关系
- * @param { group_id,secretaries ,group_full_name } groupForm
- * */
-export function postSecretary ({ group_id, secretaries, group_full_name }) {
-    return http.post('/secretary/', { group_id, secretaries, group_full_name })
-}
-
-/**
- * 更新组织的映射关系
- * @param { number } id 更新对应的 id
- * @param { number } group_id 组的 id
- * @param { array<username> } secretaries 秘书表
- * @param { string } group_full_name 组名（我也不知道有啥用，但是要传）
- * */
-export function putSecretary (id, { group_id, secretaries, group_full_name }) {
-    return http.put(`/secretary/${id}/`, { group_id, secretaries, group_full_name })
-}
-
-/**
  * API-获取用户是否为秘书, 是否为管理员
  * */
 export function getUsermanageRetrieveUser (config = {}) {
@@ -66,11 +35,23 @@ export function postGroupUser ({ group_id }) {
     })
 }
 
+/**
+ * @param group_id 小组 id
+ * */
 export function getGroupUser ({ groupId }) {
     console.log(groupId)
     return http.get('/group_user/', {
         params: {
             group_id: groupId
+        }
+    })
+}
+
+// 退出小组
+export function deleteGroupUser ({ group_id }) {
+    return http.delete('/group_user/', {
+        data: {
+            group_id
         }
     })
 }
@@ -81,8 +62,11 @@ export function getGroupUser ({ groupId }) {
  * */
 export function deleteGroupManage ({ username, group_id }) {
     return http.delete('/group_manage/', {
-        group_id,
-        username
+        params: {
+            group_id,
+            username
+
+        }
     })
 }
 
@@ -105,40 +89,16 @@ export function postGroupManage ({
  * @param group_id
  * */
 export function putGroupManage ({ username, group_id }) {
-    return http.delete('/group_manage/', {
-        data: {
-            group_id,
-            new_secretary: username
-        }
-    })
-}
-
-// 退出小组
-export function deleteGroupUser ({ group_id }) {
-    return http.delete('/group_user/', {
-        data: {
-            group_id
-        }
+    return http.put('/group_manage/', {
+        group_id,
+        new_secretary: username
     })
 }
 
 /**
- * @param { number } page 页码
- * @param { number } size 每页大小
+ * @param username
  * @param group_id
- * @param approval_status
  * */
-export function getGroupApproval ({ page, size, group_id, approval_status }) {
-    return http.get('/approval/', {
-        params: {
-            page,
-            size,
-            group_id,
-            approval_status
-        }
-    })
-}
-
 export function getGroupManage ({ group_id, status }) {
     return http.get('/group_manage/', {
         params: {
@@ -148,6 +108,9 @@ export function getGroupManage ({ group_id, status }) {
     })
 }
 
+/**
+ * 获取所有的小组
+ * */
 export function getGroupAll () {
     return http.get('/group_all/', {}, { fromCache: true })
 }

@@ -58,7 +58,7 @@
 </template>
 
 <script>
-    import { APPLY_STATE, DETAIL_ROUTE_PATH, PENDING_APPROVAL } from '@/constants'
+    import { APPLY_STATE, DETAIL_APPLY_DETAIL, DETAIL_ROUTE_PATH, DETAIL_TYPE_KEYNAME, PENDING_APPROVAL } from '@/constants'
     import { getRecord } from '@/api/service/apply-service'
     import { applyTableMixins } from '@/views/myapply/table/mixins'
     import { formatDate } from '@/common/util'
@@ -158,7 +158,7 @@
                 this.$router.push({
                     name: DETAIL_ROUTE_PATH,
                     query: {
-                        type: 'apply_detail',
+                        [DETAIL_TYPE_KEYNAME]: DETAIL_APPLY_DETAIL,
                         award_id: recordInfo['award_id'],
                         record_id: recordInfo['record_id']
                     }

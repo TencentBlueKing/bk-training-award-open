@@ -1,6 +1,5 @@
 <template>
     <div class="group-manager-container">
-
         <bk-dialog v-model="transferMyGroup"
             :render-directive="'if'"
             :mask-close="false"
@@ -282,18 +281,13 @@
             toRemoveUser (target) {
                 const { username } = target
                 const params = {
-                    username
-                }
-                if (this.tableDataIsLoading) {
-                    return
+                    username,
+                    group_id: this.$bus.curGlobalGroupId
                 }
                 this.tableDataIsLoading = true
                 return deleteGroupManage(params).then(_ => {
-                    console.log(_)
-                    //  TODO 移除对应的人
+                    this.handleInit()
                     this.messageSuccess('移除成功')
-                }).finally(_ => {
-                    this.tableDataIsLoading = false
                 })
             },
             /**
@@ -359,11 +353,9 @@
                     group_id: this.$bus.curGlobalGroupId,
                     username: params['target_username']
                 }).then(_ => {
-                    this.$store.dispatch('userInfo')
-                    this.$bus.handleGetGroupList()
+                    this.messageSuccess('转让组 ' + this.$bus.curGlobalSelectedGroup['full_name'] + ' 给' + params['target_username'] + '成功')
+                    setTimeout(() => this.$router.go(0), 100)
                     return true
-                }).catch(_ => {
-                    return false
                 })
                 return action
             },
@@ -372,12 +364,15 @@
                 const params = {
                     group_id: curGroupName
                 }
-
                 const action = await deleteGroupUser(params).then(_ => {
                     this.$store.dispatch('userInfo')
                     return true
                 }).catch(_ => {
-                    console.log(_)
+                    this.messageSuccess('退出成功')
+                    setTimeout(() => {
+                        // 如果成了新用户需要强制刷新,不然弹框冲突
+                        window.location.href = ''
+                    }, 100)
                     return false
                 })
                 return action
