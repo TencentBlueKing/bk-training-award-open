@@ -52,6 +52,13 @@
                     >
                         取消
                     </bk-button>
+                    <bk-button theme="warning"
+                        class="mr10"
+                        v-else-if="isNewer"
+                        @click="$router.go(0)"
+                    >
+                        刷新
+                    </bk-button>
                     <bk-button theme="primary" class="ml10" @click="handleToBeOlder(createType,$refs[createType])">
                         确认
                     </bk-button>

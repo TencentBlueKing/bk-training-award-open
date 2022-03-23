@@ -192,6 +192,9 @@
                 await this.validator()
                 this.handleToDealWidthApply(true, applyForm).then(res => {
                     this.messageSuccess('保存草稿成功')
+                    return this.$router.replace({
+                        name: MYAPPLY_ROUTE_PATH
+                    })
                 })
             },
             /**
@@ -216,7 +219,6 @@
                     award_department_id: this.award['award_department_id'],
                     award_id: this.award['id'],
                     ...applyForm
-
                 })
             },
             handleOnlyGroup (value) {

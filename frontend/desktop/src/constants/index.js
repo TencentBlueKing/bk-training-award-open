@@ -89,9 +89,14 @@ export const HOME_ROUTE_PATH = 'home'
 export const CANAWARDS_ROUTE_PATH = 'canawards'
 export const MYAPPLY_ROUTE_PATH = 'myapply'
 // S 申请路由中的状态量
-export const PENDING_APPROVAL = 1
-export const ING_APPROVAL = 2
-export const ENDED_APPROVAL = 3
+// REVIEW_PENDING
+// REVIEW_PASSED
+// REVIEW_NOT_PASSED
+// DRAFT
+export const MYAPPLY_PENDING_APPROVAL = 1
+export const MYAPPLY_ING_APPROVAL = 2
+export const MYAPPLY_ENDED_APPROVAL = 3
+export const MYAPPLY_DRAFT = 4
 // E 申请路由中的状态量
 
 export const GROUP_MANAGER_ROUTE_PATH = 'group-manager'

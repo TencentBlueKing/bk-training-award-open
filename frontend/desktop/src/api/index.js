@@ -12,7 +12,6 @@ import RequestQueue from './request-queue'
 import { messageError } from '@/common/bkmagic'
 import UrlParse from 'url-parse'
 import queryString from 'query-string'
-
 const BASE_URL = window.PROJECT_CONFIG.SITE_URL + AJAX_URL_PREFIX
 
 // axios 实例
@@ -113,7 +112,7 @@ async function getPromise (method, url, data, userConfig = {}) {
     if (config.fromCache && promise) {
         return promise
     }
-
+    
     promise = new Promise(async (resolve, reject) => {
         const axiosRequest = methodsWithData.includes(method)
             ? axiosInstance[method](url, data, config)
@@ -222,7 +221,9 @@ function initConfig (method, url, userConfig) {
         // 当路由变更时取消请求
         cancelWhenRouteChange: true,
         // 取消上次请求
-        cancelPrevious: true
+        cancelPrevious: true,
+        // 需要权限(不能是新手用户读取的数据)
+        canNewer: true
     }
     return Object.assign(defaultConfig, userConfig)
 }

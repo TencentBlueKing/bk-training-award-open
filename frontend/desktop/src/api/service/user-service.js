@@ -7,5 +7,5 @@ import http from '@/api'
 export function getUserInfo (config) {
     const url = '/userinfo/'
 
-    return http.get(url, {}, config)
+    return http.get(url, {}, { canNewer: true, ...config })
 }

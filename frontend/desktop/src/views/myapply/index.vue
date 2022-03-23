@@ -27,6 +27,7 @@
 <script>
     export default {
         components: {
+            Draft: () => import('@/views/myapply/table/draft'),
             PendingApproval: () => import('@/views/myapply/table/pending-approval'),
             IngApproval: () => import('@/views/myapply/table/ing-approval'),
             EndedApproval: () => import('@/views/myapply/table/ended-approval')
@@ -42,6 +43,9 @@
                 curSelectedTable: 'pending-approval',
                 myApplyTabItems: [
                     {
+                        'tab-name': '草稿',
+                        'tab-key': 'draft'
+                    }, {
                         'tab-name': '待审批',
                         'tab-key': 'pending-approval'
                     }, {
