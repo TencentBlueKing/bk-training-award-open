@@ -9,6 +9,8 @@ from django.forms import model_to_dict
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
+ApplicationState = {"pending": "0", "end": "1"}
+
 
 class ApprovalView(APIView):
     # permission_classes = [ApprovalPermission]
@@ -16,7 +18,7 @@ class ApprovalView(APIView):
     def get(self, request, *args, **kwargs):
         """我的审批: 查询我的审批列表"""
         approval_state = request.query_params["approval_status"]
-        if approval_state:
+        if approval_state == ApplicationState["end"]:
             queryset = Application.objects.filter(
                 approval_users__contains=request.user.username
             ).filter(approval_state__in=[ApprovalState.review_passed.value[0],

@@ -77,7 +77,7 @@ class AwardView(APIView):
             "action_username": request.user.username,
             "action_display_name": request.user.nickname,
             "action_target":username[0],
-            "message":"创建了奖项"
+            "message":"创建了奖项" + request.data["award_name"]
         } for username in GroupUser.objects.filter(
             group_id=request.data["award_department_id"]).values_list("username")]
         for item in messages:
@@ -127,16 +127,24 @@ class RecordView(APIView):
 
     def get(self, request):
         """获取我的申请记录"""
-        queryset = {
-            "1": [ApprovalState.review_pending.value[0], ApprovalState.review_pending.value[0]],
-            "2": [ApprovalState.review_not_passed.value[0]],
-            "3": [ApprovalState.review_passed.value[0]]
-        }
+        def get_queryset_by_status(status, queryset: QuerySet):
+            queryset = {
+                "1": record.filter(approval_state=ApprovalState.draft.value[0]),
+                "2": record.filter(approval_state=ApprovalState.review_pending.value[0]),
+                "3": record.filter(approval_state__in=[ApprovalState.review_passed.value[0],
+                                                       ApprovalState.review_not_passed.value[0]])
+            }
+            return queryset["status"].order_by("id")
         status = request.query_params["apply_status"]
-        record = AwardApplicationRecord.objects.filter(
-            application_users__contains={"username": request.user.username}).filter(
-            award_department_id=request.query_params["group_id"]
-        ).filter(approval_state__in=queryset[status]).order_by("id")
+        department_id = request.query_params.get("group_id")
+        if department_id:
+            record = AwardApplicationRecord.objects.filter(
+                application_users__contains={"username": request.user.username}).filter(
+                award_department_id=int(department_id))
+        else:
+            record = AwardApplicationRecord.objects.filter(
+                application_users__contains={"username": request.user.username})
+        record = get_queryset_by_status(status, record)
         pagination = PagePagination()
         try:
             pager_roles = pagination.paginate_queryset(queryset=record, request=request, view=self)
@@ -151,13 +159,16 @@ class RecordView(APIView):
         """撤回申请"""
         award_apply_record_id = request.data.get('id')
         award_apply_record_id = int(award_apply_record_id)
-        award = AwardApplicationRecord.objects.filter(pk=award_apply_record_id).filter(
+        applicaton = AwardApplicationRecord.objects.filter(pk=award_apply_record_id).filter(
             application_users__contains={"username": request.user.username}).first()
-        if not award:
+        if not applicaton:
             return JsonResponse(false_code("您不是申请用户，无法撤回申请"))
+        award = Awards.objects.filter(pk=applicaton.award_id).first()
+        if award.end_time < timezone.now():
+            return JsonResponse(false_code("奖项已过截止申请时间，无法撤回"))
         AwardApplicationRecord.objects.filter(pk=award_apply_record_id).update(
-            approval_state=RecordStatus['draft'])
-        return JsonResponse(success_code({}))
+            dict(approval_state=RecordStatus['draft'], approval_turn=0))
+        return JsonResponse(success_code(None))
 
     def post(self, request, *args, **kwargs):
         """保存草稿和正式申请"""
@@ -179,7 +190,10 @@ class RecordView(APIView):
 
     def put(self, request):
         id = request.query_params.get("id")
-        application = AwardApplicationRecord.objects.filter(approval_state=RecordStatus['draft']).filter(pk=id)
+        application = AwardApplicationRecord.objects.filter(approval_state=RecordStatus['draft']).filter(pk=int(id))
+        award = Awards.objects.filter(pk=application.first().award_id).first()
+        if award.end_time < timezone.now():
+            return JsonResponse(false_code("奖项已过截止申请时间，无法编辑"))
         data = application.update(**request.data)
         return JsonResponse(success_code(data))
 
