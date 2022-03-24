@@ -22,13 +22,6 @@
                 >
                     详情
                 </bk-button>
-
-                <!--                <bk-button class="mr10 ml10"-->
-                <!--                    theme="primary"-->
-                <!--                    @click="handleGetDetail(application)"-->
-                <!--                    :text="true"-->
-                <!--                > 查看评审流程</bk-button>-->
-
                 <bk-popconfirm title="确认撤回该申请？"
                     content="撤回申请之后需要重新申请！"
                     trigger="click"
@@ -58,7 +51,7 @@
 </template>
 
 <script>
-    import { APPLY_STATE, DETAIL_APPLY_DETAIL, DETAIL_ROUTE_PATH, DETAIL_TYPE_KEYNAME, MYAPPLY_PENDING_APPROVAL } from '@/constants'
+    import { APPLY_STATE, DETAIL_APPLY_DETAIL, DETAIL_ROUTE_PATH, DETAIL_TYPE_KEYNAME, MYAPPLY_PENDING_APPLY } from '@/constants'
     import { getRecord } from '@/api/service/apply-service'
     import { applyTableMixins } from '@/views/myapply/table/mixins'
     import { formatDate } from '@/common/util'
@@ -121,7 +114,7 @@
                     page,
                     size,
                     group_id: this.$bus.curGlobalGroupId,
-                    apply_status: MYAPPLY_PENDING_APPROVAL
+                    apply_status: MYAPPLY_PENDING_APPLY
                 }
                 if (this.loading) return
                 this.loading = true

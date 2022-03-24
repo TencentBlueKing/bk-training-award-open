@@ -3,22 +3,22 @@
         <top-back></top-back>
 
         <!-- 待审批悬浮窗-->
-        <div :class="['approval-list']" v-if="formType === pageType['approval']">
-            <div class="tip-button" @click="trigglePanel" v-waves>
-                {{ panelCutOut ? '展开' : '收起' }}
-            </div>
-            <div :class="['approval-content',{
-                'not_active': panelCutOut
-            }]">
-                <tabs style="height: 100%"
-                    :tab-items="approvalTabItems"
-                >
-                    <template>
-                        <component :is="'approval-list'"></component>
-                    </template>
-                </tabs>
-            </div>
-        </div>
+        <!--        <div :class="['approval-list']" v-if="formType === pageType['approval_detail']">-->
+        <!--            <div class="tip-button" @click="trigglePanel" v-waves>-->
+        <!--                {{ panelCutOut ? '展开' : '收起' }}-->
+        <!--            </div>-->
+        <!--            <div :class="['approval-content',{-->
+        <!--                'not_active': panelCutOut-->
+        <!--            }]">-->
+        <!--                <tabs style="height: 100%"-->
+        <!--                    :tab-items="approvalTabItems"-->
+        <!--                >-->
+        <!--                    <template>-->
+        <!--                        <component :is="'approval-list'" ref="approval-list"></component>-->
+        <!--                    </template>-->
+        <!--                </tabs>-->
+        <!--            </div>-->
+        <!--        </div>-->
 
         <div class="board">
 
@@ -102,7 +102,6 @@
         DETAIL_APPLY_DETAIL,
         DETAIL_APPROVAL_DETAIL,
         DETAIL_DRAFT_DETAIL,
-        DETAIL_EDIT,
         DETAIL_TYPE_KEYNAME
     } from '@/constants'
     import { postApproval } from '@/api/service/apply-service'
@@ -110,7 +109,7 @@
     export default {
         name: 'detail',
         components: {
-            ApprovalList: () => import('./table/approval-list'),
+            // ApprovalList: () => import('./table/approval-list'),
             DetailInfo: () => import('./DetailInfo'),
             ApplyForm: () => import('./ApplyForm')
         },
@@ -163,18 +162,16 @@
                 approvalType: {
                     pass: 1,
                     not_pass: 0
-                }
+                },
+                pendingApprovalRemoteData: []
             }
         },
         computed: {
             /**
              * 用于判断是否为编辑型表格
              * */
-            isShowApplyForm () {
-                return [DETAIL_APPLY, DETAIL_EDIT, DETAIL_DRAFT_DETAIL].includes(this.formType)
-            },
             formType (self) {
-                return self.$route.query[DETAIL_TYPE_KEYNAME] || 'detail'
+                return self.$route.query[DETAIL_TYPE_KEYNAME] || DETAIL_APPLY
             }
         },
         created () {
@@ -194,16 +191,16 @@
             },
             async handlePostApproval ({ approvalTips, approvalText, action }) {
                 await this.$refs['approval-form'].validate()
-                const id = this.$route.query['apply_id']
                 this.approvalForm.approvalLoading = true
                 return postApproval({
-                    id,
                     action,
+                    id: this.$route.query['record_id'],
                     approval_text: approvalText
                 }).then(_ => {
                     this.messageSuccess(approvalTips)
                     this.approvalForm.approvalVisible = false
                     this.approvalForm.approvalLoading = false
+                    this.$router.back()
                 })
             }
         }

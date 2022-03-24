@@ -29,15 +29,14 @@
         MYAPPLY_DRAFT_TAB_KEYNAME,
         MYAPPLY_ENDED_APPROVAL_TAB_KEYNAME,
         MYAPPLY_ING_APPROVAL_TAB_KEYNAME,
-        MYAPPLY_PENDING_APPROVAL_TAB_KEYNAME,
+        MYAPPLY_ING_APPLY_TAB_KEYNAME,
         MYAPPLY_ROUTER_KEYNAME
     } from '@/constants'
 
     export default {
         components: {
             [MYAPPLY_DRAFT_TAB_KEYNAME]: () => import('@/views/myapply/table/draft'),
-            [MYAPPLY_PENDING_APPROVAL_TAB_KEYNAME]: () => import('@/views/myapply/table/pending-approval'),
-            [MYAPPLY_ING_APPROVAL_TAB_KEYNAME]: () => import('@/views/myapply/table/ing-approval'),
+            [MYAPPLY_ING_APPLY_TAB_KEYNAME]: () => import('@/views/myapply/table/pending-approval'),
             [MYAPPLY_ENDED_APPROVAL_TAB_KEYNAME]: () => import('@/views/myapply/table/ended-approval')
         },
         data () {
@@ -53,13 +52,10 @@
                         'tab-name': '草稿',
                         'tab-key': MYAPPLY_DRAFT_TAB_KEYNAME
                     }, {
-                        'tab-name': '待审批',
-                        'tab-key': MYAPPLY_PENDING_APPROVAL_TAB_KEYNAME
+                        'tab-name': '申请中',
+                        'tab-key': MYAPPLY_ING_APPLY_TAB_KEYNAME
                     }, {
-                        'tab-name': '审批中',
-                        'tab-key': MYAPPLY_ING_APPROVAL_TAB_KEYNAME
-                    }, {
-                        'tab-name': '已审批',
+                        'tab-name': '已结束',
                         'tab-key': MYAPPLY_ENDED_APPROVAL_TAB_KEYNAME
                     }
                 ]
@@ -69,7 +65,7 @@
             const curType = this.$route.query[MYAPPLY_ROUTER_KEYNAME]
             if (curType && [
                 MYAPPLY_DRAFT_TAB_KEYNAME,
-                MYAPPLY_PENDING_APPROVAL_TAB_KEYNAME,
+                MYAPPLY_ING_APPLY_TAB_KEYNAME,
                 MYAPPLY_ING_APPROVAL_TAB_KEYNAME,
                 MYAPPLY_ENDED_APPROVAL_TAB_KEYNAME
             ].includes(curType)) {

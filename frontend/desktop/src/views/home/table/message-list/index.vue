@@ -99,7 +99,8 @@
 <style scoped>
 .message-table {
   .message-content {
-    max-height: 300px;
+    height: 100%;
+    max-height: 400px;
     overflow: scroll;
   }
 }

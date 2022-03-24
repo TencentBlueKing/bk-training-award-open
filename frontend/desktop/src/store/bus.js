@@ -18,7 +18,8 @@ export const bus = new Vue({
             groupList: [],
             // header 状态
             headerName: '',
-            isNewer: false
+            isNewer: false,
+            count: -1
         }
     },
     computed: {

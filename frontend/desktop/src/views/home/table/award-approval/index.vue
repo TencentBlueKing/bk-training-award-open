@@ -19,7 +19,7 @@
 </template>
 <script>
 
-    import { DETAIL_ROUTE_PATH, MYAPPLY_PENDING_APPROVAL } from '@/constants'
+    import { DETAIL_ROUTE_PATH, MYAPPLY_PENDING_APPLY } from '@/constants'
     import { getAwardApproval } from '@/api/service/apply-service'
 
     export default {
@@ -62,7 +62,7 @@
                 }
                 this.loading = true
                 
-                return getAwardApproval({ page, size, approval_status: MYAPPLY_PENDING_APPROVAL }).then(({ data }) => {
+                return getAwardApproval({ page, size, approval_status: MYAPPLY_PENDING_APPLY }).then(({ data }) => {
                     this.pagination.count = data?.count
                     this.awardApprovalRemoteList = data?.result
                 }).finally(_ => {
