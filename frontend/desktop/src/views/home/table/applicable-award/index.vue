@@ -3,7 +3,6 @@
     <self-table :data="applicationableAwardList"
         :pagination.sync="pagination"
         :loading="loading"
-        :height="300"
         @page-change="handleInit()"
     >
         <bk-table-column label="序列" width="60" type="index"></bk-table-column>

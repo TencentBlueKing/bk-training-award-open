@@ -94,18 +94,18 @@ export const MYAPPLY_ROUTE_PATH = 'myapply'
 // REVIEW_NOT_PASSED
 // DRAFT
 export const MYAPPLY_ROUTER_KEYNAME = 'myapply_type'
-export const MYAPPLY_PENDING_APPROVAL = 1
+export const MYAPPLY_PENDING_APPLY = 2
 export const MYAPPLY_ING_APPROVAL = 2
 export const MYAPPLY_ENDED_APPROVAL = 3
-export const MYAPPLY_DRAFT = 4
+export const MYAPPLY_DRAFT = 1
 
-export const MYAPPLY_PENDING_APPROVAL_TAB_KEYNAME = 'myapply-pending-approval'
+export const MYAPPLY_ING_APPLY_TAB_KEYNAME = 'myapply-ing-apply'
 export const MYAPPLY_ING_APPROVAL_TAB_KEYNAME = 'myapply-ing-approval'
 export const MYAPPLY_ENDED_APPROVAL_TAB_KEYNAME = 'myapply-ended-approval'
 export const MYAPPLY_DRAFT_TAB_KEYNAME = 'myapply-draft'
 
 export const MYAPPLY_TABLE = {
-    [MYAPPLY_PENDING_APPROVAL]: MYAPPLY_PENDING_APPROVAL_TAB_KEYNAME,
+    [MYAPPLY_PENDING_APPLY]: MYAPPLY_ING_APPLY_TAB_KEYNAME,
     [MYAPPLY_ING_APPROVAL]: MYAPPLY_ING_APPROVAL_TAB_KEYNAME,
     [MYAPPLY_ENDED_APPROVAL]: MYAPPLY_ENDED_APPROVAL_TAB_KEYNAME,
     [MYAPPLY_DRAFT]: MYAPPLY_DRAFT_TAB_KEYNAME
@@ -131,6 +131,12 @@ export const AWARD_TYPE_DETAIL = 'detail'
 // E 奖项表单的 类型
 
 export const MYCHECK_ROUTE_PATH = 'mycheck'
+// S 审批路由中的一些状态
+export const MYCHECK_ROUTE_KEYNAME = 'mycheck-type'
+export const MYCHECK_AWARD_PENGDING_APPROVAL = 1
+export const MYCHECK_AWARD_ENDED_APPROVAL = 2
+
+// E 审批路由中的一些类型
 // S
 export const GROUP_PENDING_APPROVAL = 0
 export const GROUP_ENDED_APPROVAL = 1

@@ -95,6 +95,11 @@
                 }
             }
         },
+      
+        beforeDestroy () {
+            sessionStorage.setItem('is_pass', '')
+        },
+
         created () {
             const platform = window.navigator.platform.toLowerCase()
             if (platform.indexOf('win') === 0) {

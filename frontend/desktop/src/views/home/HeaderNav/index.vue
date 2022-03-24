@@ -33,9 +33,12 @@ $card-width:  330px;
 $card-height: 137px;
 
 .header-nav {
-  min-width: $card-width;
+  width: 100%;
+  min-width: calc($card-width - 60px);
+  max-width: calc($card-width);
+
   height: $card-height;
-  margin: auto 20px;
+  padding: 20px;
   background: linear-gradient(90deg, #ff512f, #dd2476);
   border-radius: 20px;
   position: relative;
@@ -47,7 +50,6 @@ $card-height: 137px;
     justify-content: center;
     color: white;
     height: 100%;
-
     .right-panel {
       width: 70%;
       height: inherit;

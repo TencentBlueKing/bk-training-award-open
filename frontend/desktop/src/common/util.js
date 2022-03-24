@@ -374,9 +374,9 @@ export function checkRequired (message) {
  * @returns string
  * */
 export function formatDate (date) {
-    console.log(date)
     return moment(date).format('YYYY-MM-DD HH:mm')
 }
+
 /**
  * 清除 cookie
  *
@@ -392,6 +392,10 @@ export function clearAllCookie () {
     console.log(document.cookie)
 }
 
+/**
+ * @param username
+ * @param displayName
+ * */
 export function formatUsernameAndDisplayName (username, displayName) {
     return `${username}（${displayName}）`
 }

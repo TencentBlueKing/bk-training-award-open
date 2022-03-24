@@ -11,11 +11,9 @@
     export default {
         name: 'top-back',
         props: {
-            backFn: {
-                type: Function,
-                default () {
-                    return null
-                }
+            backUrl: {
+                type: String,
+                default: () => HOME_ROUTE_PATH
             }
         },
         data () {
@@ -24,16 +22,17 @@
                 count: 0
             }
         },
+        created () {
+            console.log(this.$router)
+            console.log(this.$route)
+        },
         methods: {
             handleBack () {
-                const passed = sessionStorage.getItem('is_pass')
-                if (passed) {
-                    return this.$router.go(-1)
-                } else {
-                    return this.$router.replace({
-                        name: HOME_ROUTE_PATH
-                    })
-                }
+                console.log(this.$router)
+                // this.$router.replace({
+                //     name: this.backUrl
+                // })
+                this.$router.go(-1)
             }
         }
     }

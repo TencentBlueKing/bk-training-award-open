@@ -2,15 +2,22 @@
     <div class="home-container">
         <div class="head-panel">
             <div class="header-main">
-                <header-nav
-                    v-for="nav in headerNavList"
-                    :key="nav.title"
-                    :style="nav.style"
-                    @click="headerTrigger(...nav.routerParams())"
-                    :description="nav.description"
-                >
-                    <span>{{ nav.title }}</span>
-                </header-nav>
+                <bk-container :col="30" :gutter="60">
+                    <bk-row>
+                        <bk-col v-for="nav in headerNavList"
+                            :key="nav.title"
+                            :span="6"
+                        >
+                            <header-nav
+                                :style="nav.style"
+                                @click="headerTrigger(...nav.routerParams())"
+                                :description="nav.description"
+                            >
+                                <span>{{ nav.title }}</span>
+                            </header-nav>
+                        </bk-col>
+                    </bk-row>
+                </bk-container>
             </div>
         </div>
         <div class="footer-panel">
@@ -64,35 +71,44 @@
         data (self) {
             return {
                 headerNavList: [
-                    { style: 'background: var(--gradient-orange-red);',
-                      description: '创建小组、成员管理',
-                      title: '我的小组',
-                      routerParams: () => [self.$store.state['ROUTE_TABLE']['GROUP_MANAGER_ROUTE_PATH']] },
-                    { style: 'background: var(--gradient-blue);',
-                      description: '为您的小组创建奖项',
-                      title: '创建奖项',
-                      routerParams: () => [self.$store.state['ROUTE_TABLE']['AWARD_FORM_ROUTE_PATH'], {
-                          query: {
-                              [AWARD_TYPE_ROUTE_KEY]: AWARD_TYPE_CREATE
-                          }
-                      }] },
-                    { style: 'background: var(--gradient-orange-pink);',
-                      description: '查看申请信息及申请状态',
-                      title: '我的申请',
-                      routerParams: () => [self.$store.state['ROUTE_TABLE']['MYAPPLY_ROUTE_PATH'], {
-                          query: {
-                              [MYAPPLY_ROUTER_KEYNAME]: MYAPPLY_DRAFT_TAB_KEYNAME
-                          }
-                      }]
+                    {
+                        style: 'background: var(--gradient-orange-red);',
+                        description: '创建小组、成员管理',
+                        title: '我的小组',
+                        routerParams: () => [self.$store.state['ROUTE_TABLE']['GROUP_MANAGER_ROUTE_PATH']]
                     },
-                    { style: 'background: var(--gradient-green);',
-                      description: '查看创建的奖项',
-                      title: '奖项列表',
-                      routerParams: () => [self.$store.state['ROUTE_TABLE']['AWARD_MANAGER_ROUTE_PATH']] },
-                    { style: 'background: var(--gradient-purple);',
-                      description: '审批入组、审批奖项以及审批记录',
-                      title: '我的审批',
-                      routerParams: () => [self.$store.state['ROUTE_TABLE']['MYCHECK_ROUTE_PATH']] }
+                    {
+                        style: 'background: var(--gradient-blue);',
+                        description: '为您的小组创建奖项',
+                        title: '创建奖项',
+                        routerParams: () => [self.$store.state['ROUTE_TABLE']['AWARD_FORM_ROUTE_PATH'], {
+                            query: {
+                                [AWARD_TYPE_ROUTE_KEY]: AWARD_TYPE_CREATE
+                            }
+                        }]
+                    },
+                    {
+                        style: 'background: var(--gradient-orange-pink);',
+                        description: '查看申请信息及申请状态',
+                        title: '我的申请',
+                        routerParams: () => [self.$store.state['ROUTE_TABLE']['MYAPPLY_ROUTE_PATH'], {
+                            query: {
+                                [MYAPPLY_ROUTER_KEYNAME]: MYAPPLY_DRAFT_TAB_KEYNAME
+                            }
+                        }]
+                    },
+                    {
+                        style: 'background: var(--gradient-green);',
+                        description: '查看创建的奖项',
+                        title: '奖项列表',
+                        routerParams: () => [self.$store.state['ROUTE_TABLE']['AWARD_MANAGER_ROUTE_PATH']]
+                    },
+                    {
+                        style: 'background: var(--gradient-purple);',
+                        description: '审批入组、审批奖项以及审批记录',
+                        title: '我的审批',
+                        routerParams: () => [self.$store.state['ROUTE_TABLE']['MYCHECK_ROUTE_PATH']]
+                    }
                 ],
                 workbenchTabItems: [
                     {
@@ -169,9 +185,9 @@
     display: flex;
     justify-content: center;
     min-height: 35%;
-    overflow-x: scroll;
     align-items: center;
     flex: 1;
+
     .header-main {
       display: flex;
       align-items: center;
@@ -199,10 +215,12 @@
       border-radius: 20px;
       box-shadow: 0 4px 90px rgba(163, 171, 185, 0.24);
     }
+
     .cartoon {
       width: 280px;
       transform: translateY(69px);
     }
   }
 }
+
 </style>
