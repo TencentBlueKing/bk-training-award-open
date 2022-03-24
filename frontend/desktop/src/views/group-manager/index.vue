@@ -6,16 +6,8 @@
             <div slot="title">
                 <p style="font-size: 18px">
                     移交小组
-                    <a v-bk-tooltips.click="{
-                        content: '请再次输入小组名（' + $bus.curGlobalSelectedGroup['full_name'] + '）以确认移交',
-                        showOnInit: true,
-                        trigger: 'click',
-                        theme: 'light',
-                        placements: ['top']
-                    }" class="bk-text-primary mr15">
-                        <i class="bk-icon icon-question-circle-shape"></i>
-                    </a>
                 </p>
+                <p style="font-size: 12px"> 请再次输入小组名 （<span class="bk-text-danger" v-bk-copy="$bus.curGlobalSelectedGroup['full_name']">{{ $bus.curGlobalSelectedGroup['full_name'] }}</span> ） 以确认移交</p>
             </div>
             <bk-form :label-width="100"
                 ref="transfer-form"
@@ -27,7 +19,7 @@
                     :property="'full_name'"
                 >
                     <bk-input v-model="transferForm['full_name']"
-                        :placeholder="'请再次输入小组名（' + $bus.curGlobalSelectedGroup['full_name'] + '）以确认移交'"
+                        :placeholder="$bus.curGlobalSelectedGroup['full_name']"
                         @click="$refs['popover'].showHandler()"
                     ></bk-input>
                 </bk-form-item>
@@ -50,6 +42,12 @@
         <self-dialog v-model="isOutCurGroup"
             @confirm="handleOutCurGroup"
         >
+            <div slot="title">
+                <p style="font-size: 18px">
+                    退出小组
+                </p>
+                <p style="font-size: 12px"> 请再次输入小组名 （<span class="bk-text-danger" v-bk-copy="$bus.curGlobalSelectedGroup['full_name']">{{ $bus.curGlobalSelectedGroup['full_name'] }}</span> ） 以确认移交</p>
+            </div>
             <bk-form :label-width="100"
                 :rules="outCurGroupFormRules"
                 :model="outCurGroupForm"

@@ -67,6 +67,9 @@
             }
         },
         created () {
+            if (this.$route.query['group_id']) {
+                this.$bus.curGlobalGroupId = this.$route.query['group_id']
+            }
             this.handleInit()
         },
         methods: {

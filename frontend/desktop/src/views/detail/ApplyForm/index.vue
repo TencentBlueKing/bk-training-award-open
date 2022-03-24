@@ -86,7 +86,10 @@
         DETAIL_DRAFT_DETAIL,
         DETAIL_TYPE_KEYNAME,
         GROUP_USERS_KEYNAME,
-        MYAPPLY_ROUTE_PATH
+        MYAPPLY_DRAFT_TAB_KEYNAME,
+        MYAPPLY_PENDING_APPROVAL_TAB_KEYNAME,
+        MYAPPLY_ROUTE_PATH,
+        MYAPPLY_ROUTER_KEYNAME
     } from '@/constants'
     import { postRecord } from '@/api/service/award-service'
     import { getApplicationById } from '@/api/service/apply-service'
@@ -193,7 +196,10 @@
                 this.handleToDealWidthApply(true, applyForm).then(res => {
                     this.messageSuccess('保存草稿成功')
                     return this.$router.replace({
-                        name: MYAPPLY_ROUTE_PATH
+                        name: MYAPPLY_ROUTE_PATH,
+                        query: {
+                            [MYAPPLY_ROUTER_KEYNAME]: MYAPPLY_DRAFT_TAB_KEYNAME
+                        }
                     })
                 })
             },
@@ -205,7 +211,10 @@
                 this.handleToDealWidthApply(false, applyForm).then(res => {
                     this.messageSuccess('申请成功')
                     return this.$router.replace({
-                        name: MYAPPLY_ROUTE_PATH
+                        name: MYAPPLY_ROUTE_PATH,
+                        query: {
+                            [MYAPPLY_ROUTER_KEYNAME]: MYAPPLY_PENDING_APPROVAL_TAB_KEYNAME
+                        }
                     })
                 })
             },

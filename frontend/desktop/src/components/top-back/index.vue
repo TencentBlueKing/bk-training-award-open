@@ -5,6 +5,9 @@
 </template>
 
 <script>
+    // pageCount
+    import { HOME_ROUTE_PATH } from '@/constants'
+
     export default {
         name: 'top-back',
         props: {
@@ -17,17 +20,20 @@
         },
         data () {
             return {
-                robotImg: require('@/images/robot.png')
-
+                robotImg: require('@/images/robot.png'),
+                count: 0
             }
         },
         methods: {
             handleBack () {
-                // if (this.backFn) {
-                //     console.log(this.backFn)
-                //     return this.backFn()
-                // }
-                return this.$router.go(-1)
+                const passed = sessionStorage.getItem('is_pass')
+                if (passed) {
+                    return this.$router.go(-1)
+                } else {
+                    return this.$router.replace({
+                        name: HOME_ROUTE_PATH
+                    })
+                }
             }
         }
     }

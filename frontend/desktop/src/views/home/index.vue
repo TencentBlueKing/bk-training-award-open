@@ -48,7 +48,7 @@
 </template>
 <script>
 
-    import { AWARD_TYPE_CREATE, AWARD_TYPE_ROUTE_KEY } from '@/constants'
+    import { AWARD_TYPE_CREATE, AWARD_TYPE_ROUTE_KEY, MYAPPLY_DRAFT_TAB_KEYNAME, MYAPPLY_ROUTER_KEYNAME } from '@/constants'
 
     export default {
         name: 'Home',
@@ -72,12 +72,19 @@
                       description: '为您的小组创建奖项',
                       title: '创建奖项',
                       routerParams: () => [self.$store.state['ROUTE_TABLE']['AWARD_FORM_ROUTE_PATH'], {
-                          query: { [AWARD_TYPE_ROUTE_KEY]: AWARD_TYPE_CREATE }
+                          query: {
+                              [AWARD_TYPE_ROUTE_KEY]: AWARD_TYPE_CREATE
+                          }
                       }] },
                     { style: 'background: var(--gradient-orange-pink);',
                       description: '查看申请信息及申请状态',
                       title: '我的申请',
-                      routerParams: () => [self.$store.state['ROUTE_TABLE']['MYAPPLY_ROUTE_PATH']] },
+                      routerParams: () => [self.$store.state['ROUTE_TABLE']['MYAPPLY_ROUTE_PATH'], {
+                          query: {
+                              [MYAPPLY_ROUTER_KEYNAME]: MYAPPLY_DRAFT_TAB_KEYNAME
+                          }
+                      }]
+                    },
                     { style: 'background: var(--gradient-green);',
                       description: '查看创建的奖项',
                       title: '奖项列表',
@@ -165,7 +172,6 @@
     overflow-x: scroll;
     align-items: center;
     flex: 1;
-
     .header-main {
       display: flex;
       align-items: center;
