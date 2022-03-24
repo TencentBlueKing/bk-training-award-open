@@ -36,14 +36,14 @@ class AwardView(APIView):
         """获取可申请的奖项（所属部门的）"""
         now = timezone.now()
 
-        def get_queryset_by_status(status, valid_awards: QuerySet):
+        def get_queryset_by_status(award_status, valid_awards: QuerySet):
             award_status = {
                 "1": valid_awards.filter(Q(start_time__gt=now) & Q(approval_state=0)),  # 未开始
                 "2": valid_awards.filter(Q(start_time__lt=now) & Q(end_time__gt=now) & Q(approval_state=0)),  # 已开始
                 "3": valid_awards.filter(Q(end_time__lt=now) & Q(approval_state=0)),  # 申请时间结束
                 "4": valid_awards.filter(approval_state=1),  # 已结束
             }
-            return award_status[status].order_by('-create_time')
+            return award_status[award_status].order_by('-create_time')
         department_id = request.query_params.get("group_id")
         if department_id:
             valid_awards = Awards.objects.filter(award_department_id=department_id)
@@ -127,14 +127,14 @@ class RecordView(APIView):
 
     def get(self, request):
         """获取我的申请记录"""
-        def get_queryset_by_status(status, queryset: QuerySet):
+        def get_queryset_by_status(apply_status, queryset: QuerySet):
             queryset = {
                 "1": record.filter(approval_state=ApprovalState.draft.value[0]),
                 "2": record.filter(approval_state=ApprovalState.review_pending.value[0]),
                 "3": record.filter(approval_state__in=[ApprovalState.review_passed.value[0],
                                                        ApprovalState.review_not_passed.value[0]])
             }
-            return queryset["status"].order_by("id")
+            return queryset[apply_status].order_by("id")
         status = request.query_params["apply_status"]
         department_id = request.query_params.get("group_id")
         if department_id:
