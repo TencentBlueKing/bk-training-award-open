@@ -159,7 +159,12 @@
 </template>
 <script>
     import { formatDate, formatUsernameAndDisplayName } from '@/common/util'
-    import { AWARD_LEVEL_MAP, AWARD_MANAGER_ROUTE_PATH, AWARD_TYPE_EDIT, AWARD_TYPE_ROUTE_KEY } from '@/constants'
+    import {
+        AWARD_LEVEL_MAP,
+        AWARD_MANAGER_ROUTE_PATH,
+        AWARD_TYPE_EDIT,
+        AWARD_TYPE_ROUTE_KEY
+    } from '@/constants'
     import { getAwardById, postAwards, putAward } from '@/api/service/award-service'
     import moment from 'moment'
 

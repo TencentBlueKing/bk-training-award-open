@@ -93,10 +93,23 @@ export const MYAPPLY_ROUTE_PATH = 'myapply'
 // REVIEW_PASSED
 // REVIEW_NOT_PASSED
 // DRAFT
+export const MYAPPLY_ROUTER_KEYNAME = 'myapply_type'
 export const MYAPPLY_PENDING_APPROVAL = 1
 export const MYAPPLY_ING_APPROVAL = 2
 export const MYAPPLY_ENDED_APPROVAL = 3
 export const MYAPPLY_DRAFT = 4
+
+export const MYAPPLY_PENDING_APPROVAL_TAB_KEYNAME = 'myapply-pending-approval'
+export const MYAPPLY_ING_APPROVAL_TAB_KEYNAME = 'myapply-ing-approval'
+export const MYAPPLY_ENDED_APPROVAL_TAB_KEYNAME = 'myapply-ended-approval'
+export const MYAPPLY_DRAFT_TAB_KEYNAME = 'myapply-draft'
+
+export const MYAPPLY_TABLE = {
+    [MYAPPLY_PENDING_APPROVAL]: MYAPPLY_PENDING_APPROVAL_TAB_KEYNAME,
+    [MYAPPLY_ING_APPROVAL]: MYAPPLY_ING_APPROVAL_TAB_KEYNAME,
+    [MYAPPLY_ENDED_APPROVAL]: MYAPPLY_ENDED_APPROVAL_TAB_KEYNAME,
+    [MYAPPLY_DRAFT]: MYAPPLY_DRAFT_TAB_KEYNAME
+}
 // E 申请路由中的状态量
 
 export const GROUP_MANAGER_ROUTE_PATH = 'group-manager'

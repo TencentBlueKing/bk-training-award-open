@@ -25,12 +25,20 @@
 </template>
 
 <script>
+    import {
+        MYAPPLY_DRAFT_TAB_KEYNAME,
+        MYAPPLY_ENDED_APPROVAL_TAB_KEYNAME,
+        MYAPPLY_ING_APPROVAL_TAB_KEYNAME,
+        MYAPPLY_PENDING_APPROVAL_TAB_KEYNAME,
+        MYAPPLY_ROUTER_KEYNAME
+    } from '@/constants'
+
     export default {
         components: {
-            Draft: () => import('@/views/myapply/table/draft'),
-            PendingApproval: () => import('@/views/myapply/table/pending-approval'),
-            IngApproval: () => import('@/views/myapply/table/ing-approval'),
-            EndedApproval: () => import('@/views/myapply/table/ended-approval')
+            [MYAPPLY_DRAFT_TAB_KEYNAME]: () => import('@/views/myapply/table/draft'),
+            [MYAPPLY_PENDING_APPROVAL_TAB_KEYNAME]: () => import('@/views/myapply/table/pending-approval'),
+            [MYAPPLY_ING_APPROVAL_TAB_KEYNAME]: () => import('@/views/myapply/table/ing-approval'),
+            [MYAPPLY_ENDED_APPROVAL_TAB_KEYNAME]: () => import('@/views/myapply/table/ended-approval')
         },
         data () {
             return {
@@ -38,27 +46,35 @@
                 data: [],
                 remoteData: [],
                 isLoading: false,
-
                 // 当前选择的表格
-                curSelectedTable: 'pending-approval',
+                curSelectedTable: MYAPPLY_DRAFT_TAB_KEYNAME,
                 myApplyTabItems: [
                     {
                         'tab-name': '草稿',
-                        'tab-key': 'draft'
+                        'tab-key': MYAPPLY_DRAFT_TAB_KEYNAME
                     }, {
                         'tab-name': '待审批',
-                        'tab-key': 'pending-approval'
+                        'tab-key': MYAPPLY_PENDING_APPROVAL_TAB_KEYNAME
                     }, {
                         'tab-name': '审批中',
-                        'tab-key': 'ing-approval'
+                        'tab-key': MYAPPLY_ING_APPROVAL_TAB_KEYNAME
                     }, {
                         'tab-name': '已审批',
-                        'tab-key': 'ended-approval'
+                        'tab-key': MYAPPLY_ENDED_APPROVAL_TAB_KEYNAME
                     }
                 ]
             }
         },
-        computed: {
+        created () {
+            const curType = this.$route.query[MYAPPLY_ROUTER_KEYNAME]
+            if (curType && [
+                MYAPPLY_DRAFT_TAB_KEYNAME,
+                MYAPPLY_PENDING_APPROVAL_TAB_KEYNAME,
+                MYAPPLY_ING_APPROVAL_TAB_KEYNAME,
+                MYAPPLY_ENDED_APPROVAL_TAB_KEYNAME
+            ].includes(curType)) {
+                this.curSelectedTable = curType
+            }
         },
         methods: {
             handleInit (curSelectedTable = this.curSelectedTable) {
