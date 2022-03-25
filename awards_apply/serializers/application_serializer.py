@@ -1,4 +1,5 @@
-from awards_apply.models import ApprovalState, Awards
+from awards_apply.models import (ApprovalRecord, ApprovalState,
+                                 AwardApplicationRecord, Awards)
 from django.forms import model_to_dict
 from django.utils import timezone
 from rest_framework import serializers
@@ -20,10 +21,22 @@ class ApplicationSerializer(serializers.Serializer):
             obj.update({"award_info": award_info if award_info else None})
             return obj
 
-    def update(self, instance, validated_data):
+    def update(self, instance, validated_data, username):
         action_dict = {"pass": 1, "not_pass": 0}  # 通过/不通过操作码
+        # 创建审批记录
+        ApprovalRecord.objects.create(**{
+            "application_id": instance.id,
+            "department_id": instance.award_department_id,
+            "approval_user": username,
+            "approval_action": validated_data["action"],
+        })
         if validated_data["action"] == action_dict["pass"]:
             instance.approval_turn += 1  # 进入下一轮审批
+            # 防止调接口刷轮次导致前端展示进度条不正常
+            if instance.approval_turn > len(instance.approval_users):
+                instance.approval_turn = len(instance.approval_users)
+                instance.save()
+                return instance
             # 如果是最后一轮审批, 置审批状态为通过, 填入审批评语, 通过时间
             if len(instance.approval_users) == instance.approval_turn:
                 instance.approval_state = ApprovalState.review_passed.value[0]
@@ -38,3 +51,15 @@ class ApplicationSerializer(serializers.Serializer):
             instance.approval_text = validated_data["approval_text"]
             instance.save()
             return instance
+
+
+class ApprovalRecordSerializer(serializers.ModelSerializer):
+    application_info = serializers.SerializerMethodField()
+
+    class Meta:
+        model = ApprovalRecord
+        fields = '__all__'
+
+    def get_application_info(self, obj):
+        application_info = AwardApplicationRecord.objects.filter(pk=obj.application_id).first()
+        return model_to_dict(application_info) if application_info else None

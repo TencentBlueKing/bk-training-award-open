@@ -1,8 +1,8 @@
-from awards_apply.models import ApprovalState
+from awards_apply.models import ApprovalRecord, ApprovalState
 from awards_apply.models import AwardApplicationRecord as Application
 from awards_apply.models import Group, Notification
-from awards_apply.serializers.application_serializer import \
-    ApplicationSerializer
+from awards_apply.serializers.application_serializer import (
+    ApplicationSerializer, ApprovalRecordSerializer)
 from awards_apply.utils.const import object_not_exist_error, success_code
 from awards_apply.utils.pagination import CommonPaginaation
 from django.forms import model_to_dict
@@ -18,29 +18,34 @@ class ApprovalView(APIView):
     def get(self, request, *args, **kwargs):
         """我的审批: 查询我的审批列表"""
         approval_state = request.query_params["approval_status"]
+        group_id = request.query_params.get("group_id")
+        page = CommonPaginaation()
         if approval_state == ApplicationState["end"]:
-            queryset = Application.objects.filter(
-                approval_users__contains=request.user.username
-            ).filter(approval_state__in=[ApprovalState.review_passed.value[0],
-                                         ApprovalState.review_not_passed.value[0]]).order_by("id")
+            # 已审批
+            queryset = ApprovalRecord.objects.filter(approval_user=request.user.username).order_by("approval_time")
+            if group_id:
+                queryset = queryset.filter(department_id=group_id).order_by("approval_time")
+            queryset = page.paginate_queryset(queryset, request, self)
+            serializer = ApprovalRecordSerializer(queryset, many=True)
+            response = page.get_paginated_response(serializer.data)
+            return Response(success_code(response.data))
         else:
+            # 未审批
             queryset = Application.objects.filter(
                 approval_users__contains=request.user.username
             ).filter(approval_state=ApprovalState.review_pending.value[0]).order_by("id")
-        group_id = request.query_params.get("group_id")
-        if group_id:
-            queryset = queryset.filter(award_department_id=group_id).order_by("id")
-        page = CommonPaginaation()
-        queryset = page.paginate_queryset(queryset, request, self)
-        serializer = ApplicationSerializer(
-            queryset, many=True, context={"username": request.user.username}
-        )
-        response = page.get_paginated_response(serializer.data)
-        response.data["results"] = [
-            item["obj"] for item in response.data["results"] if item["obj"] is not None
-        ]
-        response.data["count"] = len(response.data["results"])
-        return Response(success_code(response.data))
+            if group_id:
+                queryset = queryset.filter(award_department_id=group_id).order_by("id")
+            queryset = page.paginate_queryset(queryset, request, self)
+            serializer = ApplicationSerializer(
+                queryset, many=True, context={"username": request.user.username}
+            )
+            response = page.get_paginated_response(serializer.data)
+            response.data["results"] = [
+                item["obj"] for item in response.data["results"] if item["obj"] is not None
+            ]
+            response.data["count"] = len(response.data["results"])
+            return Response(success_code(response.data))
 
     def post(self, request, *args, **kwargs):
         """审批奖项"""
@@ -50,8 +55,8 @@ class ApprovalView(APIView):
             id=serializer.validated_data["id"]
         ).first()
         if not application:
-            return Response(object_not_exist_error("application"))
-        result = serializer.update(application, serializer.validated_data)
+            return Response(object_not_exist_error("申请"))
+        result = serializer.update(application, serializer.validated_data, request.user.username)
         group = Group.objects.filter(pk=application.award_department_id).first()
         Notification.objects.create(
             **{

@@ -1,5 +1,5 @@
-from awards_apply.models import (
-    ApprovalState, AwardApplicationRecord, Awards, GroupUser, Notification)
+from awards_apply.models import (ApprovalState, AwardApplicationRecord, Awards,
+                                 GroupUser, Notification)
 from awards_apply.serializers.award_serializers import (
     AwardsRecordSerializers, AwardsSerializers)
 from awards_apply.utils.const import (false_code, object_not_exist_error,
@@ -9,7 +9,6 @@ from awards_apply.utils.pagination import CommonPaginaation, PagePagination
 from django.core.paginator import EmptyPage
 from django.db import transaction
 from django.db.models import Q
-from django.db.models.query import QuerySet
 from django.forms import model_to_dict
 from django.http import JsonResponse
 from django.shortcuts import render
@@ -36,12 +35,12 @@ class AwardView(APIView):
         """获取可申请的奖项（所属部门的）"""
         now = timezone.now()
 
-        def get_queryset_by_status(award_status, valid_awards: QuerySet):
+        def get_queryset_by_status(award_status, valid_awards):
             queryset = {
-                "1": valid_awards.filter(Q(start_time__gt=now) & Q(approval_state=0)),  # 未开始
-                "2": valid_awards.filter(Q(start_time__lt=now) & Q(end_time__gt=now) & Q(approval_state=0)),  # 已开始
-                "3": valid_awards.filter(Q(end_time__lt=now) & Q(approval_state=0)),  # 申请时间结束
-                "4": valid_awards.filter(approval_state=1),  # 已结束
+                "1": valid_awards.filter(Q(start_time__gt=now) & Q(approval_state=0)),  # 申请时间段前
+                "2": valid_awards.filter(Q(start_time__lt=now) & Q(end_time__gt=now) & Q(approval_state=0)),  # 申请时间段中
+                "3": valid_awards.filter(Q(end_time__lt=now) & Q(approval_state=0)),  # 申请时间段后
+                "4": valid_awards.filter(approval_state=1),  # 已结束，奖项已公示
             }
             return queryset[award_status].order_by('-create_time')
         department_id = request.query_params.get("group_id")
@@ -51,6 +50,11 @@ class AwardView(APIView):
             departments_id = GroupUser.objects.filter(username=request.user.username).values_list("group_id")
             departments_id = [item[0] for item in departments_id]
             valid_awards = Awards.objects.filter(award_department_id__in=departments_id)
+        # 排除掉已申请奖项
+        awards_id = AwardApplicationRecord.objects.filter(
+            application_users__contains={"username": request.user.username}).values_list("award_id")
+        awards_id = [item[0] for item in awards_id]
+        valid_awards = valid_awards.exclude(id__in=awards_id)
         valid_awards = get_queryset_by_status(request.query_params.get("award_status"), valid_awards)
         pagination = PagePagination()
         try:
@@ -127,7 +131,7 @@ class RecordView(APIView):
 
     def get(self, request):
         """获取我的申请记录"""
-        def get_queryset_by_status(apply_status, queryset: QuerySet):
+        def get_queryset_by_status(apply_status, queryset):
             queryset = {
                 "1": record.filter(approval_state=ApprovalState.draft.value[0]),
                 "2": record.filter(approval_state=ApprovalState.review_pending.value[0]),
@@ -171,7 +175,7 @@ class RecordView(APIView):
         if award.end_time < timezone.now():
             return JsonResponse(false_code("奖项已过截止申请时间，无法撤回"))
         AwardApplicationRecord.objects.filter(pk=award_apply_record_id).update(
-            dict(approval_state=RecordStatus['draft'], approval_turn=0))
+            **dict(approval_state=RecordStatus['draft'], approval_turn=0))
         return JsonResponse(success_code(None))
 
     def post(self, request, *args, **kwargs):
@@ -187,8 +191,8 @@ class RecordView(APIView):
         # 判断用户是否已经申请过该奖项
         if application:
             return JsonResponse(false_code("指定用户已申请过该奖项"))
-        record.update({"application_users": [{"username": request.user.username,
-                                              "display_name": request.user.nickname}]})
+        record.update(**{"application_users": [{"username": request.user.username,
+                                                "display_name": request.user.nickname}]})
         award_record.create(record)
         return JsonResponse(success_code(None))
 
@@ -209,8 +213,8 @@ class RecordView(APIView):
             return JsonResponse(false_code("奖项已过截止申请时间，无法编辑"))
         application_reason = request.data["application_reason"]
         application_attachments = request.data["application_attachments"]
-        data = application.update(application_reason=application_reason,
-                                  application_attachments=application_attachments)
+        data = application.update(**dict(application_reason=application_reason,
+                                         application_attachments=application_attachments))
         return JsonResponse(success_code(data))
 
 
@@ -280,11 +284,17 @@ def award_application(request, id):
 
 @api_view(["GET"])
 def available_awards(request):
+    now = timezone.now()
     departments_id = GroupUser.objects.filter(username=request.user.username).values_list("group_id")
     departments_id = [item[0] for item in departments_id]
     awards = Awards.objects.filter(award_department_id__in=departments_id).filter(
-        approval_state=AwardsStatus["start"]
+        Q(start_time__lt=now) & Q(end_time__gt=now) & Q(approval_state=AwardsStatus["start"])
     ).exclude(award_reviewers__contains=request.user.username).order_by("start_time")
+    # 排除掉已申请奖项
+    awards_id = AwardApplicationRecord.objects.filter(
+        application_users__contains={"username": request.user.username}).values_list("award_id")
+    awards_id = [item[0] for item in awards_id]
+    awards = awards.exclude(id__in=awards_id)
     page = CommonPaginaation()
     queryset = page.paginate_queryset(awards, request)
     serializer = AwardsSerializers(instance=queryset, many=True)

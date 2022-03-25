@@ -65,10 +65,13 @@ class AwardApplicationRecord(models.Model):
     approval_text = models.TextField(verbose_name="评审评语", null=False, default='')
 
 
-# class Images(models.Model):
-#     image = models.ImageField(upload_to='images', blank=True, null=True)
-#     create_time = models.DateTimeField(auto_now_add=True)
-#
-#     class Meta:
-#         # 根据创建时间进行排序
-#         ordering = ["-create_time"]
+class ApprovalRecord(models.Model):
+    application_id = models.IntegerField(verbose_name="申请id")
+    department_id = models.IntegerField(verbose_name="组id")
+    approval_time = models.DateTimeField(auto_now_add=True, verbose_name="审批时间")
+    approval_user = models.CharField(max_length=100, verbose_name="审批人")
+    ApprovalAction = [
+        (0, "未通过"),
+        (1, "通过")
+    ]
+    approval_action = models.IntegerField(choices=ApprovalAction, verbose_name="审批操作")
