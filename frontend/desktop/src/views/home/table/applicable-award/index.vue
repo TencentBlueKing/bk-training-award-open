@@ -34,7 +34,7 @@
 <script>
     import { DETAIL_APPLY, DETAIL_ROUTE_PATH, DETAIL_TYPE_KEYNAME, ING_AWARD } from '@/constants'
     import { getAvailableAwards } from '@/api/service/award-service'
-    import moment from 'moment'
+    import { formatDate } from '@/common/util'
 
     export default {
         name: 'applicable-award',
@@ -62,8 +62,8 @@
                         award_consultant: item['award_consultant'],
                         award_consultant_displayname: item['award_consultant_displayname'],
                         award_demand: item['award_demand'],
-                        start_time: item['start_time'],
-                        end_time: moment(item['end_time']).format('YYYY-MM-DD hh:mm'),
+                        start_time: formatDate(item['start_time']),
+                        end_time: formatDate(item['end_time']),
                         approval_state: item['approval_state']
                     }
                 })
@@ -79,6 +79,7 @@
                     query: {
                         [DETAIL_TYPE_KEYNAME]: DETAIL_APPLY,
                         award_id: award['id']
+
                     }
                 })
             },
