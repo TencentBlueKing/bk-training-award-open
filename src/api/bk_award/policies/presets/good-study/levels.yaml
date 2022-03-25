@@ -1,0 +1,21 @@
+apiVersion: v1
+kind: AwardLevel
+spec:
+  name: "小组级"
+  sort: 1
+
+---
+
+apiVersion: v1
+kind: AwardLevel
+spec:
+  name: "大组级"
+  sort: 2
+
+---
+
+apiVersion: v1
+kind: AwardLevel
+spec:
+  name: "全班级"
+  sort: 3

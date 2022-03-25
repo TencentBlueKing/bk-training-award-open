@@ -133,3 +133,10 @@ dmypy.json
 
 # for silky
 *.prof
+.codecc
+
+# for preCI
+build.yml
+
+# for pre-commit
+pre_commit_hooks/
