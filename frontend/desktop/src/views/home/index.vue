@@ -196,15 +196,17 @@
   }
 
   .footer-panel {
-    min-height: 50%;
+    min-height: 400px;
     max-height: 60%;
     display: flex;
     justify-content: space-around;
     width: inherit;
 
     .controller-panel {
-      height: 385px;
+      max-height: 385px;
       width: 900px;
+      overflow-y: scroll;
+
       background-color: #FFFFFF;
       border-radius: 20px;
       box-shadow: 0 4px 90px rgba(163, 171, 185, 0.24);
