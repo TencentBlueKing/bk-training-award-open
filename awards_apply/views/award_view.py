@@ -37,13 +37,13 @@ class AwardView(APIView):
         now = timezone.now()
 
         def get_queryset_by_status(award_status, valid_awards: QuerySet):
-            award_status = {
+            queryset = {
                 "1": valid_awards.filter(Q(start_time__gt=now) & Q(approval_state=0)),  # 未开始
                 "2": valid_awards.filter(Q(start_time__lt=now) & Q(end_time__gt=now) & Q(approval_state=0)),  # 已开始
                 "3": valid_awards.filter(Q(end_time__lt=now) & Q(approval_state=0)),  # 申请时间结束
                 "4": valid_awards.filter(approval_state=1),  # 已结束
             }
-            return award_status[award_status].order_by('-create_time')
+            return queryset[award_status].order_by('-create_time')
         department_id = request.query_params.get("group_id")
         if department_id:
             valid_awards = Awards.objects.filter(award_department_id=department_id)
