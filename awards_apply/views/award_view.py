@@ -194,11 +194,23 @@ class RecordView(APIView):
 
     def put(self, request):
         id = request.query_params.get("id")
-        application = AwardApplicationRecord.objects.filter(approval_state=RecordStatus['draft']).filter(pk=int(id))
+        is_draft = request.query_params.get("is_draft")
+        application = AwardApplicationRecord.objects.filter(
+            approval_state=RecordStatus['draft']).filter(pk=int(id)).filter(
+            application_users__contains={"username": request.user.username}
+        )
+        if not application:
+            return JsonResponse(false_code("不可编辑他人申请"))
+        if int(is_draft):
+            application.update(approval_state=RecordStatus['wait'])
+            return JsonResponse(success_code(None, message="已发起申请"))
         award = Awards.objects.filter(pk=application.first().award_id).first()
         if award.end_time < timezone.now():
             return JsonResponse(false_code("奖项已过截止申请时间，无法编辑"))
-        data = application.update(**request.data)
+        application_reason = request.data["application_reason"]
+        application_attachments = request.data["application_attachments"]
+        data = application.update(application_reason=application_reason,
+                                  application_attachments=application_attachments)
         return JsonResponse(success_code(data))
 
 
