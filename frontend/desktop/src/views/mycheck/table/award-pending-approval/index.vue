@@ -21,10 +21,10 @@
     import { tableMixins } from '@/views/mycheck/table/tableMixins'
     import { getAwardApproval } from '@/api/service/apply-service'
     import {
-        DETAIL_APPROVAL_DETAIL,
+        DETAIL_APPROVAL,
         DETAIL_ROUTE_PATH,
         DETAIL_TYPE_KEYNAME,
-        MYAPPLY_PENDING_APPLY
+        MYCHECK_AWARD_PENGDING_APPROVAL
     } from '@/constants'
     import { formatDate, formatUsernameAndDisplayName } from '@/common/util'
 
@@ -87,7 +87,7 @@
                     page,
                     size,
                     group_id: this.$bus.curGlobalGroupId,
-                    approval_status: MYAPPLY_PENDING_APPLY
+                    approval_status: MYCHECK_AWARD_PENGDING_APPROVAL
                 }
                 return getAwardApproval(params).then(response => {
                     const approvals = response.data
@@ -101,7 +101,7 @@
                 this.$router.push({
                     name: DETAIL_ROUTE_PATH,
                     query: {
-                        [DETAIL_TYPE_KEYNAME]: DETAIL_APPROVAL_DETAIL,
+                        [DETAIL_TYPE_KEYNAME]: DETAIL_APPROVAL,
                         record_id: approval['approval_id'],
                         award_id: approval['award_id'],
                         group_id: approval['award_department_id']
