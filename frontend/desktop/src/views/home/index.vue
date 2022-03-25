@@ -197,6 +197,7 @@
 
   .footer-panel {
     min-height: 50%;
+    max-height: 60%;
     display: flex;
     justify-content: space-around;
     width: inherit;
