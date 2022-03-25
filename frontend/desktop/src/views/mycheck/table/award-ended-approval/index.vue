@@ -21,7 +21,7 @@
     import { getAwardApproval } from '@/api/service/apply-service'
     import { tableMixins } from '@/views/mycheck/table/tableMixins'
     import {
-        DETAIL_APPROVAL_DETAIL,
+        DETAIL_APPROVAL_RESULT_DETAIL,
         DETAIL_ROUTE_PATH,
         DETAIL_TYPE_KEYNAME,
         MYCHECK_AWARD_ENDED_APPROVAL
@@ -38,7 +38,7 @@
         },
         computed: {
             endedApprovalData (self) {
-                return self.endedApprovalRemoteData.map(approval => {
+                return self.endedApprovalRemoteData?.map(approval => {
                     const awardInfo = approval['award_info']
                     const applicationUsers = approval.application_users ?? []
                     return {
@@ -68,7 +68,7 @@
                             awardInfo['award_consultant']
                         )
                     }
-                })
+                }) ?? []
             }
         },
         mounted () {
@@ -102,7 +102,7 @@
                 this.$router.push({
                     name: DETAIL_ROUTE_PATH,
                     query: {
-                        [DETAIL_TYPE_KEYNAME]: DETAIL_APPROVAL_DETAIL,
+                        [DETAIL_TYPE_KEYNAME]: DETAIL_APPROVAL_RESULT_DETAIL,
                         record_id: approval['approval_id'],
                         award_id: approval['award_id']
                     }

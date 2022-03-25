@@ -90,7 +90,7 @@
         },
         computed: {
             pendingApprovalData (self) {
-                return self.pendingApprovalRemoteData.map(item => {
+                return self.pendingApprovalRemoteData?.map(item => {
                     const awardInfo = item['award_info'] ?? {}
                     const awardReviewersSteps = awardInfo['award_reviewers'].map((item, index) => {
                         return {
@@ -121,7 +121,7 @@
                         start_time: formatDate(awardInfo['start_time']),
                         end_time: formatDate(awardInfo['end_time'])
                     }
-                })
+                }) ?? []
             }
         },
         mounted () {

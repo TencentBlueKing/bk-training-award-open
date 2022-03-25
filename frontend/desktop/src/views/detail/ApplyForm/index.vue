@@ -85,7 +85,7 @@
     import {
         DETAIL_APPLY,
         DETAIL_APPLY_DETAIL,
-        DETAIL_APPROVAL_DETAIL,
+        DETAIL_APPROVAL, DETAIL_APPROVAL_RESULT_DETAIL,
         DETAIL_DRAFT_DETAIL, DETAIL_EDIT,
         DETAIL_TYPE_KEYNAME,
         GROUP_USERS_KEYNAME,
@@ -133,7 +133,14 @@
                         init () {
                         }
                     },
-                    [DETAIL_APPROVAL_DETAIL]: {
+                    [DETAIL_APPROVAL]: {
+                        hidden_button: true,
+                        is_editor: false,
+                        init () {
+                            self.handleGetRecord()
+                        }
+                    },
+                    [DETAIL_APPROVAL_RESULT_DETAIL]: {
                         hidden_button: true,
                         is_editor: false,
                         init () {
@@ -147,13 +154,13 @@
                         DETAIL_EDIT,
                         DETAIL_APPLY_DETAIL,
                         DETAIL_DRAFT_DETAIL,
-                        DETAIL_APPROVAL_DETAIL
+                        DETAIL_APPROVAL_DETAIL: DETAIL_APPROVAL
                     },
                     [DETAIL_APPLY]: DETAIL_APPLY,
                     [DETAIL_EDIT]: DETAIL_EDIT,
                     [DETAIL_APPLY_DETAIL]: DETAIL_APPLY_DETAIL,
                     [DETAIL_DRAFT_DETAIL]: DETAIL_DRAFT_DETAIL,
-                    [DETAIL_APPROVAL_DETAIL]: DETAIL_APPROVAL_DETAIL
+                    [DETAIL_APPROVAL]: DETAIL_APPROVAL
                 },
                 applyForm: {
                     /**

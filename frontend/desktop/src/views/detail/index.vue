@@ -38,7 +38,7 @@
             </div>
         </div>
         <!-- 底部按钮组 -->
-        <div class="tc w100  mt15" v-if="formType === pageType['approval_detail']">
+        <div class="tc w100  mt15" v-if="formType === pageType['DETAIL_APPROVAL']">
             <!-- 用于申请奖项的按钮 -->
             <div class="button-item">
                 <bk-button theme="danger"
@@ -100,8 +100,8 @@
     import {
         DETAIL_APPLY,
         DETAIL_APPLY_DETAIL,
-        DETAIL_APPROVAL_DETAIL,
-        DETAIL_DRAFT_DETAIL,
+        DETAIL_APPROVAL, DETAIL_APPROVAL_RESULT_DETAIL,
+        DETAIL_DRAFT_DETAIL, DETAIL_EDIT,
         DETAIL_TYPE_KEYNAME
     } from '@/constants'
     import { postApproval } from '@/api/service/apply-service'
@@ -133,10 +133,12 @@
                 applyForm: {},
                 panelCutOut: false,
                 pageType: {
-                    'apply': DETAIL_APPLY,
-                    'apply_detail': DETAIL_APPLY_DETAIL,
-                    'draft_detail': DETAIL_DRAFT_DETAIL,
-                    'approval_detail': DETAIL_APPROVAL_DETAIL
+                    DETAIL_APPLY,
+                    DETAIL_APPROVAL,
+                    DETAIL_EDIT,
+                    DETAIL_APPLY_DETAIL,
+                    DETAIL_DRAFT_DETAIL,
+                    DETAIL_APPROVAL_RESULT_DETAIL
                 },
                 approvalForm: {
                     approvalVisible: false,
