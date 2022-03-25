@@ -34,6 +34,7 @@ class AwardsRecordSerializers(serializers.Serializer):
     application_reason = serializers.CharField(required=False)
     application_attachments = serializers.ListField(required=False)
     approval_turn = serializers.IntegerField(read_only=True)
+    approval_text = serializers.CharField(required=False)
     approval_state = serializers.IntegerField(default=0, required=False)
     application_time = serializers.DateTimeField(format=TIME_FORMAT, required=False)
     award_info = serializers.SerializerMethodField()
