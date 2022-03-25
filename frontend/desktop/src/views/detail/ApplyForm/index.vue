@@ -70,7 +70,7 @@
                 ext-cls="button-item"
             >
                 <bk-icon type="check-circle" />
-                <span>重新申请</span>
+                <span>发起申请</span>
             </bk-button>
             <!-- /用于申请奖项的按钮 -->
 

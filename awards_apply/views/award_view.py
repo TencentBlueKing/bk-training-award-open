@@ -185,12 +185,10 @@ class RecordView(APIView):
         award_record.is_valid(raise_exception=True)
         record = award_record.validated_data
         application = AwardApplicationRecord.objects.filter(award_id=record["award_id"]).filter(
-            ~Q(approval_state=RecordStatus['draft'])
-            & ~Q(approval_state=RecordStatus['not_pass'])
-        ).filter(application_users__contains={"username": request.user.username}).first()
+            application_users__contains={"username": request.user.username})
         # 判断用户是否已经申请过该奖项
         if application:
-            return JsonResponse(false_code("指定用户已申请过该奖项"))
+            application.delete()
         record.update(**{"application_users": [{"username": request.user.username,
                                                 "display_name": request.user.nickname}]})
         award_record.create(record)
