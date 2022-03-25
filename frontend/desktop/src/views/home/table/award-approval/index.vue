@@ -2,6 +2,7 @@
     <self-table :data="awardApprovalList"
         :pagination.sync="pagination"
         :loading="loading"
+        :max-height="400"
         @page-change="handleInit"
     >
         <bk-table-column type="index" label="序号" width="60"></bk-table-column>
