@@ -2,34 +2,4 @@
 .mycheck-container {
     width: 80%;
     margin: 0 auto;
-
-    .status {
-        display: inline-block;
-        min-width: 60px;
-        height: 20px;
-
-        color: white;
-        background-color: var(--fontColor);
-
-        text-align: center;
-        border-radius: 2px;
-        padding: 2px;
-
-        &.review_pending {
-            background: var(--primaryColor);
-        }
-
-        &.review_passed {
-            background: var(--successColor);
-        }
-
-        &.review_not_passed {
-            background: var(--dangerColor);
-        }
-
-        &.draft {
-            background: var(--warningColor);
-        }
-    }
-
 }

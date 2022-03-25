@@ -25,12 +25,13 @@
 <script>
     import { getMessage, putMessage } from '@/api/service/message-service'
     import { formatUsernameAndDisplayName } from '@/common/util'
-
+    import { tableMixins } from '../tableMixins'
     export default {
         name: 'message-list',
         components: {
             MessageCard: () => import('@/views/home/MessageCard')
         },
+        mixins: [tableMixins],
         data () {
             return {
                 messageRemoteData: [],

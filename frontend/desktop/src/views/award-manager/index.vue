@@ -68,7 +68,7 @@
                         'tab-key': 'pending-start'
                     },
                     {
-                        'tab-name': '已开始',
+                        'tab-name': '开放中',
                         'tab-key': 'ing-award'
                     },
                     {

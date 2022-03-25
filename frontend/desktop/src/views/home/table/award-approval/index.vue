@@ -7,19 +7,35 @@
     >
         <bk-table-column type="index" label="序号" width="60"></bk-table-column>
         <bk-table-column label="奖项名称" prop="award_name"></bk-table-column>
-        <bk-table-column label="申请开始时间" prop="application_time"></bk-table-column>
-        <bk-table-column label="申请截止时间" prop="end_time"></bk-table-column>
-        <bk-table-column label="奖项顾问" prop="award_consultant_display_name_for_display"></bk-table-column>
+        <bk-table-column label="申请人">
+            <template slot-scope="approval">
+                <span :title="approval.row['application_user']"
+                    v-text="approval.row['application_user']"
+                ></span>
+            </template>
+        </bk-table-column>
+        <bk-table-column label="申请理由">
+            <template slot-scope="approval">
+                <span :title="approval.row['application_reason']"
+                    v-text="approval.row['application_reason']"
+                ></span>
+            </template>
+        </bk-table-column>
         <bk-table-column label="操作">
             <template slot-scope="approvals">
-                <bk-button class="mr10 ml10" theme="success" :text="true" @click="handleToRefundApplication(approvals.row)">前往审批</bk-button>
+                <bk-button class="mr10 ml10" theme="primary" :text="true" @click="handleToRefundApplication(approvals.row)">前往审批</bk-button>
             </template>
         </bk-table-column>
     </self-table>
 </template>
 <script>
 
-    import { DETAIL_APPROVAL, DETAIL_ROUTE_PATH, DETAIL_TYPE_KEYNAME, MYAPPLY_PENDING_APPLY } from '@/constants'
+    import {
+        DETAIL_APPROVAL,
+        DETAIL_ROUTE_PATH,
+        DETAIL_TYPE_KEYNAME,
+        MYCHECK_AWARD_PENGDING_APPROVAL
+    } from '@/constants'
     import { getAwardApproval } from '@/api/service/apply-service'
     import { formatDate, formatUsernameAndDisplayName } from '@/common/util'
 
@@ -40,16 +56,16 @@
             awardApprovalList (self) {
                 return self.awardApprovalRemoteList?.map(approval => {
                     const awardInfo = approval['award_info']
-                    const applicationUsers = approval.application_users ?? []
-                    console.log(awardInfo)
-                    console.log(approval)
+                    const applicationUsers = approval.application_users.map(user => {
+                        return formatUsernameAndDisplayName(user['username'], user['display_name'])
+                    })
                     return {
                         approval_id: approval['id'],
                         award_id: approval['award_id'],
                         award_department_id: approval['award_department_id'],
                         application_time: formatDate(approval['application_time']),
                         application_reason: approval['application_reason'],
-                        application_user: formatUsernameAndDisplayName(applicationUsers[0]?.['username'], applicationUsers[0]?.['display_name']),
+                        application_user: applicationUsers.join(','),
                         application_users: approval['application_users'],
                         application_attachments: approval['application_attachments'],
                         approval_state: approval['approval_state'],
@@ -67,7 +83,7 @@
                         award_consultant_displayname: awardInfo['award_consultant'],
                         award_consultant_display_name_for_display: formatUsernameAndDisplayName(
                             awardInfo['award_consultant'],
-                            awardInfo['award_consultant']
+                            awardInfo['award_consultant_displayname']
                         )
                     }
                 }) ?? []
@@ -100,7 +116,7 @@
                 }
                 this.loading = true
                 
-                return getAwardApproval({ page, size, approval_status: MYAPPLY_PENDING_APPLY }).then((response) => {
+                return getAwardApproval({ page, size, approval_status: MYCHECK_AWARD_PENGDING_APPROVAL }).then((response) => {
                     const data = response.data
                     this.pagination.count = data?.count ?? 0
                     this.awardApprovalRemoteList = data?.results

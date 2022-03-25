@@ -90,8 +90,8 @@
                 const attachFileList = fileList.map(item => {
                     const responseData = item['responseData']['data']
                     return {
-                        ...responseData,
-                        url: responseData['path']
+          ...responseData,
+          url: responseData['path']
                     }
                 })
                 this.$emit('change', attachFileList)
@@ -101,27 +101,33 @@
 </script>
 <style>
 
-    .file-wrapper {
-      max-height: 200px;
-      overflow-y: scroll;
-    }
-  .disabled {
-    &::after {
-      content: "";
-      z-index: 1000;
-      width: 100%;
-      height: 100%;
-      position: absolute;
-      top: 0;
-      user-select: none;
-      cursor: not-allowed;
-      background-color: #FAFBFD;
-      opacity: 20%;
-    }
+.file-wrapper {
+  max-height: 200px;
+  overflow-y: scroll;
+}
+
+.disabled {
+  &::after {
+    content: "";
+    z-index: 1000;
+    width: 100%;
+    height: 100%;
+    position: absolute;
+    top: 0;
+    user-select: none;
+    cursor: not-allowed;
+    background-color: #FAFBFD;
+    opacity: 20%;
   }
-  .readonly {
-    .file-wrapper {
-          display: none !important;
-    }
+}
+
+.readonly {
+  .file-wrapper {
+    display: none !important;
   }
+
+  .all-file .file-item .close-upload {
+    display: none !important
+  }
+}
 </style>

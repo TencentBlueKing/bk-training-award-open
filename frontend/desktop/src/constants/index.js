@@ -131,8 +131,8 @@ export const AWARD_TYPE_DETAIL = 'detail'
 export const MYCHECK_ROUTE_PATH = 'mycheck'
 // S 审批路由中的一些状态
 export const MYCHECK_ROUTE_KEYNAME = 'mycheck-type'
-export const MYCHECK_AWARD_PENGDING_APPROVAL = 1
-export const MYCHECK_AWARD_ENDED_APPROVAL = 2
+export const MYCHECK_AWARD_PENGDING_APPROVAL = 0
+export const MYCHECK_AWARD_ENDED_APPROVAL = 1
 
 // E 审批路由中的一些类型
 // S

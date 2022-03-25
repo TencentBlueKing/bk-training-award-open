@@ -38,7 +38,7 @@
                     :underline="true"
                     @click="handleAllAns($refs['message-list'])"
                 >
-                    <!--                    一键已读-->
+                    <!-- TODO: 一键已读 -->
                 </bk-link>
                 <template>
                     <message-list ref="message-list"></message-list>
@@ -115,11 +115,11 @@
                         'tab-name': '可申请奖项',
                         'tab-key': 'applicable-award'
                     }, {
-                        'tab-name': '奖项审批',
+                        'tab-name': '待审批奖项申请',
                         'tab-key': 'award-approval'
                     },
                     {
-                        'tab-name': '小组审批',
+                        'tab-name': '待审批成员申请',
                         'tab-key': 'group-approval'
                     }
                 ],
