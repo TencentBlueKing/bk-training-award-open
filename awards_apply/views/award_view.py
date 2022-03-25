@@ -142,8 +142,12 @@ class RecordView(APIView):
                 application_users__contains={"username": request.user.username}).filter(
                 award_department_id=int(department_id))
         else:
+            departments_id = GroupUser.objects.filter(username=request.user.username).values_list("group_id")
+            departments_id = [item[0] for item in departments_id]
             record = AwardApplicationRecord.objects.filter(
-                application_users__contains={"username": request.user.username})
+                application_users__contains={"username": request.user.username}).filter(
+                award_department_id__in=departments_id
+            )
         record = get_queryset_by_status(status, record)
         pagination = PagePagination()
         try:
