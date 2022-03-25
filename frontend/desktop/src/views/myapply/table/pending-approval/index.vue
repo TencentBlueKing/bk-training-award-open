@@ -77,7 +77,7 @@
     import { applyTableMixins } from '@/views/myapply/table/mixins'
     import { formatDate } from '@/common/util'
     import { deleteRecord } from '@/api/service/award-service'
-    import uuid from '@/common/uuid'
+    import { uuid } from '@/common/uuid'
 
     export default {
         name: 'pending-approval',
@@ -92,14 +92,14 @@
             pendingApprovalData (self) {
                 return self.pendingApprovalRemoteData?.map(item => {
                     const awardInfo = item['award_info'] ?? {}
-                    const awardReviewersSteps = awardInfo['award_reviewers'].map((item, index) => {
+                    const awardReviewersSteps = awardInfo['award_reviewers']?.map((item, index) => {
                         return {
                             uuid: uuid.get(),
                             title: '审批流程',
                             icon: index + 1,
                             description: item.join(',')
                         }
-                    })
+                    }) ?? []
                     return {
                         approval_id: item['id'],
                         record_id: item['id'],
@@ -144,11 +144,9 @@
                 if (this.loading) return
                 this.loading = true
                 return getRecord(params).then(response => {
-                    console.log(response)
-                  
                     const applications = response.data
-                    this.pagination['count'] = applications.count
-                    this.pendingApprovalRemoteData = applications.data
+                    this.pagination.count = applications.count ?? 0
+                    this.pendingApprovalRemoteData = applications.data ?? []
                 }).finally(_ => {
                     this.loading = false
                 })
