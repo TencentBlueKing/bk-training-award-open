@@ -1,17 +1,18 @@
 <template>
-    <bk-table size="small"
+    <bk-table :size="'small'"
         :data="data"
         :pagination="pagination"
         :highlight-current-row="true"
-        @page-change="handleSetPage($event)"
-        @page-limit-change="handleSetPageSize($event)"
         :outer-border="false"
         :header-border="false"
-        header-row-class-name="table-header"
         :max-height="$attrs['max-height']"
         :min-height="$attrs['min-height']"
         :height="$attrs['height']"
-        v-bkloading="{ isLoading: $attrs['loading'] ,title: '请稍等,正在为您安放数据' }"
+        @page-change="handleSetPage($event)"
+        @page-limit-change="handleSetPageSize($event)"
+
+        header-row-class-name="table-header"
+        v-bkloading="{ isLoading: $attrs['loading'] ,title: '正在加载中' }"
     >
         <slot></slot>
     </bk-table>
@@ -42,10 +43,10 @@
                 handleSetPageSize (size) {
                     this.handleSetPagination(1, size)
                 },
-                handleSetPagination (page = this.pagination.current, size = this.pagination.limit) {
+                handleSetPagination (current, limit) {
                     const config = {
-                        current: page,
-                        limit: size,
+                        current,
+                        limit,
                         count: this.pagination.count
                     }
                     this.$emit('update:pagination', config)
@@ -63,9 +64,8 @@
   }
 
   .bk-table-header-label {
-    font-style: normal;
     font-size: 14px;
-    color: #1F4173;
+    color: var(--primaryColor);
   }
 }
 </style>

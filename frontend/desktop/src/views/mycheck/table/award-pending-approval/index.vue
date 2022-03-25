@@ -11,7 +11,7 @@
         <bk-table-column label="奖项顾问" prop="award_consultant_display_name_for_display"></bk-table-column>
         <bk-table-column label="操作">
             <template slot-scope="approvals">
-                <bk-button class="mr10 ml10" theme="success" :text="true" @click="handleToRefundApplication(approvals.row)">前往审批</bk-button>
+                <bk-button class="mr10 ml10" theme="primary" :text="true" @click="handleToRefundApplication(approvals.row)">前往审批</bk-button>
             </template>
         </bk-table-column>
     </self-table>
