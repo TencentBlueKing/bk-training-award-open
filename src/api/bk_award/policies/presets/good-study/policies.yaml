@@ -1,0 +1,49 @@
+apiVersion: v1
+kind: AwardPolicy
+spec:
+  name: "三年二班学习成绩突破奖"
+  description: "奖励给三年二班学习成绩提高最快的个人或小组"
+  level: "全班"
+  liaisons:
+    - "张三"
+    - "李四"
+  stages:
+    - name: "预审"
+      steps:
+        - type: "approval"
+          approver_roles: ["小组长"]
+        - type: "notification"
+          content_tmpl:
+            approve: "同意参加评选，审批人：{{ approvers }}"
+            reject: "拒绝参加评选，审批人：{{ approvers }}"
+          methods: ["email"]
+
+    - name: "初审"
+      steps:
+        - type: "approval"
+          approver_roles: ["奖项联络员"]
+        - type: "approval"
+          approver_roles: ["初审评委"]
+
+    - name: "专业评审"
+      steps:
+        - type: "preparation"
+        - type: "approval"
+          approver_roles: ["专业评审"]
+
+    - name: "终审"
+      steps:
+        - type: "approval"
+          approver_roles: ["奖项联络员"]
+        - type: "notification"
+          content_tmpl:
+            approve: "恭喜你已经获得成绩突破奖"
+            reject: "很遗憾，你没有获得成绩突破奖"
+          methods: ["email"]
+
+    - name: "宣传"
+      steps:
+        - type: "notification"
+          content_tmpl:
+            default: "恭喜你已经获得成绩突破奖"
+          methods: ["email"]
