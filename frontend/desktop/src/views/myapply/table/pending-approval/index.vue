@@ -71,7 +71,7 @@
         DETAIL_EDIT,
         DETAIL_ROUTE_PATH,
         DETAIL_TYPE_KEYNAME,
-        MYAPPLY_ENDED_APPROVAL
+        MYAPPLY_PENDING_APPLY
     } from '@/constants'
     import { getRecord } from '@/api/service/apply-service'
     import { applyTableMixins } from '@/views/myapply/table/mixins'
@@ -138,8 +138,8 @@
                     page,
                     size,
                     group_id: this.$bus.curGlobalGroupId,
-                    // apply_status: MYAPPLY_PENDING_APPLY
-                    apply_status: MYAPPLY_ENDED_APPROVAL
+                    apply_status: MYAPPLY_PENDING_APPLY
+                    // apply_status: MYAPPLY_ENDED_APPROVAL
                 }
                 if (this.loading) return
                 this.loading = true
