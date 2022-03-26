@@ -95,7 +95,7 @@ def value_exception():
     """数据为空或参数异常"""
     return {
         "code": 1,
-        "result": False,
+        "result": True,
         "message": "数据为空或参数异常",
         "data": [],
     }

@@ -40,7 +40,7 @@ class AwardView(APIView):
                 "1": valid_awards.filter(Q(start_time__gt=now) & Q(approval_state=0)),  # 申请时间段前
                 "2": valid_awards.filter(Q(start_time__lt=now) & Q(end_time__gt=now) & Q(approval_state=0)),  # 申请时间段中
                 "3": valid_awards.filter(Q(end_time__lt=now) & Q(approval_state=0)),  # 申请时间段后
-                "4": valid_awards.filter(approval_state=1),  # 已结束，奖项已公示
+                "4": valid_awards.filter(approval_state=ApprovalState.review_passed.value[0]),  # 已结束，奖项已公示
             }
             return queryset[award_status].order_by('-create_time')
         department_id = request.query_params.get("group_id")
@@ -253,21 +253,55 @@ def finish_award(request, id):
         with transaction.atomic():
             award.approval_state = AwardsStatus["end"]
             award.save()
-            AwardApplicationRecord.objects.filter(award_id=award.id).update(
+            AwardApplicationRecord.objects.filter(award_id=award.id).filter(
+                approval_state=ApprovalState.review_pending.value[0]).update(
                 approval_state=ApprovalState.review_not_passed.value[0])
-            messages = [{
-                "group_id": award.award_department_id,
-                "group_name": award.award_name,
-                "action_type": 1,
-                "action_username": request.user.username,
-                "action_display_name": request.user.nickname,
-                "action_target": username[0],
-                "message": "奖项已结束"
-            } for username in GroupUser.objects.filter(
-                group_id=award.award_department_id).values_list("username")]
-            for item in messages:
-                message = Notification(**item)
-                message.save()
+            passed_application_users = AwardApplicationRecord.objects.filter(award_id=award.id).filter(
+                approval_state=ApprovalState.review_passed.value[0]
+            ).values_list("application_users")
+            passed_application_users = [item[0] for item in passed_application_users]
+            if passed_application_users:
+                username_list = [item[0]["username"] for item in passed_application_users]
+                displayname_list = [item[0]["display_name"] for item in passed_application_users]
+                messages = [{
+                    "group_id": award.award_department_id,
+                    "group_name": award.award_department_fullname,
+                    "action_type": 0,
+                    "action_username": request.user.username,
+                    "action_display_name": request.user.nickname,
+                    "action_target": username,
+                    "message": "恭喜您获得" + award.award_name + "荣誉"
+                } for username in username_list]
+                for item in messages:
+                    message = Notification(**item)
+                    message.save()
+                messages = [{
+                    "group_id": award.award_department_id,
+                    "group_name": award.award_department_fullname,
+                    "action_type": 1,
+                    "action_username": request.user.username,
+                    "action_display_name": request.user.nickname,
+                    "action_target": username[0],
+                    "message": "恭喜" + str(tuple(displayname_list)) + "获得" + award.award_name + "荣誉"
+                } for username in GroupUser.objects.filter(
+                    group_id=award.award_department_id).values_list("username")]
+                for item in messages:
+                    message = Notification(**item)
+                    message.save()
+            else:
+                messages = [{
+                    "group_id": award.award_department_id,
+                    "group_name": award.award_department_fullname,
+                    "action_type": 1,
+                    "action_username": request.user.username,
+                    "action_display_name": request.user.nickname,
+                    "action_target": username[0],
+                    "message": award.award_name + "奖项已结束"
+                } for username in GroupUser.objects.filter(
+                    group_id=award.award_department_id).values_list("username")]
+                for item in messages:
+                    message = Notification(**item)
+                    message.save()
         return JsonResponse(success_code(None))
     else :
         return JsonResponse(object_not_exist_error("奖项"))
@@ -276,8 +310,11 @@ def finish_award(request, id):
 @api_view(["GET"])
 def award_application(request, id):
     applications = AwardApplicationRecord.objects.filter(award_id=id)
-    serializers = AwardsRecordSerializers(applications, many=True)
-    return JsonResponse(success_code(serializers.data))
+    page = CommonPaginaation()
+    queryset = page.paginate_queryset(applications, request)
+    serializer = AwardsRecordSerializers(queryset, many=True)
+    response = page.get_paginated_response(serializer.data)
+    return JsonResponse(success_code(response.data))
 
 
 @api_view(["GET"])
@@ -296,5 +333,17 @@ def available_awards(request):
     page = CommonPaginaation()
     queryset = page.paginate_queryset(awards, request)
     serializer = AwardsSerializers(instance=queryset, many=True)
+    response = page.get_paginated_response(serializer.data)
+    return JsonResponse(success_code(response.data))
+
+
+@api_view(["GET"])
+def award_result(request, id):
+    applications = AwardApplicationRecord.objects.filter(award_id=id).filter(
+        approval_state=ApprovalState.review_passed.value[0]
+    ).order_by("approval_time")
+    page = CommonPaginaation()
+    queryset = page.paginate_queryset(applications, request)
+    serializer = AwardsRecordSerializers(instance=queryset, many=True)
     response = page.get_paginated_response(serializer.data)
     return JsonResponse(success_code(response.data))

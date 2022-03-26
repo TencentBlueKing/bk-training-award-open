@@ -31,6 +31,7 @@ class ApplicationSerializer(serializers.Serializer):
             "department_id": instance.award_department_id,
             "approval_user": username,
             "approval_action": validated_data["action"],
+            "approval_turn": instance.approval_turn
         })
         if validated_data["action"] == action_dict["pass"]:
             instance.approval_turn += 1  # 进入下一轮审批
@@ -43,7 +44,7 @@ class ApplicationSerializer(serializers.Serializer):
             if len(instance.approval_users) == instance.approval_turn:
                 instance.approval_state = ApprovalState.review_passed.value[0]
                 instance.approval_time = timezone.now()
-                instance.approval_text += validated_data.get("approval_text")
+                instance.approval_text += validated_data.get("approval_text") + "||"
             instance.save()
             return instance
         else:  # 不通过, 置轮次为0, 状态置为草稿, 写入审批时间,要求审批评语
@@ -64,4 +65,8 @@ class ApprovalRecordSerializer(serializers.ModelSerializer):
 
     def get_application_info(self, obj):
         application_info = AwardApplicationRecord.objects.filter(pk=obj.application_id).first()
-        return model_to_dict(application_info) if application_info else None
+        if application_info:
+            award_info = Awards.objects.filter(pk=application_info.award_id).first()
+            application_info = model_to_dict(application_info)
+            application_info.update({"award_info": model_to_dict(award_info) if award_info else None})
+        return application_info

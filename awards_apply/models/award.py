@@ -75,3 +75,4 @@ class ApprovalRecord(models.Model):
         (1, "通过")
     ]
     approval_action = models.IntegerField(choices=ApprovalAction, verbose_name="审批操作")
+    approval_turn = models.IntegerField(verbose_name="审批轮次")
