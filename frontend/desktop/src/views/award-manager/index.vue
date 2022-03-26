@@ -33,11 +33,11 @@
                 </span>
             </div>
         </empty>
-        <!-- /表格按钮区域 -->
+    <!-- /表格按钮区域 -->
 
-        <!-- 弹出区域 -->
+    <!-- 弹出区域 -->
 
-        <!-- /弹出区域 -->
+    <!-- /弹出区域 -->
     </div>
 </template>
 <script>
@@ -90,5 +90,5 @@
 
 </script>
 <style lang="postcss" scoped>
-  @import "./index.css";
+@import "./index.css";
 </style>
