@@ -31,13 +31,9 @@ class ApprovalView(APIView):
             return Response(success_code(response.data))
         else:
             # 未审批
-            approvaled_applications_id = ApprovalRecord.objects.filter(
-                approval_user=request.user.username).values_list("application_id")
-            approvaled_applications_id = [item[0] for item in approvaled_applications_id]
             queryset = Application.objects.filter(
                 approval_users__contains=request.user.username).filter(
-                approval_state=ApprovalState.review_pending.value[0])\
-                .exclude(id__in=approvaled_applications_id).order_by("id")
+                approval_state=ApprovalState.review_pending.value[0]).order_by("id")
             if group_id:
                 queryset = queryset.filter(award_department_id=group_id).order_by("id")
             queryset = page.paginate_queryset(queryset, request, self)

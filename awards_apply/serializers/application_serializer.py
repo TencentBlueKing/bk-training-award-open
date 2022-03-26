@@ -44,6 +44,8 @@ class ApplicationSerializer(serializers.Serializer):
             if len(instance.approval_users) == instance.approval_turn:
                 instance.approval_state = ApprovalState.review_passed.value[0]
                 instance.approval_time = timezone.now()
+                instance.approval_text += validated_data.get("approval_text")
+            else:
                 instance.approval_text += validated_data.get("approval_text") + "||"
             instance.save()
             return instance

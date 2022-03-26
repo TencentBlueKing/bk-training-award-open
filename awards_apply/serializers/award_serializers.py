@@ -23,6 +23,7 @@ class AwardsSerializers(serializers.Serializer):
     approval_state = serializers.IntegerField(default=0, required=False)
 
     def create(self, validated_data):  # 调用Serializer必须重写create方法
+        validated_data["award_reviewers"] = list(filter(None, validated_data["award_reviewers"]))
         res = Awards.objects.create(**validated_data)
         return res
 
@@ -32,6 +33,7 @@ class AwardsRecordSerializers(serializers.Serializer):
     award_id = serializers.IntegerField()
     award_department_id = serializers.IntegerField()
     application_reason = serializers.CharField(required=False)
+    application_users = serializers.JSONField(required=False)
     application_attachments = serializers.ListField(required=False)
     approval_turn = serializers.IntegerField(read_only=True)
     approval_text = serializers.CharField(required=False)
