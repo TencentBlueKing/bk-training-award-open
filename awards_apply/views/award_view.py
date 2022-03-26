@@ -50,11 +50,6 @@ class AwardView(APIView):
             departments_id = GroupUser.objects.filter(username=request.user.username).values_list("group_id")
             departments_id = [item[0] for item in departments_id]
             valid_awards = Awards.objects.filter(award_department_id__in=departments_id)
-        # 排除掉已申请奖项
-        awards_id = AwardApplicationRecord.objects.filter(
-            application_users__contains={"username": request.user.username}).values_list("award_id")
-        awards_id = [item[0] for item in awards_id]
-        valid_awards = valid_awards.exclude(id__in=awards_id)
         valid_awards = get_queryset_by_status(request.query_params.get("award_status"), valid_awards)
         pagination = PagePagination()
         try:
@@ -97,7 +92,7 @@ class AwardView(APIView):
                     "action_username": request.user.username,
                     "action_display_name": request.user.nickname,
                     "action_target": username,
-                    "message": "指派了你为奖项" + request.data["award_name"] + "第" + str(index + 1) + "轮审批人"
+                    "message": "指派了你为奖项 " + request.data["award_name"] + " 第" + str(index + 1) + "轮审批人"
                 })
         return JsonResponse(success_code(award.data))
 
