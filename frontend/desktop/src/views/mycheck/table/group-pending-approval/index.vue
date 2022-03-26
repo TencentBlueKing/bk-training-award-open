@@ -39,7 +39,7 @@
 </template>
 
 <script>
-    import { tableMixins } from '@/views/mycheck/table/tableMixins'
+    import { tableMixins } from '@/common/mixins/tableMixins'
     import { getGroupManage, postGroupManage } from '@/api/service/group-service'
     import { GROUP_PENDING_APPROVAL } from '@/constants'
     import { formatUsernameAndDisplayName } from '@/common/util'

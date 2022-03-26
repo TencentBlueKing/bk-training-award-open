@@ -8,6 +8,13 @@
         <bk-table-column label="奖项名称" prop="award_name"></bk-table-column>
         <bk-table-column label="申请开始时间" prop="application_time"></bk-table-column>
         <bk-table-column label="申请截止时间" prop="end_time"></bk-table-column>
+        <bk-table-column label="当前审批轮次">
+            <template slot-scope="approval">
+                <span v-bk-overflow-tips>
+                    第 {{approval.row['approval_turn']}} 轮
+                </span>
+            </template>
+        </bk-table-column>
         <bk-table-column label="奖项顾问" prop="award_consultant_display_name_for_display"></bk-table-column>
         <bk-table-column label="操作">
             <template slot-scope="approvals">
@@ -18,7 +25,7 @@
 </template>
 
 <script>
-    import { tableMixins } from '@/views/mycheck/table/tableMixins'
+    import { tableMixins } from '@/common/mixins/tableMixins'
     import { getAwardApproval } from '@/api/service/apply-service'
     import {
         DETAIL_APPROVAL,
@@ -51,7 +58,7 @@
                         application_users: approval['application_users'],
                         application_attachments: approval['application_attachments'],
                         approval_state: approval['approval_state'],
-                        approval_turn: approval['approval_turn'],
+                        approval_turn: approval['approval_turn'] + 1,
                         approval_time: approval['approval_status'],
                         approval_text: approval['approval_text'],
                         award_name: awardInfo['award_name'],

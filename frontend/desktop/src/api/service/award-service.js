@@ -133,8 +133,17 @@ export function getAwardById (id) {
 
 /**
  * 结束奖项
+ * @param awardId 需要结束的奖项id
+ * @return {any}
+ * */
+export function postFinishAward ({ awardId }) {
+    return http.post(`/finish_award/${awardId}/`)
+}
+
+/**
+ * 结束奖项
  * @param id
  * */
-export function postFinishAward (id) {
-    return http.post(`/finish_award/${id}/`)
+export function getAwardApplication (id) {
+    return http.get(`/award_application/${id}/`)
 }

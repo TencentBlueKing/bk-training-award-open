@@ -11,7 +11,6 @@ import http from '@/api'
 import preload from '@/common/preload'
 
 import {
-    AWARD_APPLICATION_DETAILS_ROUTE_PATH,
     AWARD_FORM_ROUTE_PATH,
     AWARD_MANAGER_ROUTE_PATH,
     BAD_404_ROUTE_PATH,
@@ -43,8 +42,6 @@ const Mycheck = () => import(/* webpackChunkName: 'mycheck' */'@/views/mycheck')
 const Detail = () => import(/* webpackChunkName: 'detail' */'@/views/detail')
 // 邀请页面
 const Invite = () => import(/* webpackChunkName: 'invite' */'@/views/invite')
-
-const AwardApplicationDetails = () => import(/* webpackChunkName: 'invite' */'@/views/award-application-detail')
 
 function setBaseRoutes (otherRoutes) {
     return [
@@ -147,14 +144,6 @@ const routes = setBaseRoutes([
         component: Invite,
         meta: {
             title: '邀请链接'
-        }
-    },
-    {
-        path: AWARD_APPLICATION_DETAILS_ROUTE_PATH,
-        name: AWARD_APPLICATION_DETAILS_ROUTE_PATH,
-        component: AwardApplicationDetails,
-        meta: {
-            title: '奖项申请详情列表'
         }
     }
 ])

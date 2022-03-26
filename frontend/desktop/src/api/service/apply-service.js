@@ -62,6 +62,6 @@ export function getApplicationById (applicationId) {
 /**
  * @param id
  * */
-export function getAwardApplication (id) {
+export function getAwardApplication ({ id }) {
     return http.get(`/award_application/${id}/`)
 }

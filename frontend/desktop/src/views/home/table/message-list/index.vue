@@ -1,6 +1,6 @@
 <template>
     <div class="message-table">
-        <div class="message-content" v-show="messageData.length"
+        <div class="message-list" v-show="messageData.length"
             v-bkloading="{ isLoading: loading ,title: '请稍等,正在为您安放数据' }"
         >
             <message-card v-for="(item,index) in messageData"
@@ -97,9 +97,11 @@
     }
 </script>
 
-<style scoped>
+<style lang="postcss" scoped>
 .message-table {
-  .message-content {
+  max-height: 300px;
+  overflow-y: scroll;
+  .message-list {
     height: 100%;
     max-height: 400px;
     overflow-y: scroll;
