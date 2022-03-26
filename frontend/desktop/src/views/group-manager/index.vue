@@ -182,7 +182,7 @@
     </div>
 </template>
 <script>
-    import { tableMixins } from '@/common/mixins'
+    import { tableMixins } from '@/common/mixins/tableMixins'
     import { deleteGroupManage, deleteGroupUser, getGroupUser, putGroupManage } from '@/api/service/group-service'
     import { APP_GROUP_DIALOG, GROUP_MANAGER_ROUTE_PATH } from '@/constants'
     import SelectSearch from '@/components/select-search'

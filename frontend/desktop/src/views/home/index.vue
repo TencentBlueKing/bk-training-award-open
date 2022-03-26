@@ -125,7 +125,7 @@
                 ],
                 workbenchCurIndex: 'applicable-award',
                 messageTabItems: [{
-                    'tab-name': '消息记录',
+                    'tab-name': '消息列表',
                     'tab-key': 'message-record'
                 }]
             }

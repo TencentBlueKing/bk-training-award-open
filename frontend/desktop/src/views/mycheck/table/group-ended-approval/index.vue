@@ -10,7 +10,7 @@
 <script>
     import { GROUP_ENDED_APPROVAL } from '@/constants'
     import { getGroupManage } from '@/api/service/group-service'
-    import { tableMixins } from '@/views/mycheck/table/tableMixins'
+    import { tableMixins } from '@/common/mixins/tableMixins'
     import { formatDate, formatUsernameAndDisplayName } from '@/common/util'
 
     export default {

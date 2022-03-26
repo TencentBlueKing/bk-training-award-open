@@ -55,7 +55,7 @@
                         'tab-name': '申请中',
                         'tab-key': MYAPPLY_ING_APPLY_TAB_KEYNAME
                     }, {
-                        'tab-name': '已结束',
+                        'tab-name': '已评审',
                         'tab-key': MYAPPLY_ENDED_APPROVAL_TAB_KEYNAME
                     }
                 ]

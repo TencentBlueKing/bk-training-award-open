@@ -382,7 +382,7 @@
                         this.messageWarn('至少有一级评审人')
                         flag = false
                     }
-                    awardForm['award_reviewers'] = awardForm['reviewers'].map(item => item.value)
+                    awardForm['award_reviewers'] = awardForm['reviewers'].map(item => item.value).filter(item => item.length)
                     return Promise.resolve(flag)
                 }).catch(_ => {
                     return Promise.resolve(false)
@@ -411,6 +411,9 @@
              * @param event
              * */
             addReviewer (reviewerList, event) {
+                if (!reviewerList.slice(-1)[0]?.value.length) {
+                    return this.messageWarn('请不要留下空白')
+                }
                 reviewerList.push({
                     uuid: uuid.get(),
                     value: []

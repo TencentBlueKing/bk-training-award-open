@@ -36,11 +36,11 @@
         <!-- /表格按钮区域 -->
 
         <!-- 弹出区域 -->
+
         <!-- /弹出区域 -->
     </div>
 </template>
 <script>
-    import { tableMixins } from '@/common/mixins'
 
     export default {
         name: 'award-manager',
@@ -49,19 +49,12 @@
             IngAward: () => import('./table/ing-award'),
             IngReview: () => import('./table/ing-review'),
             EndedReview: () => import('./table/ended-review')
-            // FilterSvg: () => import('./components/Svg/FilterSvg')
         },
-        mixins: [
-            /**
-             * 分页器的混入
-             * */
-            tableMixins
-        ],
         data () {
             return {
-                // S 控制信息区
-                // loading 状态
+                // tab 当前表现对应 key 值
                 workbench: 'pending-start',
+                // tab 设置
                 awardListTabItems: [
                     {
                         'tab-name': '待开始',
@@ -80,11 +73,10 @@
                         'tab-key': 'ended-review'
                     }
                 ]
-
             }
         },
         created () {
-            this.handleInit()
+            // this.handleInit()
         },
         methods: {
             handleInit () {

@@ -386,15 +386,15 @@ export function clearAllCookie () {
     console.log(keys)
     if (keys) {
         for (let i = keys.length; i--;) {
-            document.cookie = keys[i] + '=0;path=/;expires=' + new Date(0).toUTCString()// 清除当前域名下的,例如：m.kevis.com
+            document.cookie = keys[i] + '=0;path=/;expires=' + new Date(0).toUTCString()// 清除当前域名下的,
         }
     }
     console.log(document.cookie)
 }
 
 /**
- * @param username
- * @param displayName
+ * @param username 用户名
+ * @param displayName 实际 nickname
  * */
 export function formatUsernameAndDisplayName (username, displayName) {
     return `${username}（${displayName}）`

@@ -5,34 +5,18 @@
 </template>
 
 <script>
-    // pageCount
-    import { HOME_ROUTE_PATH } from '@/constants'
 
     export default {
         name: 'top-back',
-        props: {
-            backUrl: {
-                type: String,
-                default: () => HOME_ROUTE_PATH
-            }
-        },
         data () {
             return {
                 robotImg: require('@/images/robot.png'),
                 count: 0
             }
         },
-        created () {
-            console.log(this.$router)
-            console.log(this.$route)
-        },
         methods: {
             handleBack () {
-                console.log(this.$router)
-                // this.$router.replace({
-                //     name: this.backUrl
-                // })
-                this.$router.go(-1)
+                return this.$router.go(-1)
             }
         }
     }
