@@ -62,15 +62,16 @@ class ApprovalView(APIView):
             return Response(object_not_exist_error("申请"))
         result = serializer.update(application, serializer.validated_data, request.user.username)
         group = Group.objects.filter(pk=application.award_department_id).first()
-        Notification.objects.create(
-            **{
-                "group_id": group.id,
-                "group_name": group.full_name,
-                "action_type": 0,
-                "action_username": request.user.username,
-                "action_display_name": request.user.nickname,
-                "action_target": application.application_users[0],
-                "message": "审批了你的申请"
-            }
-        )
+        if group:
+            Notification.objects.create(
+                **{
+                    "group_id": group.id,
+                    "group_name": group.full_name,
+                    "action_type": 0,
+                    "action_username": request.user.username,
+                    "action_display_name": request.user.nickname,
+                    "action_target": application.application_users[0],
+                    "message": "审批了你的申请"
+                }
+            )
         return Response(success_code(model_to_dict(result)))
