@@ -6,29 +6,39 @@
             :pagination.sync="pagination"
             @page-change="handleInit()"
         >
-            <bk-table-column type="index" label="序号" :width="60"></bk-table-column>
-            <bk-table-column label="奖项名称">
+            <bk-table-column type="index" label="序号" width="60"></bk-table-column>
+            <bk-table-column label="奖项名称" prop="award_name" :width="200">
                 <template slot-scope="ingAwards">
-                    <span :title="ingAwards.row['award_name']" v-text="ingAwards.row['award_name']"></span>
+                    <span
+                        :title="ingAwards.row['award_name']"
+                    >
+                        {{ ingAwards.row['award_name'] }}
+                    </span>
                 </template>
             </bk-table-column>
+            <bk-table-column label="奖项开始时间" prop="start_time"></bk-table-column>
+            <bk-table-column label="奖项截止时间" prop="end_time"></bk-table-column>
             <bk-table-column label="奖项咨询人">
                 <template slot-scope="ingAwards">
-                    <span :title="ingAwards.row['award_consultant_displayname_for_display']">{{
-                        ingAwards.row['award_consultant_displayname_for_display']
-                    }}</span>
+                    <span
+                        :title="ingAwards.row['award_consultant_displayname_for_display']"
+                    >
+
+                        {{ ingAwards.row['award_consultant_displayname_for_display'] }}
+                    </span>
                 </template>
             </bk-table-column>
-            <bk-table-column label="总评审轮次" :width="300">
-                <template slot-scope="endedApprovals">
+
+            <bk-table-column label="总评审轮次">
+                <template slot-scope="ingAwards">
                     <bk-select
-                        :value="0"
+                        :value="1"
                         :clearable="false"
                     >
-                        <bk-option v-for="(item,index) in endedApprovals.row['award_reviewers_for_display']"
+                        <bk-option v-for="(item,index) in ingAwards.row['award_reviewers_for_display']"
                             :key="item['uuid']"
                             :name="item['description']"
-                            :id="index"
+                            :id="index + 1"
                             :title="item['description']"
                         ></bk-option>
                     </bk-select>
@@ -62,14 +72,29 @@
             <div slot="content">
                 <self-table :data="ingAwardApplicationDetailData"
                     :loading="loading"
-                    :pagination.sync="awardApplicationDetailPagination"
+                    :pagination.sync="ingAwardApplicationDetailPagination"
                 >
                     <bk-table-column label="序号" type="index" :width="80"></bk-table-column>
                     <bk-table-column label="申请人">
                         <template slot-scope="ingAwardApplication">
-                            <span :title="ingAwardApplication.row['']"
-                                v-text="ingAwardApplication.row['']"
+                            <span :title="ingAwardApplication.row['application_user_for_display']"
+                                v-text="ingAwardApplication.row['application_user_for_display']"
                             ></span>
+                        </template>
+                    </bk-table-column>
+                    <bk-table-column label="评审轮次" :width="300">
+                        <template slot-scope="pendingAwards">
+                            <bk-select
+                                :value="pendingAwards.row['approval_turn'] || 1"
+                                :clearable="false"
+                            >
+                                <bk-option v-for="(item,index) in pendingAwards.row['award_reviewers_for_display']"
+                                    :key="item['uuid']"
+                                    :name="item['description']"
+                                    :id="index + 1"
+                                    :title="item['description']"
+                                ></bk-option>
+                            </bk-select>
                         </template>
                     </bk-table-column>
                 </self-table>
@@ -80,12 +105,24 @@
                     @click="$refs['application-detail'].hidden()"
                 >取消
                 </bk-button>
-                <bk-button theme="success"
-                    class="ml20 mr20"
-                    v-show="!isOnlyDetail"
-                    @click="handleToOverAward(curAwardInfo)"
-                >确认结束奖项
-                </bk-button>
+                <bk-popconfirm trigger="click"
+                    :width="280"
+                    @confirm="handleToOverAward(curAwardInfo)"
+                >
+                    <div slot="content">
+                        <div>
+                            <i class="bk-text-danger bk-icon icon-info-circle-shape content-icon"></i>
+                            <span class="content-text pb10 mb20">结束后，所有评审中的奖项将设置为
+                                <em class="bk-text-danger"> 未通过</em>
+                            </span>
+                        </div>
+                    </div>
+                    <bk-button theme="success"
+                        class="ml20 mr20"
+                        v-show="!isOnlyDetail"
+                    >确认结束奖项
+                    </bk-button>
+                </bk-popconfirm>
             </div>
         </slider-layout>
         <!-- E 申请详情 -->
@@ -96,7 +133,7 @@
 
 <script>
     import { getAwards, postFinishAward } from '@/api/service/award-service'
-    import { tableMixins } from '@/common/mixins/tableMixins'
+    import { paginationTemplate, tableMixins } from '@/common/mixins/tableMixins'
     import {
         APPLY_APPROVAL_STATE_EN_MAP,
         APPLY_APPROVAL_STATE_MAP,
@@ -113,14 +150,14 @@
             SliderLayout: () => import('@/views/award-manager/slider-layout')
         },
         mixins: [tableMixins],
-        data (self) {
+        data () {
             return {
                 // 待审批的奖项远端数据收集，用于后续的 computed 格式化数据
                 ingReviewRemoteData: [],
                 // 待审批的奖项申请详情 远端数据收集
                 ingReviewApplicationDetailRemoteData: [],
                 // 待审批的奖项申请详情 分页配置，pagination 来自于 tableMixins
-                awardApplicationDetailPagination: { ...self.pagination },
+                ingAwardApplicationDetailPagination: { ...paginationTemplate },
                 // 当前查看详情的奖项信息
                 curAwardInfo: {},
                 // 是否只是详情，如果只是详情的话，就不显示 确认结束奖项的按钮
@@ -156,9 +193,16 @@
                     }
                 })
             },
-            ingAwardApplicationDetailData () {
-                return this.ingReviewApplicationDetailRemoteData.map(application => {
+            ingAwardApplicationDetailData (self) {
+                return self.ingReviewApplicationDetailRemoteData?.map(application => {
                     const applicationUser = application['application_users']?.[0] ?? {}
+                    const awardInfo = application['award_info']
+                    const awardReviewers = awardInfo['award_reviewers']?.map((reviewers, index) => {
+                        return {
+                            uuid: uuid.get(),
+                            description: '第' + (index + 1) + '轮:' + reviewers.join(',') ?? ''
+                        }
+                    }) ?? []
                     return {
                         application_id: application['id'],
                         award_id: application['award_id'],
@@ -166,6 +210,7 @@
                         approval_turn: application['approval_turn'],
                         approval_text: application['approval_text'],
                         approval_state: application['approval_state'],
+                        award_reviewers_for_display: awardReviewers,
                         approval_state_en: APPLY_APPROVAL_STATE_EN_MAP[application['approval_state']],
                         approval_state_cn: APPLY_APPROVAL_STATE_MAP[application['approval_state']],
                         application_time: formatDate(application['application_time']),
@@ -220,6 +265,7 @@
                 return postFinishAward({ awardId }).then(response => {
                     this.handleInit()
                     this.messageSuccess('已成功终止奖项评审')
+                    this.toHiddenAwardApplicationInfo()
                 })
             },
             /**
@@ -235,8 +281,11 @@
                 this.isOnlyDetail = isOnlyDetail
                 return getAwardApplication({
                     id: awardId
-                }).then(res => {
-                    return Promise.resolve(res)
+                }).then(response => {
+                    const awardApplicationDetailData = response.data
+                    this.ingAwardApplicationDetailPagination.count = awardApplicationDetailData.count ?? 0
+                    this.ingReviewApplicationDetailRemoteData = awardApplicationDetailData.results ?? []
+                    return Promise.resolve()
                 }).then(_ => {
                     return this.toShowAwardApplicationInfo()
                 })
@@ -244,7 +293,11 @@
 
             toShowAwardApplicationInfo () {
                 this.$refs['application-detail'].show()
+            },
+            toHiddenAwardApplicationInfo () {
+                this.$refs['application-detail'].hidden()
             }
+            
         }
 
     }
