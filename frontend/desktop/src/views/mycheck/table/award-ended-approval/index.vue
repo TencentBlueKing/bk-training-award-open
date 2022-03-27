@@ -14,6 +14,13 @@
         </bk-table-column>
         <bk-table-column label="申请开始时间" prop="application_time"></bk-table-column>
         <bk-table-column label="申请截止时间" prop="end_time"></bk-table-column>
+        <bk-table-column label="申请理由" prop="application_reason">
+            <template slot-scope="application">
+                <span :title="application.row['application_reason']">
+                    {{application.row['application_reason']}}
+                </span>
+            </template>
+        </bk-table-column>
         <bk-table-column label="审批轮次">
             <template slot-scope="approval">
                 <span :title="approval.row['approval_turn']">

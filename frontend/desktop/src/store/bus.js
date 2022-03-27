@@ -5,16 +5,18 @@
 
 import Vue from 'vue'
 import http from '@/api'
-import { GROUP_KEYNAME, GROUP_USERS_KEYNAME } from '@/constants'
-import { getGroup } from '@/api/service/group-service'
 import store from '@/store/index'
+
+import { getGroup, getGroupUser } from '@/api/service/group-service'
+import { GROUP_KEYNAME, GROUP_USERS_KEYNAME } from '@/constants'
+import { formatUsernameAndDisplayName } from '@/common/util'
 
 // Use a bus for components communication,
 // see https://vuejs.org/v2/guide/components.html#Non-Parent-Child-Communication
 export const bus = new Vue({
     data () {
         return {
-            curGlobalGroupId: '',
+            curGlobalGroupId: null,
             groupList: [],
             // header 状态
             headerName: '',
@@ -28,35 +30,50 @@ export const bus = new Vue({
                 const map = {}
                 const groups = self.groupList
                 groups?.forEach(group => {
-                    group['secretary_display_name_for_dispaly'] = group['secretary'] + '（' + group['secretary_display_name'] + '）'
+                    group['secretary_display_name_for_dispaly'] = formatUsernameAndDisplayName(group['secretary'], group['secretary_display_name'])
                     map[group['group_id']] = group
                 })
-                return map?.[self.curGlobalGroupId] || {}
+                return map?.[self.curGlobalGroupId] ?? {}
             }
         },
         isCurGroupAdmin (self) {
-            return self.curGlobalSelectedGroup['secretary'] === store.state.user['username']
+            return self.curGlobalSelectedGroup?.['secretary'] === store.state.user['username']
         },
         curGroupUsers (self) {
             const groupId = self.curGlobalGroupId
+
             return self.$http.cache.get(GROUP_USERS_KEYNAME + groupId)
         }
     },
-    created () {
-        this.handleGetGroupList()
+    async created () {
+        await this.handleGetGroupList()
     },
     methods: {
         // 获取组列表
         handleGetGroupList (config = {}) {
-            const groupUsers = http.cache.get(GROUP_KEYNAME)
-            if (groupUsers) {
-                this.curGlobalGroupId = groupUsers?.[0]?.['group_id']
-            }
             return getGroup(config).then(response => {
-                http.cache.set(GROUP_KEYNAME, response.data)
-                this.curGlobalGroupId = response.data?.[0]?.['group_id']
-                this.groupList = response.data
-                return Promise.resolve(response.data)
+                const groupList = response.data
+                this.groupList = groupList
+                this.curGlobalGroupId = groupList?.[0]?.['group_id']
+                http.cache.set(GROUP_KEYNAME, groupList)
+                return Promise.resolve(groupList)
+            })
+        },
+        handleGetGroupUserList () {
+            const groupId = this.curGlobalGroupId
+            return getGroupUser({ groupId }).then(response => {
+                const responseData = response.data
+                if (!responseData) {
+                    this.messageWarn('出错啦')
+                    return
+                }
+                responseData.forEach(item => {
+                    item['display_name_for_display'] = formatUsernameAndDisplayName(
+                        item['username'],
+                        item['display_name']
+                    )
+                })
+                http.cache.set(GROUP_USERS_KEYNAME + groupId, responseData)
             })
         }
     }

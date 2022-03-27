@@ -12,14 +12,29 @@
                     <span :title="ingAwards.row['award_name']" v-text="ingAwards.row['award_name']"></span>
                 </template>
             </bk-table-column>
-            <bk-table-column label="奖项开始时间">
+            <bk-table-column label="申请开始时间">
                 <template slot-scope="ingAwards">
                     <span :title="ingAwards.row['start_time']" v-text="ingAwards.row['start_time']"></span>
                 </template>
             </bk-table-column>
-            <bk-table-column label="奖项截止时间">
+            <bk-table-column label="申请截止时间">
                 <template slot-scope="ingAwards">
                     <span :title="ingAwards.row['end_time']" v-text="ingAwards.row['end_time']"></span>
+                </template>
+            </bk-table-column>
+            <bk-table-column label="评审轮次" :width="300">
+                <template slot-scope="pendingAwards">
+                    <bk-select
+                        :value="pendingAwards.row['approval_turn'] || 1"
+                        :clearable="false"
+                    >
+                        <bk-option v-for="(item,index) in pendingAwards.row['award_reviewers_for_display']"
+                            :key="item['uuid']"
+                            :name="item['description']"
+                            :id="index + 1"
+                            :title="item['description']"
+                        ></bk-option>
+                    </bk-select>
                 </template>
             </bk-table-column>
             <bk-table-column label="奖项咨询人">
@@ -31,11 +46,18 @@
             </bk-table-column>
             <bk-table-column label="操作">
                 <template slot-scope="ingAwards">
+
                     <bk-button :text="true"
                         class="mr10"
-                        @click="toGetAwardApplicationDetail(ingAwards.row,true)">
-                        查看申请详情
+                        @click="handleToCheckAward(ingAwards.row)">
+                        奖项详情
                     </bk-button>
+                    <bk-button :text="true"
+                        class="mr10 ml10"
+                        @click="toGetAwardApplicationDetail(ingAwards.row,true)">
+                        申请详情
+                    </bk-button>
+
                 </template>
             </bk-table-column>
         </self-table>
@@ -52,13 +74,6 @@
                     @page-change="toGetAwardApplicationDetail(curAwardInfo)"
                 >
                     <bk-table-column label="序号" type="index" :width="80"></bk-table-column>
-                    <bk-table-column label="评审结果" :width="90">
-                        <template slot-scope="ingAwardApplication">
-                            <approval-state-tag :approval-state-cn="ingAwardApplication.row['approval_state_cn']"
-                                :approval-state-en="ingAwardApplication.row['approval_state_en']"
-                            ></approval-state-tag>
-                        </template>
-                    </bk-table-column>
                     <bk-table-column label="申请人">
                         <template slot-scope="ingAwardApplication">
                             <span :title="ingAwardApplication.row['application_user_for_display']"
@@ -66,25 +81,10 @@
                             ></span>
                         </template>
                     </bk-table-column>
-                    <bk-table-column label="评审轮次" :width="300">
-                        <template slot-scope="pendingAwards">
-                            <bk-select
-                                :value="pendingAwards.row['approval_turn'] || 1"
-                                :clearable="false"
-                            >
-                                <bk-option v-for="(item,index) in pendingAwards.row['award_reviewers_for_display']"
-                                    :key="item['uuid']"
-                                    :name="item['description']"
-                                    :id="index + 1"
-                                    :title="item['description']"
-                                ></bk-option>
-                            </bk-select>
-                        </template>
-                    </bk-table-column>
-                    <bk-table-column label="评语">
+                    <bk-table-column label="申请理由">
                         <template slot-scope="ingAwardApplication">
-                            <span :title="ingAwardApplication.row['approval_text']"
-                                v-text="ingAwardApplication.row['approval_text'] || '无评语'"
+                            <span :title="ingAwardApplication.row['application_reason']"
+                                v-text="ingAwardApplication.row['application_reason'] || '暂无评语'"
                             ></span>
                         </template>
                     </bk-table-column>
@@ -113,7 +113,6 @@
     export default {
         name: 'ended-approval',
         components: {
-            ApprovalStateTag: () => import('@/views/award-manager/approval-state-tag'),
             SliderLayout: () => import('@/views/award-manager/slider-layout')
         },
         mixins: [tableMixins],
@@ -181,6 +180,7 @@
                         approval_state_cn: APPLY_APPROVAL_STATE_MAP[application['approval_state']],
                         application_time: formatDate(application['application_time']),
                         application_users: application['application_users'],
+                        application_reason: application['application_reason'],
                         application_user_for_display: formatUsernameAndDisplayName(applicationUser['username'], applicationUser['display_name'])
                     }
                 }) ?? []
@@ -245,7 +245,18 @@
             },
             toShowAwardApplicationInfo () {
                 this.$refs['application-detail'].show()
+            },
+          
+            handleToCheckAward (awardInfo) {
+                this.$router.push({
+                    name: AWARD_FORM_ROUTE_PATH,
+                    query: {
+                        [AWARD_TYPE_ROUTE_KEY]: AWARD_TYPE_DETAIL,
+                        award_id: awardInfo['award_id']
+                    }
+                })
             }
+
         }
 
     }

@@ -19,11 +19,10 @@
         :behavior="$attrs['behavior']"
     >
     </bk-select>
-
 </template>
 
 <script>
-    import { BK_GROUP_KEYNAME, GROUP_USERS_KEYNAME, SYS_KEYNAME } from '@/constants'
+    import { BK_GROUP_KEYNAME, SYS_KEYNAME } from '@/constants'
     import { getGroupAll, getGroupUser } from '@/api/service/group-service'
     import { formatUsernameAndDisplayName } from '@/common/util'
 
@@ -165,13 +164,8 @@
             handleGetUserManageListUsers () {
                 this.loading = true
                 const groupId = this.$bus.curGlobalGroupId
-                const groupUsers = this.$http.cache.get(GROUP_USERS_KEYNAME + groupId)
-                if (groupUsers) {
-                    this.groupUsers = groupUsers
-                    this.loading = false
-                    return
-                }
-                return getGroupUser({ groupId: this.$bus.curGlobalGroupId }).then(response => {
+
+                return getGroupUser({ groupId: groupId }).then(response => {
                     if (!response.data) {
                         this.messageWarn('出错啦')
                         this.loading = false
@@ -181,7 +175,6 @@
                         item['display_name_for_display'] = formatUsernameAndDisplayName(item['username'], item['display_name'])
                         return item
                     })
-                    this.$http.cache.set(GROUP_USERS_KEYNAME + groupId, response.data)
                 }).finally(_ => {
                     this.loading = false
                 })

@@ -33,7 +33,7 @@ function getBkInfo () {
 export default function () {
     return Promise.all([
         getUser(),
-        getBkInfo(),
-        getGroup()
+        getGroup(),
+        getBkInfo()
     ])
 }

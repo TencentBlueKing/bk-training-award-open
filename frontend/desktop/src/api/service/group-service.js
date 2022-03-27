@@ -39,11 +39,13 @@ export function postGroupUser ({ group_id }) {
  * @param group_id 小组 id
  * */
 export function getGroupUser ({ groupId }) {
-    console.log(groupId)
     return http.get('/group_user/', {
         params: {
             group_id: groupId
         }
+    }, {
+        clearCache: true,
+        cancelWhenRouteChange: true
     })
 }
 
@@ -65,7 +67,6 @@ export function deleteGroupManage ({ username, group_id }) {
         params: {
             group_id,
             username
-
         }
     })
 }

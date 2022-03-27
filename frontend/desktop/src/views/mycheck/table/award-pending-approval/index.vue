@@ -14,10 +14,10 @@
         </bk-table-column>
         <bk-table-column label="申请人" prop="application_user"></bk-table-column>
         <bk-table-column label="申请时间" prop="application_time"></bk-table-column>
-        <bk-table-column label="申请理由" prop="approval_text">
+        <bk-table-column label="申请理由">
             <template slot-scope="approval">
-                <span :title="approval.row['approval_text']">
-                    {{ approval.row['approval_text'] }}
+                <span :title="approval.row['application_reason']">
+                    {{ approval.row['application_reason'] }}
                 </span>
             </template>
         </bk-table-column>
