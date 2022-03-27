@@ -13,23 +13,37 @@
                 <span v-bk-tooltips.light="application.row['application_reason']"> {{application.row['application_reason']}}</span>
             </template>
         </bk-table-column>
-        <!--        <bk-table-column label="评语" :width="300">-->
-        <!--            <template slot-scope="endedApprovals">-->
-        <!--                <span v-bk-tooltips.light="endedApprovals.row['approval_text']"-->
-        <!--                >{{endedApprovals.row['approval_text']}}</span>-->
-        <!--            </template>-->
-        <!--        </bk-table-column>-->
+        <bk-table-column label="评审结果">
+            <template slot-scope="application">
+                <approval-state-tag :approval-state-cn="application.row['approval_state_en']"
+                    :approval-state-en="application.row['approval_state_en']"
+                ></approval-state-tag>
+            </template>
+        </bk-table-column>
+        <bk-table-column label="评语" :width="300">
+            <template slot-scope="endedApprovals">
+                <span v-bk-tooltips.light="endedApprovals.row['approval_text']"
+                >{{endedApprovals.row['approval_text']}}</span>
+            </template>
+        </bk-table-column>
     </self-table>
 </template>
 
 <script>
-    import { DETAIL_ROUTE_PATH, MYAPPLY_ENDED_APPROVAL } from '@/constants'
+    import {
+        APPLY_APPROVAL_STATE_EN_MAP,
+        APPLY_APPROVAL_STATE_MAP,
+        DETAIL_ROUTE_PATH,
+        MYAPPLY_ENDED_APPROVAL
+    } from '@/constants'
     import { getRecord } from '@/api/service/apply-service'
     import { applyTableMixins } from '@/views/myapply/table/mixins'
     import { formatDate } from '@/common/util'
+    import ApprovalStateTag from '@/views/award-manager/approval-state-tag'
 
     export default {
         name: 'ended-approval',
+        components: { ApprovalStateTag },
         mixins: [applyTableMixins],
         data () {
             return {
@@ -38,8 +52,8 @@
         },
         computed: {
             endedApprovalData (self) {
-                return self.endedApprovalRemoteData.map(item => {
-                    const awardInfo = item['award_info'] ?? {}
+                return self.endedApprovalRemoteData.map(approval => {
+                    const awardInfo = approval['award_info'] ?? {}
                     const awardReviewersSteps = awardInfo['award_reviewers'].map((item, index) => {
                         return {
                             title: '审批流程',
@@ -48,13 +62,15 @@
                         }
                     })
                     return {
-                        approval_id: item['id'],
-                        record_id: item['id'],
-                        approval_state: item['approval_state'],
-                        application_reason: item['application_reason'],
-                        application_time: formatDate(item['application_time']),
-                        award_id: item['award_id'],
-                        award_name: item['award_info']?.['award_name'],
+                        approval_id: approval['id'],
+                        record_id: approval['id'],
+                        approval_state: approval['approval_state'],
+                        approval_state_en: APPLY_APPROVAL_STATE_EN_MAP[approval['approval_state']],
+                        approval_state_cn: APPLY_APPROVAL_STATE_MAP[approval['approval_state']],
+                        application_reason: approval['application_reason'],
+                        application_time: formatDate(approval['application_time']),
+                        award_id: approval['award_id'],
+                        award_name: approval['award_info']?.['award_name'],
                         award_department_id: ['award_department_id'],
                         award_department_fullname: awardInfo['award_department_fullname'],
                         award_reviewers: awardInfo['award_reviewers'],
