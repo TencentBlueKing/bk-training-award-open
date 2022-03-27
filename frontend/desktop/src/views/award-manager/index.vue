@@ -74,17 +74,6 @@
                     }
                 ]
             }
-        },
-        created () {
-            // this.handleInit()
-        },
-        methods: {
-            handleInit () {
-                const workbench = this.workbench
-
-                this.$refs[workbench]?.handleInit()
-                // 添加监听事件
-            }
         }
     }
 

@@ -96,7 +96,7 @@
     } from '@/constants'
     import { postRecord } from '@/api/service/award-service'
     import { getApplicationById } from '@/api/service/apply-service'
-    import { formatUsernameAndDisplayName } from '@/common/util'
+    import { formatUsernameAndDisplayName, setTitle } from '@/common/util'
 
     export default {
         name: 'apply-form',
@@ -111,6 +111,7 @@
                         hidden_button: false,
                         is_editor: true,
                         init () {
+                            setTitle('申请奖项')
                         }
                     },
                     [DETAIL_EDIT]: {
@@ -118,6 +119,7 @@
                         is_editor: true,
                         init () {
                             self.handleGetRecord()
+                            setTitle('编辑草稿')
                         }
                     },
                     [DETAIL_APPLY_DETAIL]: {
@@ -125,12 +127,14 @@
                         is_editor: false,
                         init () {
                             self.handleGetRecord()
+                            setTitle('申请详情')
                         }
                     },
                     [DETAIL_DRAFT_DETAIL]: {
                         hidden_button: false,
                         is_editor: true,
                         init () {
+                            setTitle('编辑草稿')
                         }
                     },
                     [DETAIL_APPROVAL]: {
@@ -138,6 +142,7 @@
                         is_editor: false,
                         init () {
                             self.handleGetRecord()
+                            setTitle('申请详情')
                         }
                     },
                     [DETAIL_APPROVAL_RESULT_DETAIL]: {
@@ -145,6 +150,7 @@
                         is_editor: false,
                         init () {
                             self.handleGetRecord()
+                            setTitle('申请详情')
                         }
                     }
                 },

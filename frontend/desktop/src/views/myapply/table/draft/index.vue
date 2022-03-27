@@ -93,7 +93,7 @@
                 })
             }
         },
-        mounted () {
+        created () {
             this.handleInit()
         },
         methods: {
@@ -112,8 +112,6 @@
                 if (this.loading) return
                 this.loading = true
                 return getRecord(params).then(response => {
-                    console.log(response)
-                  
                     const applications = response.data
                     this.pagination['count'] = applications.count
                     this.pendingApprovalRemoteData = applications.data
@@ -149,23 +147,23 @@
                         record_id: recordInfo['record_id']
                     }
                 })
-            },
-            handleGetDetail (expand) {
-                // magicBox 实例中的展开状态列表
-                const expandRows = expand.store['states'].expandRows
-                // 当前列
-                const curRow = expand.row
-                const isExist = expandRows?.some((item, index) => {
-                    // 如果当前列已经存在了，那就折叠回去
-                    if (item.approval_id === expand.row['approval_id']) {
-                        expandRows.splice(index, 1)
-                        return true
-                    }
-                })
-                // 如果不存在。添加到展开列中
-                if (isExist) return
-                expandRows.push(curRow)
             }
+            // handleGetDetail (expand) {
+            //     // magicBox 实例中的展开状态列表
+            //     const expandRows = expand.store['states'].expandRows
+            //     // 当前列
+            //     const curRow = expand.row
+            //     const isExist = expandRows?.some((item, index) => {
+            //         // 如果当前列已经存在了，那就折叠回去
+            //         if (item.approval_id === expand.row['approval_id']) {
+            //             expandRows.splice(index, 1)
+            //             return true
+            //         }
+            //     })
+            //     // 如果不存在。添加到展开列中
+            //     if (isExist) return
+            //     expandRows.push(curRow)
+            // }
         }
     }
 </script>

@@ -46,7 +46,7 @@
         DETAIL_TYPE_KEYNAME,
         MYCHECK_AWARD_ENDED_APPROVAL
     } from '@/constants'
-    import { formatDate, formatUsernameAndDisplayName } from '@/common/util'
+    import { formatDate, formatUsernameAndDisplayName, setTitle } from '@/common/util'
 
     export default {
         name: 'award-ended-approval',
@@ -116,7 +116,7 @@
                 return list
             }
         },
-        mounted () {
+        created () {
             this.handleInit()
         },
         methods: {
@@ -125,6 +125,7 @@
                 Promise.all(
                     [this.handleGetEndedAwardApproval()]
                 )
+                setTitle('奖项审批结果')
             },
             handleGetEndedAwardApproval (page = this.pagination.current, size = this.pagination.limit) {
                 if (this.loading) return

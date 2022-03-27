@@ -11,7 +11,7 @@
     import { GROUP_ENDED_APPROVAL } from '@/constants'
     import { getGroupManage } from '@/api/service/group-service'
     import { tableMixins } from '@/common/mixins/tableMixins'
-    import { formatDate, formatUsernameAndDisplayName } from '@/common/util'
+    import { formatDate, formatUsernameAndDisplayName, setTitle } from '@/common/util'
 
     export default {
         name: 'group-ended-approval',
@@ -39,7 +39,7 @@
                 })
             }
         },
-        mounted () {
+        created () {
             this.handleInit()
         },
         methods: {
@@ -47,6 +47,7 @@
                 Promise.all([
                     this.handleGetGroupEndedApproval()
                 ])
+                setTitle('小组审批结果')
             },
             handleGetGroupEndedApproval (page = this.pagination.curren, size = this.pagination.limit) {
                 if (this.loading) return
