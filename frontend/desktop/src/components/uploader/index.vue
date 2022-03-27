@@ -1,5 +1,6 @@
 <template>
     <bk-upload :theme="theme"
+        v-if="!($attrs['readonly'] && attachFiles.length < 1)"
         :files="attachFiles"
         :limit="limit"
         :tip="$attrs['tip']"
@@ -17,9 +18,9 @@
             disabled: $attrs['disabled'],
             readonly: $attrs['readonly']
         }"
-        v-if="!($attrs['readonly'] && attachFiles.length < 1)"
         :size="100"
         ref="file-panel"
+        v-download="attachFiles"
     ></bk-upload>
     <empty v-else
         style="border: solid 1px #C4C6CC;"
@@ -28,10 +29,39 @@
 </template>
 <script>
     import cookie from 'cookie'
-    import { postUpload } from '@/api/service/common-service'
 
     export default {
         name: 'uploader',
+        directives: {
+            download: {
+                componentUpdated (filePanel, binding) {
+                    const attachFiles = binding.value
+                    filePanel.querySelectorAll('.file-item .file-info').forEach((fileItem, index) => {
+                        // 已经被绑定就返回
+                        if (fileItem.__binded__) {
+                            return
+                        }
+                        fileItem.addEventListener('click', () => {
+                            const curFile = attachFiles[index]
+                            if (!curFile) {
+                                return
+                            }
+                            // 创建 a 标签
+                            const downloadElement = document.createElement('a')
+                            downloadElement.style.display = 'none'
+                            downloadElement.href = curFile['url']
+                            downloadElement.download = curFile['name'] // 下载后文件名
+                            document.body.appendChild(downloadElement)
+                            downloadElement.click() // 点击下载
+                            document.body.removeChild(downloadElement) // 下载完成移除元素
+                            window.URL.revokeObjectURL(curFile['url']) // 释放掉blob对象
+                        })
+                        // 标记已经被绑定
+                        fileItem.__binded__ = true
+                    })
+                }
+            }
+        },
         model: {
             prop: 'attachFiles',
             event: 'change'
@@ -67,33 +97,8 @@
         },
         mounted () {
             this.cookie = cookie.parse(document.cookie)['csrftoken']
-            this.hackUpload()
         },
         methods: {
-            /**
-             * 这是用于 hack 入 upload 的方案
-             * */
-            hackUpload () {
-                const filePanel = this.$refs['file-panel'].$el
-                const attachFiles = this.attachFiles
-                filePanel.querySelectorAll('.file-item .file-icon').forEach((fileItem, index) => {
-                    fileItem.addEventListener('click', _ => {
-                        const curFile = attachFiles[index]
-                        if (!curFile) {
-                            return
-                        }
-                        // 创建 a 标签
-                        const downloadElement = document.createElement('a')
-                        downloadElement.style.display = 'none'
-                        downloadElement.href = curFile['url']
-                        downloadElement.download = curFile['name'] // 下载后文件名
-                        document.body.appendChild(downloadElement)
-                        downloadElement.click() // 点击下载
-                        document.body.removeChild(downloadElement) // 下载完成移除元素
-                        window.URL.revokeObjectURL(curFile['url']) // 释放掉blob对象
-                    })
-                })
-            },
             handleUploadFileRes (response) {
                 return response.result
             },
@@ -103,21 +108,12 @@
             handleUploadExceed (limit, currentFileLength) {
                 this.messageWarn(`限制选择${limit}个，当前已选择${currentFileLength}`)
             },
-            handleUploder ({ fileObj }) {
-                const form = new FormData()
-                form.append('upload_file', fileObj.origin)
-                return postUpload(form).then(res => {
-                    this.handleUploadFileRes(res, fileObj)
-                }).catch(_ => {
-                    this.messageError('上传失败')
-                })
-            },
             handleSuccess (file, fileList) {
                 const attachFileList = fileList.map(item => {
                     const responseData = item['responseData']['data']
                     return {
-                      ...responseData,
-                      url: responseData['path']
+          ...responseData,
+          url: responseData['path']
                     }
                 })
                 this.$emit('change', attachFileList)
@@ -130,6 +126,10 @@
 .file-wrapper {
   max-height: 200px;
   overflow-y: scroll;
+}
+
+.file-item .file-info {
+  cursor: pointer;
 }
 
 .disabled {
@@ -151,6 +151,7 @@
   .file-wrapper {
     display: none !important;
   }
+
   .all-file .file-item .close-upload {
     display: none !important
   }

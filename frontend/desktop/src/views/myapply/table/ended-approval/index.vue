@@ -15,7 +15,7 @@
         </bk-table-column>
         <bk-table-column label="评审结果">
             <template slot-scope="application">
-                <approval-state-tag :approval-state-cn="application.row['approval_state_en']"
+                <approval-state-tag :approval-state-cn="application.row['approval_state_cn']"
                     :approval-state-en="application.row['approval_state_en']"
                 ></approval-state-tag>
             </template>
