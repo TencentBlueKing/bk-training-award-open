@@ -187,7 +187,7 @@
     import { tableMixins } from '@/common/mixins/tableMixins'
     import { deleteGroupManage, deleteGroupUser, getGroupUser, putGroupManage } from '@/api/service/group-service'
     import { APP_GROUP_DIALOG, GROUP_MANAGER_ROUTE_PATH } from '@/constants'
-    import { formatUsernameAndDisplayName } from '@/common/util'
+    import { formatUsernameAndDisplayName, setTitle } from '@/common/util'
 
     export default {
         name: GROUP_MANAGER_ROUTE_PATH,
@@ -278,11 +278,12 @@
              *  初始化函数
              * */
             handleInit () {
-                return Promise.all(
+                Promise.all(
                     [
                         this.handleGetPageData()
                     ]
                 )
+                setTitle('我的小组')
             },
             /**
              * @param target 需要移交的对象

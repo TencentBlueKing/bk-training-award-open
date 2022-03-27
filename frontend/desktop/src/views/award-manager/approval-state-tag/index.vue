@@ -11,11 +11,11 @@
         props: {
             approvalStateCn: {
                 type: String,
-                default: () => ''
+                default: () => '待审批'
             },
             approvalStateEn: {
                 type: String,
-                default: () => ''
+                default: () => 'review_pending'
             }
         }
     }

@@ -46,7 +46,7 @@
         DETAIL_TYPE_KEYNAME,
         MYCHECK_AWARD_PENGDING_APPROVAL
     } from '@/constants'
-    import { formatDate, formatUsernameAndDisplayName } from '@/common/util'
+    import { formatDate, formatUsernameAndDisplayName, setTitle } from '@/common/util'
 
     export default {
         name: 'award-pending-approval',
@@ -92,8 +92,9 @@
                 }) ?? []
             }
         },
-        mounted () {
+        created () {
             this.handleInit()
+            setTitle('奖项待审批')
         },
         methods: {
             handleInit () {

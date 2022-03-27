@@ -3,6 +3,7 @@
  * @author wheel-w
  */
 import moment from 'moment'
+import { bus } from '@/store/bus'
 
 /**
  * 函数柯里化
@@ -398,4 +399,12 @@ export function clearAllCookie () {
  * */
 export function formatUsernameAndDisplayName (username, displayName) {
     return `${username}（${displayName}）`
+}
+/**
+ * 设置 title
+ * @param { string } title
+ * */
+export function setTitle (title) {
+    bus.headerName = title
+    document.title = `奖项申报系统-${title}`
 }

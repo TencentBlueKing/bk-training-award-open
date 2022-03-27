@@ -35,7 +35,7 @@
 
 <script>
     import { mapGetters } from 'vuex'
-    import { MYAPPLY_ROUTE_PATH, MYCHECK_ROUTE_PATH, POWER_CONTROLLER } from '@/constants'
+    import { setTitle } from '@/common/util'
 
     export default {
         name: 'monitor-navigation',
@@ -52,54 +52,20 @@
                     toggle: true,
                     submenuActive: false,
                     title: '奖项申报系统'
-                },
-                message: {},
-                userMenu: {
-                    list: [
-                        {
-                            label: '我的审批',
-                            path: MYCHECK_ROUTE_PATH,
-                            func: this.toRoute(MYCHECK_ROUTE_PATH)
-                        },
-                        {
-                            label: '我的申请',
-                            path: MYAPPLY_ROUTE_PATH,
-                            func: this.toRoute(MYAPPLY_ROUTE_PATH)
-                        }
-                    ]
-                },
-                lang: {
-                    list: []
                 }
             }
         },
         computed: {
-            ...mapGetters(['mainContentLoading', 'user']),
-            userTopMenu (self) {
-              const ident = self.$store.getters.ident
-              return self.userMenu.list.filter(item => item.path && !POWER_CONTROLLER[item.path][ident]['header-button-hidden'])
-            }
+            ...mapGetters(['mainContentLoading', 'user'])
         },
         watch: {
-            '$route.name': {
-                immediate: true,
-                handler (newValue) {
-                    this.nav.id = newValue
-                }
-            },
             '$route.meta': {
                 immediate: true,
                 handler (newValue) {
-                    this.$bus.headerName = newValue.title || ''
-                    document.title = '奖项申报系统-' + newValue.title
+                    setTitle(newValue.title)
                 }
             }
         },
-      
-        beforeDestroy () {
-            sessionStorage.setItem('is_pass', '')
-        },
-
         created () {
             const platform = window.navigator.platform.toLowerCase()
             if (platform.indexOf('win') === 0) {
@@ -111,19 +77,8 @@
             })
         },
         methods: {
-            handleSelect (id, item) {
-                this.nav.id = id
-                this.$router.push({
-                    name: item.pathName
-                })
-            },
             handleToggle (v) {
                 this.nav.toggle = v
-            },
-            toRoute (route) {
-                return () => this.$router.push({
-                    name: route
-                })
             }
         }
     }

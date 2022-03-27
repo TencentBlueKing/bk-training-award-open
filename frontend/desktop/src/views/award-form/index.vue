@@ -160,7 +160,7 @@
     </div>
 </template>
 <script>
-    import { formatDate, formatUsernameAndDisplayName } from '@/common/util'
+    import { formatDate, formatUsernameAndDisplayName, setTitle } from '@/common/util'
     import {
         AWARD_LEVEL_MAP,
         AWARD_MANAGER_ROUTE_PATH, AWARD_TYPE_CREATE, AWARD_TYPE_DETAIL,
@@ -276,6 +276,20 @@
                 awardLevels: AWARD_LEVEL_MAP,
                 submitLoading: false,
                 config: {
+                    
+                    [AWARD_TYPE_CREATE]: {
+                        'title': '新增奖项',
+                        'title-clz': 'new',
+                        'button-title': '确认新增',
+                        'button-theme': 'success',
+                        'confirm-func': this.handleConfirmAddNewAward,
+                        'cancel-func': () => {
+                            this.$router.go(-1)
+                        },
+                        init () {
+                            setTitle('创建奖项')
+                        }
+                    },
                     [AWARD_TYPE_EDIT]: {
                         'title': '编辑奖项',
                         'title-clz': 'edit',
@@ -286,16 +300,13 @@
                             this.$router.replace({
                                 name: AWARD_MANAGER_ROUTE_PATH
                             })
-                        }
-                    },
-                    [AWARD_TYPE_CREATE]: {
-                        'title': '新增奖项',
-                        'title-clz': 'new',
-                        'button-title': '确认新增',
-                        'button-theme': 'success',
-                        'confirm-func': this.handleConfirmAddNewAward,
-                        'cancel-func': () => {
-                            this.$router.go(-1)
+                        },
+                        init () {
+                            const awardId = this.$route.query['award_id']
+                            if (awardId) {
+                                this.handleGetAwardDetailById(awardId)
+                            }
+                            setTitle('编辑奖项')
                         }
                     },
                     [AWARD_TYPE_DETAIL]: {
@@ -306,6 +317,13 @@
                         'confirm-func': () => {},
                         'cancel-func': () => {
                             this.$router.go(-1)
+                        },
+                        init () {
+                            const awardId = this.$route.query['award_id']
+                            if (awardId) {
+                                this.handleGetAwardDetailById(awardId)
+                            }
+                            setTitle('奖项详情')
                         }
                     }
                 }
@@ -353,12 +371,7 @@
              * 初始化信息
              * */
             handleInit () {
-                if ([AWARD_TYPE_DETAIL, AWARD_TYPE_EDIT].includes(this.formType)
-                    && this.$route.query['award_id']
-                ) {
-                    this.handleGetAwardDetailById(this.$route.query['award_id'])
-                    this.$bus.headerName = ''
-                }
+                this.config[this.formType]?.init()
             },
             handleGetAwardDetailById (awardId) {
                 if (awardId) {

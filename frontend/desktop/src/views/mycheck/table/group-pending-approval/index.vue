@@ -42,7 +42,7 @@
     import { tableMixins } from '@/common/mixins/tableMixins'
     import { getGroupManage, postGroupManage } from '@/api/service/group-service'
     import { GROUP_PENDING_APPROVAL } from '@/constants'
-    import { formatUsernameAndDisplayName } from '@/common/util'
+    import { formatUsernameAndDisplayName, setTitle } from '@/common/util'
 
     export default {
         name: 'group-pending-approval',
@@ -69,8 +69,9 @@
                 }) ?? []
             }
         },
-        mounted () {
+        created () {
             this.handleInit()
+            setTitle('小组待审批')
         },
         methods: {
             handleInit () {

@@ -45,7 +45,7 @@
                             // 创建 a 标签
                             const downloadElement = document.createElement('a')
                             downloadElement.style.display = 'none'
-                            downloadElement.href = curFile['url']
+                            downloadElement.href = 'https://bkrepo.paas-edu.bktencent.com/generic/temporary/download/bksaas-addons/private-bkapp-bk-awa-11/media/logo2.png?token=9b78ee0b057343c6b610d7f4d7d47f49'
                             downloadElement.target = '_blank'
                             downloadElement.download = curFile['name'] // 下载后文件名
                             document.body.appendChild(downloadElement)

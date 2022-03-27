@@ -9,10 +9,5 @@ export const applyTableMixins = {
             },
             loading: false
         }
-    },
-    mounted () {
-        this.handleInit()
-    },
-    methods: {
     }
 }

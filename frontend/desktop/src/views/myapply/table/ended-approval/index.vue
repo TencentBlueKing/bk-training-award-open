@@ -86,7 +86,7 @@
                 })
             }
         },
-        mounted () {
+        created () {
             this.handleInit()
         },
         methods: {
