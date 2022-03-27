@@ -41,13 +41,15 @@ export const bus = new Vue({
         },
         curGroupUsers (self) {
             const groupId = self.curGlobalGroupId
-
             return self.$http.cache.get(GROUP_USERS_KEYNAME + groupId)
         }
     },
     watch: {
-        curGlobalGroupId () {
-            this.handleGetGroupUserList()
+        'curGlobalGroupId': {
+            handler (newVal) {
+                console.log(newVal)
+                this.handleGetGroupUserList(newVal)
+            }
         }
     },
     async created () {
@@ -64,8 +66,8 @@ export const bus = new Vue({
                 return Promise.resolve(groupList)
             })
         },
-        handleGetGroupUserList () {
-            const groupId = this.curGlobalGroupId
+        handleGetGroupUserList (groupId) {
+            if (!groupId) return
             return getGroupUser({ groupId }).then(response => {
                 const responseData = response.data
                 if (!responseData) {

@@ -62,7 +62,7 @@
                     :required="true"
                 >
                     <bk-input v-model="outCurGroupForm['full_name']"
-                        :placeholder="'请再次输入小组名（' + $bus.curGlobalSelectedGroup['full_name'] + '）以确认退出小组'"
+                        :placeholder="$bus.curGlobalSelectedGroup['full_name']"
                     ></bk-input>
                 </bk-form-item>
             </bk-form>
@@ -91,11 +91,7 @@
 
                     </div>
                     <ul class="more-action" slot="dropdown-content">
-                        <!--                        <bk-button class="mb10"-->
-                        <!--                            v-bk-copy="inviteLink"-->
-                        <!--                            :text="true"-->
-                        <!--                        >邀请入组-->
-                        <!--                        </bk-button>-->
+                        <!-- TODO:邀请入组-->
                         <bk-button class="mb10"
                             @click="toTransferGroup()"
                             v-if="$bus.isCurGroupAdmin"
@@ -266,9 +262,6 @@
                     }
                 }) ?? []
             }
-            // inviteLink (self) {
-            //     return `${window.location.origin + window.location.pathname}/invite?group_id=${self.$bus.curGlobalGroupId}`
-            // }
         },
         created () {
             this.handleInit()
@@ -315,6 +308,7 @@
                     this.loading = false
                 })
             },
+            // 做弹出型
             toJoinGroup () {
                 this.$bus.$emit(APP_GROUP_DIALOG, [true, true, 'join'])
             },
@@ -324,12 +318,10 @@
             toTransferGroup () {
                 this.transferMyGroup = true
             },
-            toInviteUser () {
-
-            },
             toOutCurGroup () {
                 this.isOutCurGroup = true
             },
+
             async transferValidator () {
                 const transferValidator = this.$refs['transfer-form']
                 return transferValidator.validate()

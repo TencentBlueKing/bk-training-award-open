@@ -9,12 +9,7 @@ import Vuex from 'vuex'
 import { unifyObjectStyle } from '@/common/util'
 import {
     APP_AUTH_NEWER,
-    GROUP_KEYNAME,
-    GROUP_MANAGER_ROUTE_PATH,
-    IDENT_COMMON,
-    MYCHECK_ROUTE_PATH,
-    POWER_CONTROLLER,
-    ROUTE_TABLE
+    GROUP_KEYNAME
 } from '@/constants'
 import { getUserInfo } from '@/api/service/user-service'
 import { bus } from '@/store/bus'
@@ -35,41 +30,19 @@ const store = new Vuex.Store({
         bkInfo: {},
         groupList: [],
         curGlobalSelectGroup: null,
-        ROUTE_TABLE: Object.freeze(ROUTE_TABLE),
         /**
          * 根据用户细节调整部分系统部分控件的
          * */
-        powerConfig: Object.freeze(POWER_CONTROLLER),
         // 当前用户信息
         user_ident: {
             is_admin: false,
-            is_secretary: false,
-            ident: IDENT_COMMON
+            is_secretary: false
         }
     },
     // 公共 getters
     getters: {
         mainContentLoading: state => state.mainContentLoading,
-        user: state => state.user,
-        groupMap: state => {
-            const map = {}
-            const groups = http.cache.get(GROUP_KEYNAME)
-            groups?.forEach(group => {
-                map[group['group_id']] = group
-            })
-            return map
-        },
-        ident: state => state.user_ident.ident,
-        // 将权限转移到对应的页面，这样会更合适一些
-        groupPowerConfig: state => {
-            const ident = state.user_ident['ident']
-            return POWER_CONTROLLER[GROUP_MANAGER_ROUTE_PATH][ident]
-        },
-        checkpagePowerConfig: state => {
-            const ident = state.user_ident['ident']
-            return POWER_CONTROLLER[MYCHECK_ROUTE_PATH][ident]
-        }
-
+        user: state => state.user
     },
     // 公共 mutations
     mutations: {

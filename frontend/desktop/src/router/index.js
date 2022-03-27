@@ -20,6 +20,7 @@ import {
     MYAPPLY_ROUTE_PATH,
     MYCHECK_ROUTE_PATH
 } from '@/constants'
+import { bus } from '@/store/bus'
 
 Vue.use(VueRouter)
 const MainEntry = () => import(/* webpackChunkName: 'entry' */'@/views')
@@ -170,10 +171,15 @@ router.beforeEach(async (to, from, next) => {
    
     next()
 })
-
 router.afterEach(async (to, from) => {
     store.commit('setMainContentLoading', true)
-
+    try {
+        if (to.query['group_id']) {
+            bus.curGlobalGroupId = to.query['group_id']
+        }
+    } catch (e) {
+        console.error(e)
+    }
     preloading = true
     await preload()
     preloading = false

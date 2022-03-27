@@ -74,6 +74,11 @@
                     }
                 ]
             }
+        },
+        methods: {
+            handleInit () {
+                this.$refs[this.workbench]?.handleInit?.()
+            }
         }
     }
 

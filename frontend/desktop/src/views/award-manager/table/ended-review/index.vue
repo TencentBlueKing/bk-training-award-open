@@ -9,11 +9,9 @@
             <bk-table-column type="index" label="序号" width="60"></bk-table-column>
             <bk-table-column label="奖项名称" prop="award_name">
                 <template slot-scope="endedAwards">
-                    <span
-                        :title="endedAwards.row['award_name']"
-                    >
+                    <award-title :award="endedAwards.row" :title="endedAwards.row['award_name']">
                         {{ endedAwards.row['award_name'] }}
-                    </span>
+                    </award-title>
                 </template>
             </bk-table-column>
             <bk-table-column label="奖项开始时间" prop="start_time"></bk-table-column>
@@ -116,10 +114,12 @@
     import { formatDate, formatUsernameAndDisplayName } from '@/common/util'
     import { getAwardApplication } from '@/api/service/apply-service'
     import { uuid } from '@/common/uuid'
+    import AwardTitle from '@/views/award-manager/award-title'
 
     export default {
         name: 'ended-review',
         components: {
+            AwardTitle,
             ApprovalStateTag: () => import('@/views/award-manager/approval-state-tag'),
             SliderLayout: () => import('@/views/award-manager/slider-layout')
         },
@@ -180,7 +180,7 @@
                         award_id: application['award_id'],
                         award_department_id: application['award_department_id'],
                         approval_turn: application['approval_turn'],
-                        approval_text: application['approval_text'],
+                        approval_text: application['approval_text'] || '暂无评语',
                         approval_state: application['approval_state'],
                         award_reviewers_for_display: awardReviewers,
                         approval_state_en: APPLY_APPROVAL_STATE_EN_MAP[application['approval_state']],

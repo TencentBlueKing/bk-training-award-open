@@ -38,18 +38,15 @@
     import { getGroupManage, postGroupManage } from '@/api/service/group-service'
     import { formatUsernameAndDisplayName, formatDate } from '@/common/util'
     import { GROUP_PENDING_APPROVAL } from '@/constants'
+    import { tableMixins } from '@/common/mixins/tableMixins'
 
     export default {
         name: 'group-approval',
+        mixins: [tableMixins],
         data () {
             return {
-                groupApprovalRemoteData: [],
-                loading: false,
-                pagination: {
-                    current: 1,
-                    count: 0,
-                    limit: 10
-                }
+                // 小组审批的远程数据
+                groupApprovalRemoteData: []
             }
         },
         computed: {
@@ -74,10 +71,18 @@
         },
         methods: {
             handleInit () {
-                this.handleGetPageData(this.pagination)
+                Promise.all([
+                    this.handleGetPageData()
+                ])
             },
-            handleGetPageData (config) {
-                const { current: page, limit: size } = config
+
+            /**
+             * 获取数据
+             * @param page
+             * @param size
+             * @return {any}
+             * */
+            handleGetPageData (page = this.pagination.current, size = this.pagination.limit) {
                 if (this.loading) {
                     return
                 }
@@ -88,25 +93,38 @@
                     this.loading = false
                 })
             },
+            /**
+             * 通过用户的申请
+             * @param applyInfo
+             * @return {any}
+             * */
             handleToPassGroupUser (applyInfo) {
                 const params = {
                     apply_ids: [applyInfo['apply_id']],
                     is_allow: true
                 }
-                this.handlePostGroupManage(params, `已同意用户：${applyInfo['display_name_for_display']}加入${applyInfo['group_name']}`)
+                this.handlePostGroupManage(params, `已同意用户${applyInfo['display_name_for_display']}加入：${applyInfo['group_name']}`)
             },
+            /**
+             * 拒绝用户的申请
+             * @param applyInfo
+             * @return {any}
+             * */
             handleRejectGroupUser (applyInfo) {
                 const params = {
                     apply_ids: [applyInfo['apply_id']],
                     is_allow: false
                 }
-                this.handlePostGroupManage(params, `已拒绝用户：${applyInfo['display_name_for_display']}加入${applyInfo['group_name']}`)
+                this.handlePostGroupManage(params, `已拒绝用户${applyInfo['display_name_for_display']}加入：${applyInfo['group_name']}`)
             },
             /**
              * 处理记录的统一入口
+             * @param dealArr
+             * @param tips
+             * @return {any}
              * */
             handlePostGroupManage (dealArr, tips) {
-                return postGroupManage(dealArr).then(response => {
+                return postGroupManage(dealArr).then(_ => {
                     this.messageSuccess(tips)
                     this.handleInit()
                 })

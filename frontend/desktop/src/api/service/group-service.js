@@ -43,10 +43,8 @@ export function getGroupUser ({ groupId }) {
         params: {
             group_id: groupId
         }
-    }, {
-        clearCache: true,
-        cancelWhenRouteChange: true
-    })
+    }
+    )
 }
 
 // 退出小组

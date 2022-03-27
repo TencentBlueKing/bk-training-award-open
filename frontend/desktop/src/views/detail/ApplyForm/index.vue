@@ -213,9 +213,6 @@
             handleInit () {
                 this.config[this.$route.query[DETAIL_TYPE_KEYNAME]]?.init?.()
             },
-            handleSetDefaultInfo () {
-              
-            },
             validator () {
                 return this.$refs['apply-form'].validate()
             },
@@ -261,20 +258,15 @@
                     ...applyForm
                 })
             },
-            handleOnlyGroup (value) {
-                const department = value['departments'].map(item => item['full_name'])
-                const awardDepartmentFullname = this.$route.params['award_department_fullname']
-                return department.includes(awardDepartmentFullname)
-            },
             handleGetRecord () {
                 return getApplicationById(this.$route.query['record_id']).then(response => {
-                    const reponseData = response.data
+                    const responseData = response.data
                     this.applyForm.application_users = formatUsernameAndDisplayName(
-                        reponseData.application_users[0]['username'],
-                        reponseData.application_users[0]['display_name']
+                        responseData.application_users[0]['username'],
+                        responseData.application_users[0]['display_name']
                     )
-                    this.applyForm.application_reason = reponseData.application_reason
-                    this.applyForm.application_attachments = reponseData.application_attachments
+                    this.applyForm.application_reason = responseData.application_reason
+                    this.applyForm.application_attachments = responseData.application_attachments
                 })
             }
         }

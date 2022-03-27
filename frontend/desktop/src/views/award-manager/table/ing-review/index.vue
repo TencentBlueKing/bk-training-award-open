@@ -9,11 +9,9 @@
             <bk-table-column type="index" label="序号" width="60"></bk-table-column>
             <bk-table-column label="奖项名称" prop="award_name" :width="200">
                 <template slot-scope="ingAwards">
-                    <span
-                        :title="ingAwards.row['award_name']"
-                    >
+                    <award-title :award="ingAwards.row" :title="ingAwards.row['award_name']">
                         {{ ingAwards.row['award_name'] }}
-                    </span>
+                    </award-title>
                 </template>
             </bk-table-column>
             <bk-table-column label="申请开始时间" prop="start_time"></bk-table-column>
@@ -44,13 +42,13 @@
                     </bk-select>
                 </template>
             </bk-table-column>
-            <bk-table-column label="操作">
+            <bk-table-column label="操作" :width="300">
                 <template slot-scope="ingReviewAwards">
                     <bk-button class="mr10"
                         :text="true"
                         @click="toGetAwardApplicationDetail(ingReviewAwards.row,true)"
                     >
-                        查看申请详情
+                        申请详情
                     </bk-button>
                     <bk-button theme="danger"
                         class="mr20 ml20 "
@@ -112,6 +110,11 @@
                     @click="$refs['application-detail'].hidden()"
                 >取消
                 </bk-button>
+                <bk-button theme="warning"
+                    class="ml20 mr20"
+                    @click="toGetAwardApplicationDetail(curAwardInfo,isOnlyDetail,false)"
+                >刷新
+                </bk-button>
                 <bk-popconfirm trigger="click"
                     :width="280"
                     @confirm="handleToOverAward(curAwardInfo)"
@@ -144,16 +147,18 @@
     import {
         APPLY_APPROVAL_STATE_EN_MAP,
         APPLY_APPROVAL_STATE_MAP,
-        AWARD_APPLICATION_DETAILS_ROUTE_PATH,
+        AWARD_APPLICATION_DETAILS_ROUTE_PATH, AWARD_FORM_ROUTE_PATH, AWARD_TYPE_DETAIL, AWARD_TYPE_ROUTE_KEY,
         ING_REVIEW
     } from '@/constants'
     import { getAwardApplication } from '@/api/service/apply-service'
     import { uuid } from '@/common/uuid'
     import { formatDate, formatUsernameAndDisplayName } from '@/common/util'
+    import AwardTitle from '@/views/award-manager/award-title'
 
     export default {
         name: 'ended-approval',
         components: {
+            AwardTitle,
             ApprovalStateTag: () => import('@/views/award-manager/approval-state-tag'),
             SliderLayout: () => import('@/views/award-manager/slider-layout')
         },
@@ -216,7 +221,7 @@
                         award_id: application['award_id'],
                         award_department_id: application['award_department_id'],
                         approval_turn: application['approval_turn'],
-                        approval_text: application['approval_text'],
+                        approval_text: application['approval_text'] || '暂无评语',
                         approval_state: application['approval_state'],
                         award_reviewers_for_display: awardReviewers,
                         approval_state_en: APPLY_APPROVAL_STATE_EN_MAP[application['approval_state']],
@@ -280,11 +285,13 @@
              * @description 获取数据，弹出侧栏
              * @param {object} awardInfo 奖项信息
              * @param {boolean} isOnlyDetail 是否是侧栏详情信息
+             * @param trigger
              * @return {any}
              * */
-            toGetAwardApplicationDetail (awardInfo, isOnlyDetail) {
+            toGetAwardApplicationDetail (awardInfo, isOnlyDetail, trigger = true) {
                 this.curAwardInfo = awardInfo
                 const awardId = awardInfo['award_id']
+                this.loading = true
                 this.toShowAwardApplicationInfo()
                 this.isOnlyDetail = isOnlyDetail
                 return getAwardApplication({
@@ -295,7 +302,11 @@
                     this.ingReviewApplicationDetailRemoteData = awardApplicationDetailData.results ?? []
                     return Promise.resolve()
                 }).then(_ => {
-                    return this.toShowAwardApplicationInfo()
+                    if (trigger) {
+                        return this.toShowAwardApplicationInfo()
+                    }
+                }).finally(_ => {
+                    this.loading = false
                 })
             },
 
@@ -304,6 +315,16 @@
             },
             toHiddenAwardApplicationInfo () {
                 this.$refs['application-detail'].hidden()
+            },
+            handleToCheckAward (awardInfo) {
+                this.$router.push({
+                    name: AWARD_FORM_ROUTE_PATH,
+                    query: {
+                        [AWARD_TYPE_ROUTE_KEY]: AWARD_TYPE_DETAIL,
+                        award_id: awardInfo['award_id'],
+                        group_id: awardInfo['award_department_id']
+                    }
+                })
             }
             
         }

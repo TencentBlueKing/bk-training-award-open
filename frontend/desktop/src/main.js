@@ -19,6 +19,8 @@ import '@/common/bkmagic'
 import '@/common/self-components'
 // 一些自定义的组件或者指令
 import '@/common/directives'
+// 挂载常量
+import '@/common/constants'
 
 auth.requestCurrentUser().then(user => {
     injectCSRFTokenToHeaders()

@@ -19,15 +19,15 @@
 </template>
 
 <script>
+    import { paginationTemplate } from '@/common/mixins/tableMixins'
+
     export default {
         name: 'self-table',
         props: {
             pagination: {
                 type: Object,
                 default: () => ({
-                    current: 1,
-                    count: 0,
-                    limit: 10
+                  ...paginationTemplate
                 })
             },
             data: {

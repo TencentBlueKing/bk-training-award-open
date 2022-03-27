@@ -67,7 +67,8 @@
 
 <script>
     import {
-        APPLY_STATE, DETAIL_APPLY_DETAIL,
+        APPLY_STATE,
+        DETAIL_APPLY_DETAIL,
         DETAIL_EDIT,
         DETAIL_ROUTE_PATH,
         DETAIL_TYPE_KEYNAME,
@@ -108,8 +109,8 @@
                         application_reason: item['application_reason'],
                         application_time: formatDate(item['application_time']),
                         award_id: item['award_id'],
-                        award_name: item['award_info']?.['award_name'],
-                        award_department_id: ['award_department_id'],
+                        award_name: awardInfo['award_name'],
+                        award_department_id: awardInfo['award_department_id'],
                         award_department_fullname: awardInfo['award_department_fullname'],
                         award_reviewers: awardInfo['award_reviewers'],
                         award_reviewers_steps: awardReviewersSteps,
@@ -166,7 +167,8 @@
                     query: {
                         [DETAIL_TYPE_KEYNAME]: DETAIL_EDIT,
                         award_id: recordInfo['award_id'],
-                        record_id: recordInfo['record_id']
+                        record_id: recordInfo['record_id'],
+                        group_id: recordInfo['award_department_id']
                     }
                 })
             },
@@ -176,7 +178,8 @@
                     query: {
                         [DETAIL_TYPE_KEYNAME]: DETAIL_APPLY_DETAIL,
                         award_id: recordInfo['award_id'],
-                        record_id: recordInfo['record_id']
+                        record_id: recordInfo['record_id'],
+                        group_id: recordInfo['award_department_id']
                     }
                 })
             },

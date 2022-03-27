@@ -10,7 +10,9 @@
             <bk-table-column type="index" label="序号" :width="60"></bk-table-column>
             <bk-table-column label="奖项名称">
                 <template slot-scope="pendingAwards">
-                    <span :title="pendingAwards.row['award_name']" v-text="pendingAwards.row['award_name']"></span>
+                    <award-title :award="pendingAwards.row" :title="pendingAwards.row['award_name']">
+                        {{ pendingAwards.row['award_name'] }}
+                    </award-title>
                 </template>
             </bk-table-column>
             <bk-table-column label="申请开始时间">
@@ -66,8 +68,10 @@
     } from '@/constants'
     import { formatDate, formatUsernameAndDisplayName } from '@/common/util'
     import { uuid } from '@/common/uuid'
+    import AwardTitle from '@/views/award-manager/award-title'
     export default {
         name: 'pending-start',
+        components: { AwardTitle },
         mixins: [tableMixins],
         data () {
             return {

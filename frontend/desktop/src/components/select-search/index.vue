@@ -22,9 +22,10 @@
 </template>
 
 <script>
-    import { BK_GROUP_KEYNAME, SYS_KEYNAME } from '@/constants'
+    import { BK_GROUP_KEYNAME, GROUP_USERS_KEYNAME, SYS_KEYNAME } from '@/constants'
     import { getGroupAll, getGroupUser } from '@/api/service/group-service'
     import { formatUsernameAndDisplayName } from '@/common/util'
+    import http from '@/api'
 
     export default {
         name: 'select-search',
@@ -156,15 +157,17 @@
                 const groupId = this.$bus.curGlobalGroupId
 
                 return getGroupUser({ groupId }).then(response => {
-                    if (!response.data) {
+                    const responseData = response.data
+                    if (!responseData) {
                         this.messageWarn('出错啦')
                         this.loading = false
                         return
                     }
-                    this.groupUsers = response.data.map(item => {
+                    this.groupUsers = responseData?.map(item => {
                         item['display_name_for_display'] = formatUsernameAndDisplayName(item['username'], item['display_name'])
                         return item
-                    })
+                    }) ?? []
+                    http.cache.set(GROUP_USERS_KEYNAME + groupId, responseData)
                 }).finally(_ => {
                     this.loading = false
                 })
@@ -181,7 +184,6 @@
                     return
                 }
                 return getGroupAll().then(response => {
-                    console.log(response)
                     this.groupUsers = response.data
                     this.$http.cache.set(SYS_KEYNAME, response.data)
                 }).finally(_ => {

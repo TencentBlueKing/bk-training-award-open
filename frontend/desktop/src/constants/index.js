@@ -1,24 +1,4 @@
 /* 常量表 */
-/**
- * 奖项申请状态
- * */
-export const NOT_APPLY = 0
-export const APPLYED = 1
-export const ENDED = 2
-export const APPROVAL_STATE = {
-    [NOT_APPLY]: NOT_APPLY,
-    [APPLYED]: APPLYED
-}
-export const AWARD_APPROVAL_STATE_MAP = {
-    [NOT_APPLY]: '未开始',
-    [APPLYED]: '开放申请中',
-    [ENDED]: '已结束'
-}
-export const AWARD_APPROVAL_STATE_EN_MAP = {
-    [NOT_APPLY]: 'not_apply',
-    [APPLYED]: 'applyied',
-    [ENDED]: 'ended'
-}
 
 /***
  * 申请表状态
