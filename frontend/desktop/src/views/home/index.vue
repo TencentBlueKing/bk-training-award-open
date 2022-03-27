@@ -2,6 +2,7 @@
     <div class="home-container">
         <div class="head-panel">
             <div class="header-main">
+                <!-- S 首部导航 -->
                 <bk-container :col="30" :gutter="60">
                     <bk-row>
                         <bk-col v-for="nav in headerNavList"
@@ -18,9 +19,11 @@
                         </bk-col>
                     </bk-row>
                 </bk-container>
+                <!-- S 首部导航 -->
             </div>
         </div>
         <div class="footer-panel">
+            <!-- S 审批列表 -->
             <tabs style="width: calc(8*118px + 7*8px);"
                 :tab-items="workbenchTabItems"
                 v-model="workbenchCurIndex"
@@ -32,6 +35,8 @@
                     <component :is="workbenchCurIndex" :ref="workbenchCurIndex"></component>
                 </template>
             </tabs>
+            <!-- E 审批列表 -->
+            <!-- S 消息列表 -->
             <tabs style="width: 370px"
                 :tab-items="messageTabItems"
                 class="mr10 ml10"
@@ -47,12 +52,16 @@
                     <message-list ref="message-list"></message-list>
                 </template>
             </tabs>
+            <!-- E 消息列表 -->
+            
+            <!-- S 卡通人物区域 -->
             <div class="cartoon">
                 <cartoon-robot>
                     <span>{{ grant }}，{{ $store.state.user['username'] }}</span>
                 </cartoon-robot>
             </div>
-
+            <!-- E 卡通人物区域 -->
+          
         </div>
     </div>
 </template>
@@ -68,7 +77,6 @@
             AwardApproval: () => import('@/views/home/table/award-approval'),
             ApplicableAward: () => import('@/views/home/table/applicable-award'),
             HeaderNav: () => import('@/views/home/HeaderNav'),
-            Tabs: () => import('@/components/Tabs'),
             CartoonRobot: () => import('@/components/cartoon-robot')
         },
         data (self) {
@@ -78,13 +86,13 @@
                         style: 'background: var(--gradient-orange-red);',
                         description: '创建小组、成员管理',
                         title: '我的小组',
-                        routerParams: () => [self.$store.state['ROUTE_TABLE']['GROUP_MANAGER_ROUTE_PATH']]
+                        routerParams: () => [self.$constants['ROUTE_TABLE']['GROUP_MANAGER_ROUTE_PATH']]
                     },
                     {
                         style: 'background: var(--gradient-blue);',
                         description: '为您的小组创建奖项',
                         title: '创建奖项',
-                        routerParams: () => [self.$store.state['ROUTE_TABLE']['AWARD_FORM_ROUTE_PATH'], {
+                        routerParams: () => [self.$constants['ROUTE_TABLE']['AWARD_FORM_ROUTE_PATH'], {
                             query: {
                                 [AWARD_TYPE_ROUTE_KEY]: AWARD_TYPE_CREATE
                             }
@@ -94,7 +102,7 @@
                         style: 'background: var(--gradient-orange-pink);',
                         description: '查看申请信息及申请状态',
                         title: '我的申请',
-                        routerParams: () => [self.$store.state['ROUTE_TABLE']['MYAPPLY_ROUTE_PATH'], {
+                        routerParams: () => [self.$constants['ROUTE_TABLE']['MYAPPLY_ROUTE_PATH'], {
                             query: {
                                 [MYAPPLY_ROUTER_KEYNAME]: MYAPPLY_DRAFT_TAB_KEYNAME
                             }
@@ -104,13 +112,13 @@
                         style: 'background: var(--gradient-green);',
                         description: '查看创建的奖项',
                         title: '奖项列表',
-                        routerParams: () => [self.$store.state['ROUTE_TABLE']['AWARD_MANAGER_ROUTE_PATH']]
+                        routerParams: () => [self.$constants['ROUTE_TABLE']['AWARD_MANAGER_ROUTE_PATH']]
                     },
                     {
                         style: 'background: var(--gradient-purple);',
                         description: '审批入组、审批奖项以及审批记录',
                         title: '我的审批',
-                        routerParams: () => [self.$store.state['ROUTE_TABLE']['MYCHECK_ROUTE_PATH']]
+                        routerParams: () => [self.$constants['ROUTE_TABLE']['MYCHECK_ROUTE_PATH']]
                     }
                 ],
                 workbenchTabItems: [

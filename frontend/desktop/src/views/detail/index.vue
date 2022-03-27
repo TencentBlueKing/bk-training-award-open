@@ -1,34 +1,13 @@
 <template>
     <div class="detail-container">
         <top-back></top-back>
-
-        <!-- 待审批悬浮窗-->
-        <!--        <div :class="['approval-list']" v-if="formType === pageType['approval_detail']">-->
-        <!--            <div class="tip-button" @click="trigglePanel" v-waves>-->
-        <!--                {{ panelCutOut ? '展开' : '收起' }}-->
-        <!--            </div>-->
-        <!--            <div :class="['approval-content',{-->
-        <!--                'not_active': panelCutOut-->
-        <!--            }]">-->
-        <!--                <tabs style="height: 100%"-->
-        <!--                    :tab-items="approvalTabItems"-->
-        <!--                >-->
-        <!--                    <template>-->
-        <!--                        <component :is="'approval-list'" ref="approval-list"></component>-->
-        <!--                    </template>-->
-        <!--                </tabs>-->
-        <!--            </div>-->
-        <!--        </div>-->
-
         <div class="board">
-
             <!-- /编辑部分 -->
             <div>
                 <bk-divider style="width: 100%"></bk-divider>
             </div>
             <div class="form-panel">
                 <DetailInfo class="detail" ref="award-detail" type="award_detail"></DetailInfo>
-
                 <!-- /详情部分 -->
 
                 <!-- 编辑部分 -->
@@ -109,7 +88,6 @@
     export default {
         name: 'detail',
         components: {
-            // ApprovalList: () => import('./table/approval-list'),
             DetailInfo: () => import('./DetailInfo'),
             ApplyForm: () => import('./ApplyForm')
         },
@@ -181,10 +159,6 @@
         },
         methods: {
             handleInit () {
-                this.applyForm = this.$route.params
-            },
-            trigglePanel () {
-                this.panelCutOut = !this.panelCutOut
             },
             toApproval (tips, type) {
                 this.approvalForm.approvalTips = tips

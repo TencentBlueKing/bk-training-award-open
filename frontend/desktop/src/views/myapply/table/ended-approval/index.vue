@@ -23,7 +23,7 @@
         <bk-table-column label="评语" :width="300">
             <template slot-scope="endedApprovals">
                 <span v-bk-tooltips.light="endedApprovals.row['approval_text']"
-                >{{endedApprovals.row['approval_text']}}</span>
+                >{{endedApprovals.row['approval_text'] }}</span>
             </template>
         </bk-table-column>
     </self-table>
@@ -33,7 +33,6 @@
     import {
         APPLY_APPROVAL_STATE_EN_MAP,
         APPLY_APPROVAL_STATE_MAP,
-        DETAIL_ROUTE_PATH,
         MYAPPLY_ENDED_APPROVAL
     } from '@/constants'
     import { getRecord } from '@/api/service/apply-service'
@@ -65,6 +64,7 @@
                         approval_id: approval['id'],
                         record_id: approval['id'],
                         approval_state: approval['approval_state'],
+                        approval_text: approval['approval_text'] || '暂无评语',
                         approval_state_en: APPLY_APPROVAL_STATE_EN_MAP[approval['approval_state']],
                         approval_state_cn: APPLY_APPROVAL_STATE_MAP[approval['approval_state']],
                         application_reason: approval['application_reason'],
@@ -111,18 +111,7 @@
                 }).finally(_ => {
                     this.loading = false
                 })
-            },
-            handleToGetDetail (recordInfo) {
-                this.$router.push({
-                    name: DETAIL_ROUTE_PATH,
-                    query: {
-                        type: 'detail',
-                        award_id: recordInfo['award_id'],
-                        record_id: recordInfo['record_id']
-                    }
-                })
             }
-          
         }
 
     }

@@ -3,10 +3,16 @@
     <self-table :data="applicationableAwardList"
         :pagination.sync="pagination"
         :loading="loading"
-        @page-change="handleInit()"
+        @page-change="handleInit"
     >
         <bk-table-column label="序列" width="60" type="index"></bk-table-column>
-        <bk-table-column label="奖项名称" prop="award_name"></bk-table-column>
+        <bk-table-column label="奖项名称" prop="award_name">
+            <template slot-scope="awards">
+                <span :title="awards['row']['award_name']">
+                    {{ awards.row['award_name']}}
+                </span>
+            </template>
+        </bk-table-column>
         <bk-table-column label="所属小组">
             <template slot-scope="awards">
                 <span :title="awards['row']['award_department_fullname']">
@@ -14,7 +20,7 @@
                 </span>
             </template>
         </bk-table-column>
-        <bk-table-column label="截止申请时间" :width="200">
+        <bk-table-column label="申请截止时间" :width="200">
             <template slot-scope="awards">
                 <span :title="awards['row']['end_time']">
                     {{ awards['row']['end_time']}}
@@ -73,16 +79,6 @@
             this.handleInit()
         },
         methods: {
-            toApply (award) {
-                this.$router.push({
-                    name: DETAIL_ROUTE_PATH,
-                    query: {
-                        [DETAIL_TYPE_KEYNAME]: DETAIL_APPLY,
-                        award_id: award['id']
-
-                    }
-                })
-            },
             handleInit () {
                 this.handleGetPageData()
             },
@@ -100,6 +96,20 @@
                     this.applicationableAwardRemoteList = data?.results
                 }).finally(_ => {
                     this.loading = false
+                })
+            },
+            /**
+             * 跳转申请页面
+             * @param award
+             * */
+            toApply (award) {
+                this.$router.push({
+                    name: DETAIL_ROUTE_PATH,
+                    query: {
+                        [DETAIL_TYPE_KEYNAME]: DETAIL_APPLY,
+                        award_id: award['id'],
+                        group_id: award['award_department_id']
+                    }
                 })
             }
 

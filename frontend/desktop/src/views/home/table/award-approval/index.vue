@@ -23,7 +23,10 @@
         </bk-table-column>
         <bk-table-column label="操作">
             <template slot-scope="approvals">
-                <bk-button class="mr10 ml10" theme="primary" :text="true" @click="handleToRefundApplication(approvals.row)">前往审批</bk-button>
+                <bk-button class="mr10 ml10"
+                    theme="primary"
+                    :text="true"
+                    @click="handleToRefundApplication(approvals.row)">前往审批</bk-button>
             </template>
         </bk-table-column>
     </self-table>
@@ -38,40 +41,31 @@
     } from '@/constants'
     import { getAwardApproval } from '@/api/service/apply-service'
     import { formatDate, formatUsernameAndDisplayName } from '@/common/util'
+    import { tableMixins } from '@/common/mixins/tableMixins'
 
     export default {
         name: 'award-approval',
+        mixins: [tableMixins],
         data () {
             return {
-                awardApprovalRemoteList: [],
-                loading: false,
-                pagination: {
-                    current: 1,
-                    count: 0,
-                    limit: 10
-                }
+                awardApprovalRemoteList: []
             }
         },
         computed: {
             awardApprovalList (self) {
                 return self.awardApprovalRemoteList?.map(approval => {
                     const awardInfo = approval['award_info']
-                    const applicationUsers = approval.application_users.map(user => {
-                        return formatUsernameAndDisplayName(user['username'], user['display_name'])
-                    })
+                    const applicationUser = approval['application_users']?.[0]
                     return {
                         approval_id: approval['id'],
                         award_id: approval['award_id'],
                         award_department_id: approval['award_department_id'],
                         application_time: formatDate(approval['application_time']),
                         application_reason: approval['application_reason'],
-                        application_user: applicationUsers.join(','),
+                        application_user: formatUsernameAndDisplayName(applicationUser?.['username'], applicationUser?.['display_name']) || '未定义',
                         application_users: approval['application_users'],
                         application_attachments: approval['application_attachments'],
-                        approval_state: approval['approval_state'],
-                        approval_turn: approval['approval_turn'],
                         approval_time: approval['approval_status'],
-                        approval_text: approval['approval_text'],
                         award_name: awardInfo['award_name'],
                         award_description: awardInfo['award_description'],
                         award_department_fullname: awardInfo['award_department_fullname'],
@@ -93,36 +87,31 @@
             this.handleInit()
         },
         methods: {
-            toApproval (approval) {
-                this.$router.push({
-                    name: DETAIL_ROUTE_PATH,
-                    query: {
-                        [DETAIL_TYPE_KEYNAME]: DETAIL_APPROVAL,
-                        query: {
-                            record_id: approval['approval_id'],
-                            award_id: approval['award_id'],
-                            group_id: approval['award_department_id']
-                        }
-                    }
-                })
-            },
             handleInit () {
                 this.handleGetPageData()
             },
-            handleGetPageData (config = this.pagination) {
-                const { current: page, limit: size } = config
+            /**
+             * @param page
+             * @param size
+             * @return {any}
+             * */
+            handleGetPageData (page = this.pagination.current, size = this.pagination.limit) {
                 if (this.loading) {
                     return
                 }
                 this.loading = true
                 
-                return getAwardApproval({ page, size, approval_status: MYCHECK_AWARD_PENGDING_APPROVAL }).then((response) => {
-                    const data = response.data
-                    this.pagination.count = data?.count ?? 0
-                    this.awardApprovalRemoteList = data?.results
-                }).finally(_ => {
-                    this.loading = false
-                })
+                return getAwardApproval({
+                    page,
+                    size,
+                    approval_status: MYCHECK_AWARD_PENGDING_APPROVAL })
+                    .then((response) => {
+                        const data = response.data
+                        this.pagination.count = data?.count ?? 0
+                        this.awardApprovalRemoteList = data?.results
+                    }).finally(_ => {
+                        this.loading = false
+                    })
             },
           
             handleToRefundApplication (approval) {

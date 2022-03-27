@@ -74,7 +74,7 @@
                         approval_state: approval['approval_state'],
                         approval_turn: approval['approval_turn'] + 1,
                         approval_time: approval['approval_status'],
-                        approval_text: approval['approval_text'],
+                        approval_text: approval['approval_text'] || '暂无评语',
                         award_name: awardInfo['award_name'],
                         award_description: awardInfo['award_description'],
                         award_department_fullname: awardInfo['award_department_fullname'],

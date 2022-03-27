@@ -12,6 +12,7 @@
                 </span>
             </template>
         </bk-table-column>
+        <bk-table-column label="申请人" prop="application_user"></bk-table-column>
         <bk-table-column label="申请开始时间" prop="application_time"></bk-table-column>
         <bk-table-column label="申请截止时间" prop="end_time"></bk-table-column>
         <bk-table-column label="申请理由" prop="application_reason">
@@ -59,20 +60,21 @@
         computed: {
             endedApprovalData (self) {
                 const endedApprovalRemoteData = self.endedApprovalRemoteData
-                
+              
                 const list = endedApprovalRemoteData?.map(approval => {
                     const applicationInfo = approval['application_info']
                     const awardInfo = applicationInfo?.['award_info'] ?? {}
-                    const applicationUsers = approval.application_users ?? []
+                    const applicationUsers = applicationInfo?.['application_users'] ?? []
+                    const applicationUser = applicationUsers[0]
                     return {
                         approval_id: approval['id'],
                         application_id: approval['application_id'],
                         award_id: applicationInfo['award_id'],
                         award_department_id: approval['award_department_id'],
                         application_time: formatDate(applicationInfo['application_time']),
-                        application_reason: approval['application_reason'],
-                        application_user: formatUsernameAndDisplayName(applicationUsers[0]?.['username'], applicationUsers[0]?.['display_name']),
-                        application_users: approval['application_users'],
+                        application_reason: applicationInfo['application_reason'] || '未填写申请理由',
+                        application_user: formatUsernameAndDisplayName(applicationUser?.['username'], applicationUser?.['display_name']),
+                        application_users: applicationUsers['application_users'],
                         application_attachments: approval['application_attachments'],
                         approval_state: approval['approval_state'],
                         approval_turn: approval['approval_turn'] + 1,

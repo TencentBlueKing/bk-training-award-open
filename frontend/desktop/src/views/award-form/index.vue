@@ -160,7 +160,7 @@
     </div>
 </template>
 <script>
-    import { formatDate, formatUsernameAndDisplayName, setTitle } from '@/common/util'
+    import { formatDate, setTitle } from '@/common/util'
     import {
         AWARD_LEVEL_MAP,
         AWARD_MANAGER_ROUTE_PATH, AWARD_TYPE_CREATE, AWARD_TYPE_DETAIL,
@@ -302,10 +302,7 @@
                             })
                         },
                         init () {
-                            const awardId = this.$route.query['award_id']
-                            if (awardId) {
-                                this.handleGetAwardDetailById(awardId)
-                            }
+                            self.handleGetAwardDetailById()
                             setTitle('编辑奖项')
                         }
                     },
@@ -319,10 +316,7 @@
                             this.$router.go(-1)
                         },
                         init () {
-                            const awardId = this.$route.query['award_id']
-                            if (awardId) {
-                                this.handleGetAwardDetailById(awardId)
-                            }
+                            self.handleGetAwardDetailById()
                             setTitle('奖项详情')
                         }
                     }
@@ -331,7 +325,7 @@
         },
         computed: {
             formType (self) {
-                return self.$route.query[AWARD_TYPE_ROUTE_KEY] || 'create'
+                return self.$route.query[AWARD_TYPE_ROUTE_KEY] || AWARD_TYPE_CREATE
             },
             groupInfo: {
                 get (self) {
@@ -373,15 +367,13 @@
             handleInit () {
                 this.config[this.formType]?.init()
             },
-            handleGetAwardDetailById (awardId) {
+            handleGetAwardDetailById () {
+                const awardId = this.$route.query['award_id']
                 if (awardId) {
                     return getAwardById(awardId).then(awardDetail => {
                         const detail = awardDetail.data
                         try {
-                            detail['award_consultant_displayname'] = formatUsernameAndDisplayName(
-                                detail['award_consultant'],
-                                detail['award_consultant_displayname']
-                            )
+                            console.log(detail)
                             detail['reviewers'] = detail['reviewers'] = detail['award_reviewers'].map(item => {
                                 return {
                                     uuid: uuid.get(),
@@ -392,7 +384,9 @@
                         } catch (e) {
                             console.error(e)
                         }
-                        this.awardForm = detail
+                        this.$nextTick(item => {
+                            this.awardForm = detail
+                        })
                     })
                 }
             },

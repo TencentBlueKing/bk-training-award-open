@@ -3,16 +3,16 @@
         <div class="message-list" v-show="messageData.length"
             v-bkloading="{ isLoading: loading ,title: '请稍等,正在为您安放数据' }"
         >
-            <message-card v-for="(item,index) in messageData"
+            <message-card v-for="(item) in messageData"
                 :key="item['id']"
                 :message="item"
-                @tool-click="handleRead(item,index)"
+                @tool-click="handleRead(item)"
             ></message-card>
         </div>
         <empty v-show="!messageData.length"></empty>
         <bk-pagination
             :small="true"
-            v-show="pagination.count > 2"
+            v-show="pagination.count > 3"
             :current.sync="pagination.current"
             :count="pagination.count"
             :limit.sync="pagination.limit"
@@ -34,6 +34,7 @@
         mixins: [tableMixins],
         data () {
             return {
+                // 获取得到的消息容器
                 messageRemoteData: []
             }
         },
@@ -81,10 +82,8 @@
                     this.loading = false
                 })
             },
-            handleRead ({ msg_id, message }, index) {
-                return putMessage({ msg_id }).then(response => {
-                    this.messageRemoteData[index]['is_read'] = true
-                    console.log(response)
+            handleRead ({ msg_id }) {
+                return putMessage({ msg_id }).then(_ => {
                     this.handleInit()
                 })
             }

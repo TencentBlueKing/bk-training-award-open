@@ -9,7 +9,9 @@
             <bk-table-column type="index" label="序号" :width="60"></bk-table-column>
             <bk-table-column label="奖项名称">
                 <template slot-scope="ingAwards">
-                    <span :title="ingAwards.row['award_name']" v-text="ingAwards.row['award_name']"></span>
+                    <award-title :award="ingAwards.row" :title="ingAwards.row['award_name']">
+                        {{ ingAwards.row['award_name'] }}
+                    </award-title>
                 </template>
             </bk-table-column>
             <bk-table-column label="申请开始时间">
@@ -84,7 +86,7 @@
                     <bk-table-column label="申请理由">
                         <template slot-scope="ingAwardApplication">
                             <span :title="ingAwardApplication.row['application_reason']"
-                                v-text="ingAwardApplication.row['application_reason'] || '暂无评语'"
+                                v-text="ingAwardApplication.row['application_reason'] "
                             ></span>
                         </template>
                     </bk-table-column>
@@ -109,10 +111,12 @@
     import { formatDate, formatUsernameAndDisplayName } from '@/common/util'
     import { getAwardApplication } from '@/api/service/apply-service'
     import { uuid } from '@/common/uuid'
+    import AwardTitle from '@/views/award-manager/award-title'
 
     export default {
         name: 'ended-approval',
         components: {
+            AwardTitle,
             SliderLayout: () => import('@/views/award-manager/slider-layout')
         },
         mixins: [tableMixins],
@@ -173,7 +177,7 @@
                         award_id: application['award_id'],
                         award_department_id: application['award_department_id'],
                         approval_turn: application['approval_turn'],
-                        approval_text: application['approval_text'],
+                        approval_text: application['approval_text'] || '暂无评语',
                         approval_state: application['approval_state'],
                         award_reviewers_for_display: awardReviewers,
                         approval_state_en: APPLY_APPROVAL_STATE_EN_MAP[application['approval_state']],
@@ -252,7 +256,8 @@
                     name: AWARD_FORM_ROUTE_PATH,
                     query: {
                         [AWARD_TYPE_ROUTE_KEY]: AWARD_TYPE_DETAIL,
-                        award_id: awardInfo['award_id']
+                        award_id: awardInfo['award_id'],
+                        group_id: awardInfo['award_department_id']
                     }
                 })
             }
