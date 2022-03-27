@@ -25,6 +25,9 @@
                 :tab-items="workbenchTabItems"
                 v-model="workbenchCurIndex"
             >
+                <template slot="right-controller">
+                    <bk-button theme="warning" @click="$refs[workbenchCurIndex].handleInit()"> 刷新</bk-button>
+                </template>
                 <template>
                     <component :is="workbenchCurIndex" :ref="workbenchCurIndex"></component>
                 </template>
