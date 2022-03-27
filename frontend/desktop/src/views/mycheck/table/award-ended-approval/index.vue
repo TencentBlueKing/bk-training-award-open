@@ -5,12 +5,18 @@
         @page-change="handleInit()"
     >
         <bk-table-column type="index" label="序号" width="60"></bk-table-column>
-        <bk-table-column label="奖项名称" prop="award_name"></bk-table-column>
+        <bk-table-column label="奖项名称" prop="award_name">
+            <template slot-scope="approval">
+                <span :title="approval.row['award_name']">
+                    {{ approval.row['award_name'] }}
+                </span>
+            </template>
+        </bk-table-column>
         <bk-table-column label="申请开始时间" prop="application_time"></bk-table-column>
         <bk-table-column label="申请截止时间" prop="end_time"></bk-table-column>
-        <bk-table-column label="当前审批轮次">
+        <bk-table-column label="审批轮次">
             <template slot-scope="approval">
-                <span v-bk-overflow-tips>
+                <span :title="approval.row['approval_turn']">
                     第 {{approval.row['approval_turn']}} 轮
                 </span>
             </template>
@@ -45,12 +51,15 @@
         },
         computed: {
             endedApprovalData (self) {
-                return self.endedApprovalRemoteData?.map(approval => {
+                const endedApprovalRemoteData = self.endedApprovalRemoteData
+                
+                const list = endedApprovalRemoteData?.map(approval => {
                     const applicationInfo = approval['application_info']
                     const awardInfo = applicationInfo?.['award_info'] ?? {}
                     const applicationUsers = approval.application_users ?? []
                     return {
                         approval_id: approval['id'],
+                        application_id: approval['application_id'],
                         award_id: applicationInfo['award_id'],
                         award_department_id: approval['award_department_id'],
                         application_time: formatDate(applicationInfo['application_time']),
@@ -77,6 +86,27 @@
                         )
                     }
                 }) ?? []
+                // 一个合并方案
+                // const endedApprovalData = list.filter(item => {
+                //     // 在下面打上标记，如果被读过就扔掉，因为是同一个申请
+                //     if (item.is_leaf) return false
+                //     item.children = list.filter(_ => {
+                //         // 首先判断是否是同一个申请的审批
+                //         if (item.application_id !== _.application_id) {
+                //             return false
+                //         }
+                //         // 如果是同一轮那就 g 了
+                //         if (item.approval_turn === _.approval_turn) {
+                //             return false
+                //         }
+                //         // 如果不是同意轮 打上标记
+                //         _.is_leaf = true
+                //         return true
+                //     })
+                //     return item
+                // })
+                // console.log(endedApprovalData)
+                return list
             }
         },
         mounted () {

@@ -25,7 +25,7 @@
 <script>
     import { getMessage, putMessage } from '@/api/service/message-service'
     import { formatUsernameAndDisplayName } from '@/common/util'
-    import { tableMixins } from '../tableMixins'
+    import { tableMixins } from '@/common/mixins/tableMixins'
     export default {
         name: 'message-list',
         components: {
@@ -34,13 +34,7 @@
         mixins: [tableMixins],
         data () {
             return {
-                messageRemoteData: [],
-                loading: false,
-                pagination: {
-                    current: 1,
-                    count: 0,
-                    limit: 10
-                }
+                messageRemoteData: []
             }
         },
         computed: {
@@ -90,6 +84,8 @@
             handleRead ({ msg_id, message }, index) {
                 return putMessage({ msg_id }).then(response => {
                     this.messageRemoteData[index]['is_read'] = true
+                    console.log(response)
+                    this.handleInit()
                 })
             }
         }
@@ -99,11 +95,10 @@
 
 <style lang="postcss" scoped>
 .message-table {
-  max-height: 300px;
-  overflow-y: scroll;
+  max-height: 400px;
   .message-list {
     height: 100%;
-    max-height: 400px;
+    max-height: 300px;
     overflow-y: scroll;
   }
 }
