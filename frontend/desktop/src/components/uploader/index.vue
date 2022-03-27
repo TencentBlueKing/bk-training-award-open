@@ -36,12 +36,8 @@
             download: {
                 componentUpdated (filePanel, binding) {
                     const attachFiles = binding.value
-                    filePanel.querySelectorAll('.file-item .file-info').forEach((fileItem, index) => {
-                        // 已经被绑定就返回
-                        if (fileItem.__binded__) {
-                            return
-                        }
-                        fileItem.addEventListener('click', () => {
+                    function download (index) {
+                        return () => {
                             const curFile = attachFiles[index]
                             if (!curFile) {
                                 return
@@ -50,12 +46,23 @@
                             const downloadElement = document.createElement('a')
                             downloadElement.style.display = 'none'
                             downloadElement.href = curFile['url']
+                            downloadElement.target = '_blank'
                             downloadElement.download = curFile['name'] // 下载后文件名
                             document.body.appendChild(downloadElement)
                             downloadElement.click() // 点击下载
                             document.body.removeChild(downloadElement) // 下载完成移除元素
-                            window.URL.revokeObjectURL(curFile['url']) // 释放掉blob对象
-                        })
+                        }
+                    }
+                    [
+                        ...filePanel.querySelectorAll('.file-item .file-info'),
+                        ...filePanel.querySelectorAll('.file-item .file-icon')
+                    ].forEach((fileItem, index) => {
+                        // 已经被绑定就返回
+                        if (fileItem.__binded__) {
+                            return
+                        }
+                        fileItem.title = '点击下载'
+                        fileItem.addEventListener('click', download(index))
                         // 标记已经被绑定
                         fileItem.__binded__ = true
                     })
