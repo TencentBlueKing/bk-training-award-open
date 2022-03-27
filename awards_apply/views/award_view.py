@@ -179,11 +179,22 @@ class RecordView(APIView):
         award_record = AwardsRecordSerializers(data=request.data)
         award_record.is_valid(raise_exception=True)
         record = award_record.validated_data
+        award_target = Awards.objects.filter(id=record["award_id"]).first()
+        if award_target:
+            if award_target.end_time < timezone.now():
+                return JsonResponse(false_code("奖项申请已截止"))
+        else:
+            return JsonResponse(false_code("要申请的奖项不存在"))
         application = AwardApplicationRecord.objects.filter(award_id=record["award_id"]).filter(
             application_users__contains={"username": request.user.username})
         # 判断用户是否已经申请过该奖项
         if application:
-            application.delete()
+            # 如果是草稿 直接覆盖
+            if application.first().approval_state == ApprovalState.draft.value[0]:
+                application.delete()
+            # 防止调接口,导致申请被覆盖
+            else:
+                return JsonResponse(false_code("您的申请已发起, 请勿重复申请"))
         record.update(**{"application_users": [{"username": request.user.username,
                                                 "display_name": request.user.nickname}]})
         award_record.create(record)
