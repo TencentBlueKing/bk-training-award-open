@@ -5,9 +5,22 @@
         @page-change="handleInit()"
     >
         <bk-table-column type="index" label="序号" width="60"></bk-table-column>
-        <bk-table-column label="奖项名称" prop="award_name"></bk-table-column>
-        <bk-table-column label="申请开始时间" prop="application_time"></bk-table-column>
-        <bk-table-column label="申请截止时间" prop="end_time"></bk-table-column>
+        <bk-table-column label="奖项名称" prop="award_name">
+            <template slot-scope="approval">
+                <span :title="approval.row['award_name']">
+                    {{ approval.row['award_name'] }}
+                </span>
+            </template>
+        </bk-table-column>
+        <bk-table-column label="申请人" prop="application_user"></bk-table-column>
+        <bk-table-column label="申请时间" prop="application_time"></bk-table-column>
+        <bk-table-column label="申请理由" prop="approval_text">
+            <template slot-scope="approval">
+                <span :title="approval.row['approval_text']">
+                    {{ approval.row['approval_text'] }}
+                </span>
+            </template>
+        </bk-table-column>
         <bk-table-column label="当前审批轮次">
             <template slot-scope="approval">
                 <span v-bk-overflow-tips>
@@ -48,13 +61,14 @@
                 return self.pendingApprovalRemoteData?.map(approval => {
                     const awardInfo = approval['award_info']
                     const applicationUsers = approval.application_users ?? []
+                    const applicationUser = applicationUsers[0]
                     return {
                         approval_id: approval['id'],
                         award_id: approval['award_id'],
                         award_department_id: approval['award_department_id'],
                         application_time: formatDate(approval['application_time']),
                         application_reason: approval['application_reason'],
-                        application_user: formatUsernameAndDisplayName(applicationUsers[0]?.['username'], applicationUsers[0]?.['display_name']),
+                        application_user: formatUsernameAndDisplayName(applicationUser?.['username'], applicationUser?.['display_name']),
                         application_users: approval['application_users'],
                         application_attachments: approval['application_attachments'],
                         approval_state: approval['approval_state'],
