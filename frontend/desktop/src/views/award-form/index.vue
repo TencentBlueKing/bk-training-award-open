@@ -136,9 +136,11 @@
                     <bk-button theme="danger" class="mr10 ml10"
                         @click="config[formType]['cancel-func']"
                     >
-                        取消
+                        返回
                     </bk-button>
-                    <bk-button :theme="config[formType]['button-theme']" class="mr10 ml10"
+                    <bk-button v-if="config[formType]['button-theme']"
+                        :theme="config[formType]['button-theme']"
+                        class="mr10 ml10"
                         @click="config[formType]['confirm-func']()"
                     >
                         {{config[formType]['button-title']}}
@@ -161,7 +163,7 @@
     import { formatDate, formatUsernameAndDisplayName } from '@/common/util'
     import {
         AWARD_LEVEL_MAP,
-        AWARD_MANAGER_ROUTE_PATH,
+        AWARD_MANAGER_ROUTE_PATH, AWARD_TYPE_CREATE, AWARD_TYPE_DETAIL,
         AWARD_TYPE_EDIT,
         AWARD_TYPE_ROUTE_KEY
     } from '@/constants'
@@ -274,7 +276,7 @@
                 awardLevels: AWARD_LEVEL_MAP,
                 submitLoading: false,
                 config: {
-                    edit: {
+                    [AWARD_TYPE_EDIT]: {
                         'title': '编辑奖项',
                         'title-clz': 'edit',
                         'button-title': '提交修改',
@@ -286,12 +288,22 @@
                             })
                         }
                     },
-                    create: {
+                    [AWARD_TYPE_CREATE]: {
                         'title': '新增奖项',
                         'title-clz': 'new',
                         'button-title': '确认新增',
                         'button-theme': 'success',
                         'confirm-func': this.handleConfirmAddNewAward,
+                        'cancel-func': () => {
+                            this.$router.go(-1)
+                        }
+                    },
+                    [AWARD_TYPE_DETAIL]: {
+                        'title': '奖项详情',
+                        'title-clz': '',
+                        'button-title': '',
+                        'button-theme': '',
+                        'confirm-func': () => {},
                         'cancel-func': () => {
                             this.$router.go(-1)
                         }
@@ -341,11 +353,11 @@
              * 初始化信息
              * */
             handleInit () {
-                if ((this.formType === AWARD_TYPE_EDIT)
+                if ([AWARD_TYPE_DETAIL, AWARD_TYPE_EDIT].includes(this.formType)
                     && this.$route.query['award_id']
                 ) {
                     this.handleGetAwardDetailById(this.$route.query['award_id'])
-                    this.$bus.headerName = '编辑奖项'
+                    this.$bus.headerName = ''
                 }
             },
             handleGetAwardDetailById (awardId) {

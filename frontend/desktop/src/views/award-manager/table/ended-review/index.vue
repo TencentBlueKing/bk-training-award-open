@@ -55,7 +55,7 @@
             </bk-table-column>
         </self-table>
         <slider-layout ref="application-detail"
-            :header-title="'测试奖项名'"
+            :header-title="'奖项人列表'"
             :width="800"
         >
             <div slot="content">
@@ -66,13 +66,7 @@
                     @page-change="handleGetAwardApplications(curAwardInfo)"
                 >
                     <bk-table-column label="序号" type="index" :width="80"></bk-table-column>
-                    <bk-table-column label="评审结果" :width="90">
-                        <template slot-scope="ingAwardApplication">
-                            <approval-state-tag :approval-state-cn="ingAwardApplication.row['approval_state_cn']"
-                                :approval-state-en="ingAwardApplication.row['approval_state_en']"
-                            ></approval-state-tag>
-                        </template>
-                    </bk-table-column>
+           
                     <bk-table-column label="申请人">
                         <template slot-scope="ingAwardApplication">
                             <span :title="ingAwardApplication.row['application_user_for_display']"
@@ -93,6 +87,13 @@
                                     :title="item['description']"
                                 ></bk-option>
                             </bk-select>
+                        </template>
+                    </bk-table-column>
+                    <bk-table-column label="评审结果" :width="90">
+                        <template slot-scope="ingAwardApplication">
+                            <approval-state-tag :approval-state-cn="ingAwardApplication.row['approval_state_cn']"
+                                :approval-state-en="ingAwardApplication.row['approval_state_en']"
+                            ></approval-state-tag>
                         </template>
                     </bk-table-column>
                     <bk-table-column label="评语">

@@ -16,8 +16,8 @@
                     </span>
                 </template>
             </bk-table-column>
-            <bk-table-column label="奖项开始时间" prop="start_time"></bk-table-column>
-            <bk-table-column label="奖项截止时间" prop="end_time"></bk-table-column>
+            <bk-table-column label="申请开始时间" prop="start_time"></bk-table-column>
+            <bk-table-column label="申请截止时间" prop="end_time"></bk-table-column>
             <bk-table-column label="奖项咨询人">
                 <template slot-scope="ingAwards">
                     <span
@@ -97,6 +97,13 @@
                             </bk-select>
                         </template>
                     </bk-table-column>
+                    <bk-table-column label="评审结果" :width="90">
+                        <template slot-scope="pendingAwards">
+                            <approval-state-tag :approval-state-cn="pendingAwards.row['approval_state_cn']"
+                                :approval-state-en="pendingAwards.row['approval_state_en']"
+                            ></approval-state-tag>
+                        </template>
+                    </bk-table-column>
                 </self-table>
             </div>
             <div slot="footer">
@@ -112,7 +119,7 @@
                     <div slot="content">
                         <div>
                             <i class="bk-text-danger bk-icon icon-info-circle-shape content-icon"></i>
-                            <span class="content-text pb10 mb20">结束后，所有评审中的奖项将设置为
+                            <span class="content-text pb10 mb20">结束后，所有评审中的申请将设置为
                                 <em class="bk-text-danger"> 未通过</em>
                             </span>
                         </div>
@@ -147,6 +154,7 @@
     export default {
         name: 'ended-approval',
         components: {
+            ApprovalStateTag: () => import('@/views/award-manager/approval-state-tag'),
             SliderLayout: () => import('@/views/award-manager/slider-layout')
         },
         mixins: [tableMixins],

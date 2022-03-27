@@ -8,11 +8,10 @@ import Vuex from 'vuex'
 
 import { unifyObjectStyle } from '@/common/util'
 import {
-    APP_AUTH_NEWER, GROUP_KEYNAME,
+    APP_AUTH_NEWER,
+    GROUP_KEYNAME,
     GROUP_MANAGER_ROUTE_PATH,
-    IDENT_ADMIN,
     IDENT_COMMON,
-    IDENT_SECRETARY,
     MYCHECK_ROUTE_PATH,
     POWER_CONTROLLER,
     ROUTE_TABLE
@@ -21,6 +20,7 @@ import { getUserInfo } from '@/api/service/user-service'
 import { bus } from '@/store/bus'
 import http from '@/api'
 import { getGroup, getUsermanageRetrieveUser } from '@/api/service/group-service'
+
 Vue.use(Vuex)
 
 const store = new Vuex.Store({
@@ -69,7 +69,7 @@ const store = new Vuex.Store({
             const ident = state.user_ident['ident']
             return POWER_CONTROLLER[MYCHECK_ROUTE_PATH][ident]
         }
-        
+
     },
     // 公共 mutations
     mutations: {
@@ -92,26 +92,6 @@ const store = new Vuex.Store({
         updateUser (state, user) {
             state.user = { ...user }
         },
-        updateGroupList (state, groupList) {
-            state.groupList = [...groupList]
-        },
-        updateUserIdent (state, userIdent) {
-            const { is_admin: isAdmin, is_secretary: isSecretary } = userIdent
-            let ident = IDENT_COMMON
-            if (isAdmin) {
-                ident = IDENT_ADMIN
-            } else if (isSecretary) {
-                ident = IDENT_SECRETARY
-            }
-            state.user_ident = {
-                is_admin: isAdmin,
-                is_secretary: isSecretary,
-                ident: ident
-            }
-        },
-        updateCurGlobalSelectGroup (state, groupId) {
-            state.curGlobalSelectGroup = groupId
-        },
         updateBkInfo (state, data) {
             state.bkInfo = data
         }
@@ -122,28 +102,27 @@ const store = new Vuex.Store({
          *
          * @param {Object} context store 上下文对象 { commit, state, dispatch }
          *
+         * @param { object } config
          * @return {Promise} promise 对象
          */
         userInfo (context, config = {}) {
-            // ajax 地址为 USER_INFO_URL，如果需要 mock，那么只需要在 url 后加上 AJAX_MOCK_PARAM 的参数，
-            // 参数值为 mock/ajax 下的路径和文件名，然后加上 invoke 参数，参数值为 AJAX_MOCK_PARAM 参数指向的文件里的方法名
-            // 例如本例子里，ajax 地址为 USER_INFO_URL，mock 地址为 USER_INFO_URL?AJAX_MOCK_PARAM=index&invoke=getUserInfo
-
-            // 后端提供的地址
-            // mock 的地址，示例先使用 mock 地址
-            // const mockUrl = USER_INFO_URL + (USER_INFO_URL.indexOf('?') === -1 ? '?' : '&') + AJAX_MOCK_PARAM + '=index&invoke=getUserInfo'
             return getUserInfo(config).then(response => {
                 const userData = response.data || {}
                 context.commit('updateUser', userData)
                 return Promise.resolve(userData)
             }).then(userData => {
                 if (userData['is_newer']) {
-                    bus.$emit(APP_AUTH_NEWER, true)
                     bus.isNewer = true
+                    bus.$emit(APP_AUTH_NEWER, true)
                 }
                 return Promise.resolve(userData)
             })
         },
+        /**
+         * @param context
+         * @param config
+         * @return {Array | Promise | any}
+         * */
         group (context, config = {}) {
             const groupUsers = http.cache.get(GROUP_KEYNAME)
             if (groupUsers) {
@@ -156,6 +135,11 @@ const store = new Vuex.Store({
                 return Promise.resolve(response.data)
             })
         },
+        /**
+         * @param context
+         * @param config
+         * @return {any}
+         * */
         bkInfo (context, config) {
             return getUsermanageRetrieveUser(config).then(response => {
                 const bkInfo = response.data || {}
