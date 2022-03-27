@@ -4,7 +4,6 @@
         :ext-cls="$attrs['ext-cls']"
         :is-show.sync="sliderShow"
         :quick-close="true"
-        :transfer="true"
     >
         <div slot="header">
             <slot v-if="!!$slots['header']" name="header"></slot>

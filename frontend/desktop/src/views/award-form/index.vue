@@ -409,9 +409,9 @@
                     const awardForm = this.awardForm
                     awardForm.start_time = formatDate(awardForm.start_time)
                     awardForm.end_time = formatDate(awardForm.end_time)
-
-                    this.awardForm['award_consultant_displayname'] = this.$bus.curGroupUsers.find(item => item['username'] === awardForm['award_consultant'])['display_name']
+                    console.log(this.$bus.curGroupUsers)
                     this.awardForm['award_department_id'] = this.$bus.curGlobalGroupId
+                    this.awardForm['award_consultant_displayname'] = this.$bus.curGroupUsers.find(item => item['username'] === awardForm['award_consultant'])['display_name']
                     this.awardForm['award_department_fullname'] = this.$bus.curGlobalSelectedGroup['full_name']
                     return awardForm
                 }

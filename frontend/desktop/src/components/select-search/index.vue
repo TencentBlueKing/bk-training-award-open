@@ -13,7 +13,7 @@
         :multiple="multiple"
         :display-tag="true"
         :value="value"
-        :z-index="9999999999"
+        :z-index="9999"
         :is-tag-width-limit="false"
         @change="handleChange($event)"
         :behavior="$attrs['behavior']"
@@ -115,16 +115,6 @@
                 return list
             }
         },
-        watch: {
-            '$bus.curGlobalGroupId': {
-                handler (newValue, oldValue) {
-                    if (newValue !== oldValue) {
-                        this.handleInit()
-                    }
-                },
-                immediate: true
-            }
-        },
         created () {
             this.handleInit()
         },
@@ -165,7 +155,7 @@
                 this.loading = true
                 const groupId = this.$bus.curGlobalGroupId
 
-                return getGroupUser({ groupId: groupId }).then(response => {
+                return getGroupUser({ groupId }).then(response => {
                     if (!response.data) {
                         this.messageWarn('出错啦')
                         this.loading = false

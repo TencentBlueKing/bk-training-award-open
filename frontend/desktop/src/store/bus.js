@@ -45,6 +45,11 @@ export const bus = new Vue({
             return self.$http.cache.get(GROUP_USERS_KEYNAME + groupId)
         }
     },
+    watch: {
+        curGlobalGroupId () {
+            this.handleGetGroupUserList()
+        }
+    },
     async created () {
         await this.handleGetGroupList()
     },
