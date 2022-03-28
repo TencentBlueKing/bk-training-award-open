@@ -139,4 +139,4 @@ dmypy.json
 build.yml
 
 # for pre-commit
-pre_commit_hooks/
+pre_commit_hooks

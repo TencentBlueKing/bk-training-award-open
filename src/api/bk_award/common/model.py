@@ -21,8 +21,11 @@ class UuidModel(models.Model):
         abstract = True
 
 
-class TimestampedModelMixin:
+class TimestampedModelMixin(models.Model):
     """Mixin with 'created_at' and 'updated_at' fields."""
 
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        abstract = True
