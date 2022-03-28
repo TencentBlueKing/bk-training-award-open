@@ -33,11 +33,11 @@
             message: {
                 type: Object,
                 default: () => ({
-                    create_time: '2021-03-02 hh:mm',
+                    create_time: '',
                     group_name: '小组名',
-                    action_user: '3234853521Q',
-                    action_display_name: '陈润',
-                    message: '通过您的第一次申请'
+                    action_user: '',
+                    action_display_name: '',
+                    message: ''
                 })
             }
         },

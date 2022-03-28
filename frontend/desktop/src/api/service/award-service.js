@@ -5,15 +5,7 @@
 import http from '@/api'
 
 /**
- * 新增奖项
- * @param { award_name, award_level, award_description, award_consultant, award_image, award_department_fullname, award_reviewers, start_time, end_time } fields
- * */
-export function postAwards (fields) {
-    return http.post('awards/', fields)
-}
-
-/**
- * 获取奖项
+ * @description 根据状态获取奖项列表
  * @param { number } page
  * @param { number } size
  * @param group_id
@@ -34,8 +26,24 @@ export function getAwards ({
         }
     })
 }
+/**
+ * @description 新增奖项
+ * @param { ,奖项名称: award_name
+ * , 奖项等级: award_level
+ * , 奖项描述: award_description
+ * , 奖项要求: award_demand
+ * , 奖项顾问username: award_consultant
+ * , 奖项顾问display_name: award_department_fullname
+ * , 奖项评审人:award_reviewers
+ * , 奖项开始时间: start_time
+ * , 奖项截止申请时间: end_time } fields
+ * */
+export function postAwards (fields) {
+    return http.post('awards/', fields)
+}
+
 /***
- * 获取可申请奖项
+ * @description 获取可申请奖项
  * @param { number } page
  * @param { number } size
  * @param award_status
@@ -52,7 +60,7 @@ export function getAvailableAwards ({ page, size, award_status, group_id }) {
     })
 }
 /**
- * 奖项申请的统一入口
+ * @description 用户发起奖项申请
  * @param { boolean } isDraft
  * @param { id,award_id,application_reason,application_users,application_attachments } applyForm
  *
@@ -63,8 +71,9 @@ export function postRecord (isDraft, applyForm) {
         ...applyForm
     })
 }
+
 /**
- * 撤销申请
+ * @description 用户撤销申请
  * @param { number } applyId
  *
  * */
@@ -77,7 +86,7 @@ export function deleteRecord (applyId) {
         } })
 }
 /**
- * 编辑奖项
+ * @description 编辑奖项
  * @param {string} awardId
  * @param { string } award_name
  * @param { string } award_level
@@ -124,15 +133,15 @@ export function putAward (awardId, {
 }
 
 /**
- * 撤销申请
- * @param id
+ * @description 通过 奖项 id 获取奖项信息
+ * @param awardId
  * */
-export function getAwardById (id) {
-    return http.get(`/awards/${id}/`)
+export function getAwardById (awardId) {
+    return http.get(`/awards/${awardId}/`)
 }
 
 /**
- * 结束奖项
+ * @description 秘书结束奖项
  * @param awardId 需要结束的奖项id
  * @return {any}
  * */
@@ -141,9 +150,9 @@ export function postFinishAward ({ awardId }) {
 }
 
 /**
- * 结束奖项
- * @param id
+ * @description 获取奖项申请信息
+ * @param awardId
  * */
-export function getAwardApplication (id) {
-    return http.get(`/award_application/${id}/`)
+export function getAwardApplication (awardId) {
+    return http.get(`/award_application/${awardId}/`)
 }

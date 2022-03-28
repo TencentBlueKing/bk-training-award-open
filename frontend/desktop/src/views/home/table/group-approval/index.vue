@@ -45,7 +45,7 @@
         mixins: [tableMixins],
         data () {
             return {
-                // 小组审批的远程数据
+                // 小组审批的远程数据 用于后续 computed 的格式化
                 groupApprovalRemoteData: []
             }
         },

@@ -41,36 +41,32 @@
     import { DETAIL_APPLY, DETAIL_ROUTE_PATH, DETAIL_TYPE_KEYNAME, ING_AWARD } from '@/constants'
     import { getAvailableAwards } from '@/api/service/award-service'
     import { formatDate } from '@/common/util'
-
+    import { tableMixins } from '@/common/mixins/tableMixins'
     export default {
         name: 'applicable-award',
+        mixins: [tableMixins],
         data () {
             return {
-                applicationableAwardRemoteList: [],
-                loading: false,
-                pagination: {
-                    current: 1,
-                    count: 0,
-                    limit: 10
-                }
+                // 可申请表单对应的远程数据集合用于后续的处理格式
+                applicationableAwardRemoteList: []
             }
         },
         computed: {
             applicationableAwardList (self) {
-                return self.applicationableAwardRemoteList?.map(item => {
+                return self.applicationableAwardRemoteList?.map(award => {
                     return {
-                        id: item['id'],
-                        award_name: item['award_name'],
-                        award_description: item['award_description'],
-                        award_department_fullname: item['award_department_fullname'],
-                        award_department_id: item['award_department_id'],
-                        award_reviewers: item['award_reviewers'],
-                        award_consultant: item['award_consultant'],
-                        award_consultant_displayname: item['award_consultant_displayname'],
-                        award_demand: item['award_demand'],
-                        start_time: formatDate(item['start_time']),
-                        end_time: formatDate(item['end_time']),
-                        approval_state: item['approval_state']
+                        id: award['id'],
+                        award_name: award['award_name'],
+                        award_description: award['award_description'],
+                        award_department_fullname: award['award_department_fullname'],
+                        award_department_id: award['award_department_id'],
+                        award_reviewers: award['award_reviewers'],
+                        award_consultant: award['award_consultant'],
+                        award_consultant_displayname: award['award_consultant_displayname'],
+                        award_demand: award['award_demand'],
+                        start_time: formatDate(award['start_time']),
+                        end_time: formatDate(award['end_time']),
+                        approval_state: award['approval_state']
                     }
                 })
             }

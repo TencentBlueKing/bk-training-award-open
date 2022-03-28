@@ -48,6 +48,7 @@
         mixins: [tableMixins],
         data () {
             return {
+                // 奖项审批对应的远程数据集合用于后续的处理格式
                 awardApprovalRemoteList: []
             }
         },

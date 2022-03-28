@@ -1,15 +1,14 @@
 <template>
     <bk-upload :theme="theme"
-        v-if="!($attrs['readonly'] && attachFiles.length < 1)"
+        ref="file-panel"
+        :size="100"
+        :url="url"
         :files="attachFiles"
         :limit="limit"
         :tip="$attrs['tip']"
         :with-credentials="true"
-        :url="url"
-        @on-exceed="handleUploadExceed(limit,attachFiles.length)"
         :ext-cls="$attrs['ext-cls']"
         :multiple="$attrs['multiple']"
-        @on-success="handleSuccess"
         :handle-res-code="handleUploadFileRes"
         :header="[
             { name: 'X-CSRFToken',value: cookie }
@@ -18,8 +17,10 @@
             disabled: $attrs['disabled'],
             readonly: $attrs['readonly']
         }"
-        :size="100"
-        ref="file-panel"
+        @on-exceed="handleUploadExceed(limit,attachFiles.length)"
+        @on-success="handleSuccess"
+
+        v-if="!($attrs['readonly'] && attachFiles.length < 1)"
         v-download="attachFiles"
     ></bk-upload>
     <empty v-else
@@ -35,13 +36,16 @@
         directives: {
             download: {
                 componentUpdated (filePanel, binding) {
+                    // 获取绑定的文件
                     const attachFiles = binding.value
+                    // 下载函数
                     function download (index) {
                         return () => {
                             const curFile = attachFiles[index]
                             if (!curFile) {
                                 return
                             }
+                            // 将协议替换为空，这样下载的时候协议会
                             const httpReg = /^http:/
                             // 创建 a 标签
                             const downloadElement = document.createElement('a')
@@ -120,8 +124,8 @@
                 const attachFileList = fileList.map(item => {
                     const responseData = item['responseData']['data']
                     return {
-          ...responseData,
-          url: responseData['path']
+                      ...responseData,
+                      url: responseData['path']
                     }
                 })
                 this.$emit('change', attachFileList)

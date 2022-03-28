@@ -10,8 +10,7 @@
         name: 'top-back',
         data () {
             return {
-                robotImg: require('@/images/robot.png'),
-                count: 0
+                robotImg: require('@/images/robot.png')
             }
         },
         methods: {

@@ -34,24 +34,24 @@
         mixins: [tableMixins],
         data () {
             return {
-                // 获取得到的消息容器
+                // 获取得到的消息容器 用于 computed 处理数据
                 messageRemoteData: []
             }
         },
         computed: {
             messageData (self) {
-                return self.messageRemoteData?.map(item => {
+                return self.messageRemoteData?.map(message => {
                     return {
-                        msg_id: item['id'],
-                        group_id: item['group_id'],
-                        group_name: item['group_name'],
-                        action_type: item['action_type'],
-                        action_target: item['action_target'],
-                        action_username: item['action_username'],
-                        action_display_name: item['action_display_name'],
-                        action_display_name_for_display: formatUsernameAndDisplayName(item['action_username'], item['action_display_name']),
-                        message: item['message'],
-                        is_read: item['is_read']
+                        msg_id: message['id'],
+                        is_read: message['is_read'],
+                        message: message['message'],
+                        group_id: message['group_id'],
+                        group_name: message['group_name'],
+                        action_type: message['action_type'],
+                        action_target: message['action_target'],
+                        action_username: message['action_username'],
+                        action_display_name: message['action_display_name'],
+                        action_display_name_for_display: formatUsernameAndDisplayName(message['action_username'], message['action_display_name'])
                     }
                 }) ?? []
             }
@@ -61,7 +61,9 @@
         },
         methods: {
             handleInit () {
-                this.handleGetPageData()
+                Promise.all([
+                    this.handleGetPageData()
+                ])
             },
             handleSetLimit () {
                 this.pagination.current = 1
@@ -82,6 +84,10 @@
                     this.loading = false
                 })
             },
+            /**
+             * @param msg_id 消息id
+             * @return {any}
+             * */
             handleRead ({ msg_id }) {
                 return putMessage({ msg_id }).then(_ => {
                     this.handleInit()

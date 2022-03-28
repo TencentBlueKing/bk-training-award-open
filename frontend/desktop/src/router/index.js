@@ -16,7 +16,7 @@ import {
     BAD_404_ROUTE_PATH,
     DETAIL_ROUTE_PATH,
     GROUP_MANAGER_ROUTE_PATH,
-    HOME_ROUTE_PATH, INVITE_ROUTE_PATH,
+    HOME_ROUTE_PATH,
     MYAPPLY_ROUTE_PATH,
     MYCHECK_ROUTE_PATH
 } from '@/constants'
@@ -41,8 +41,6 @@ const Myapply = () => import(/* webpackChunkName: 'myapply' */'@/views/myapply')
 const Mycheck = () => import(/* webpackChunkName: 'mycheck' */'@/views/mycheck')
 // 奖项细节
 const Detail = () => import(/* webpackChunkName: 'detail' */'@/views/detail')
-// 邀请页面
-const Invite = () => import(/* webpackChunkName: 'invite' */'@/views/invite')
 
 function setBaseRoutes (otherRoutes) {
     return [
@@ -137,14 +135,6 @@ const routes = setBaseRoutes([
         component: Detail,
         meta: {
             title: '奖项信息'
-        }
-    },
-    {
-        path: INVITE_ROUTE_PATH,
-        name: INVITE_ROUTE_PATH,
-        component: Invite,
-        meta: {
-            title: '邀请链接'
         }
     }
 ])
