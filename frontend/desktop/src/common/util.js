@@ -394,6 +394,7 @@ export function clearAllCookie () {
 }
 
 /**
+ * 格式化 用户名
  * @param username 用户名
  * @param displayName 实际 nickname
  * */
@@ -401,7 +402,7 @@ export function formatUsernameAndDisplayName (username, displayName) {
     return `${username}（${displayName}）`
 }
 /**
- * 设置 title
+ * 设置 document title 和 headerName
  * @param { string } title
  * */
 export function setTitle (title) {

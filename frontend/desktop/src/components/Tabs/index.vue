@@ -28,6 +28,15 @@
 </template>
 
 <script>
+/*
+* 自定义的 tabs： 这是一个对 tabs 组件的改造设计，可以通过 component 组件 is props 对 cur-tab 绑定，这样的外在表现会更加独立
+* model: 绑定为当前的被选择的 tabs
+* props:
+*   tab-items: 顶栏配置
+*   defaultKey: 默认激活的 tab （对应传入的 tab-key）
+*   cur-tab: 当前激活的 tab 的 tab-key 默认为 tab-items 配置的第一个
+* events: tab-click 返回 tabItem 配置中的 ['tab-key']
+* */
     export default {
         name: 'Tabs',
         model: {

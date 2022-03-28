@@ -1,3 +1,8 @@
+/**
+ * @file 常量信息挂载
+ * @author couriourc
+ */
+
 import Vue from 'vue'
 import * as origin from '@/constants'
 
@@ -11,7 +16,7 @@ const install = function (Vue) {
 
 if (window.Vue) {
     window.constants = constants
-    Vue.use(install); // eslint-disable-line
+    Vue.use(install)
 }
 
 Vue.use(install)

@@ -170,9 +170,6 @@
     import { getAwardById, postAwards, putAward } from '@/api/service/award-service'
     import moment from 'moment'
     import { uuid } from '@/common/uuid'
-    /**
-     * 全局临时叠加的唯一值
-     * */
 
     export default {
         name: 'new-award-form',

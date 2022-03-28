@@ -5,7 +5,7 @@
 import http from '@/api'
 
 /**
- * API-获取用户是否为秘书, 是否为管理员
+ * @description API-获取用户是否为秘书, 是否为管理员
  * */
 export function getUsermanageRetrieveUser (config = {}) {
     return http.get('/usermanage/retrieve_user/', {}, config)
@@ -16,7 +16,7 @@ export function getGroup (config = {}) {
 }
 
 /**
- * 更新组织的映射关系
+ * @description 更新组织的映射关系
  * @param { string } group_name 组名
  * */
 export function postGroup ({ group_name }) {
@@ -110,7 +110,7 @@ export function getGroupManage ({ group_id, status }) {
 }
 
 /**
- * 获取所有的小组
+ * @description 获取所有的小组
  * */
 export function getGroupAll () {
     return http.get('/group_all/', {}, { canNewer: true, fromCache: true })

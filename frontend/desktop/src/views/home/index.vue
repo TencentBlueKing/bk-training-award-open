@@ -81,6 +81,7 @@
         },
         data (self) {
             return {
+                // header 导航配置
                 headerNavList: [
                     {
                         style: 'background: var(--gradient-orange-red);',
@@ -121,6 +122,8 @@
                         routerParams: () => [self.$constants['ROUTE_TABLE']['MYCHECK_ROUTE_PATH']]
                     }
                 ],
+                // controller 的审批面板以及奖项面板配置
+                // TODO: tab-key 已经做到对应表格组件名的联动，所以需要抽离成全局会更合适
                 workbenchTabItems: [
                     {
                         'tab-name': '可申请奖项',
@@ -134,7 +137,9 @@
                         'tab-key': 'group-approval'
                     }
                 ],
+                // 当前所选择的审批面板以及奖项面板配置的表格索引
                 workbenchCurIndex: 'applicable-award',
+                // 消息列表的 tabs 配置，如果有需要，就添加对应的配置就行
                 messageTabItems: [{
                     'tab-name': '消息列表',
                     'tab-key': 'message-record'
