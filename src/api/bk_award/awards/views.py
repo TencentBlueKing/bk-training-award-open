@@ -21,13 +21,13 @@ class PolicyViewSet(viewsets.ViewSet):
     """策略 API"""
 
     @atomic
-    @inject_serializer(body_in=serializers.CreatePolicySLZ, out=serializers.PolicySLZ)
+    @inject_serializer(body_in=serializers.CreatePolicySLZ, out=serializers.PolicySLZ, tag="policy")
     def create(self, validated_data: dict):
-        """创建申报应用"""
+        """创建奖项策略"""
         policy = Policy.objects.create(**validated_data)
         return policy
 
-    @inject_serializer(out=serializers.PolicySLZ(many=True))
+    @inject_serializer(out=serializers.PolicySLZ(many=True), tag="policy")
     def list(self):
         """查询策略列表"""
         return Policy.objects.filter(enabled=True)
