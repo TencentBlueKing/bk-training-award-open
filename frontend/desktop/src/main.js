@@ -21,6 +21,12 @@ import '@/common/self-components'
 import '@/common/directives'
 // 挂载常量
 import '@/common/constants'
+/**
+ * 生产环境重写 info 级别的信息，不输出
+ * */
+if (process.env.NODE_ENV !== 'production') {
+    window.console.log = () => {}
+}
 
 auth.requestCurrentUser().then(user => {
     injectCSRFTokenToHeaders()

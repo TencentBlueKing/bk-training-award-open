@@ -164,7 +164,6 @@
                         const detail = awardDetail.data
                         try {
                             detail['time_range'] = `${formatDate(detail['start_time'])}~${formatDate(detail['end_time'])}`
-                            console.log(detail['award_reviewers'])
                             detail['reviewers'] = detail['award_reviewers'].map(item => {
                                 return {
                                     uuid: uuid++,

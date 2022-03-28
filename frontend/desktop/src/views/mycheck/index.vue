@@ -153,7 +153,6 @@
                 })
             },
             toCheck (curInfo, action, tips) {
-                console.log(curInfo)
                 this.approvalForm.id = curInfo['id']
                 this.approvalForm.editing = true
                 this.approvalForm.action = action
