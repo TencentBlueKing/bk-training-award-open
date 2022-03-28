@@ -9,25 +9,10 @@ Unless required by applicable law or agreed to in writing, software distributed 
 an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the License for the
 specific language governing permissions and limitations under the License.
 """
-from blue_krill.web.drf_utils import inject_serializer
-from django.db.transaction import atomic
-from rest_framework import viewsets
+from django.urls import path
 
-from bk_award.awards import serializers
-from bk_award.awards.models import Policy
+from .views import PolicyViewSet
 
-
-class PolicyViewSet(viewsets.ViewSet):
-    """策略 API"""
-
-    @atomic
-    @inject_serializer(body_in=serializers.CreatePolicySLZ, out=serializers.PolicySLZ)
-    def create(self, validated_data: dict):
-        """创建申报应用"""
-        policy = Policy.objects.create(**validated_data)
-        return policy
-
-    @inject_serializer(out=serializers.PolicySLZ(many=True))
-    def list(self):
-        """查询策略列表"""
-        return Policy.objects.filter(enabled=True)
+urlpatterns = [
+    path("api/v1/policies/", PolicyViewSet.as_view({"get": "list", "post": "create"})),
+]

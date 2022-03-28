@@ -16,6 +16,7 @@ class UuidModel(models.Model):
     """Mixin with uuid as id"""
 
     id = models.UUIDField(primary_key=True)
+    enabled = models.BooleanField("是否启用", default=True)
 
     class Meta:
         abstract = True

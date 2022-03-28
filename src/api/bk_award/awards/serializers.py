@@ -30,3 +30,4 @@ class CreatePolicySLZ(serializers.Serializer):
 class PolicySLZ(serializers.ModelSerializer):
     class Meta:
         model = Policy
+        fields = "__all__"

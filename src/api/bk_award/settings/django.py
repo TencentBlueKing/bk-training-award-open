@@ -39,6 +39,7 @@ INSTALLED_APPS = [
     "django.contrib.staticfiles",
     "rest_framework",
     "bk_award.awards.apps.AwardsConfig",
+    "drf_yasg",
 ]
 
 MIDDLEWARE = [
