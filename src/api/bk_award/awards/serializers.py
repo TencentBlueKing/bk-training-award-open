@@ -9,9 +9,25 @@ Unless required by applicable law or agreed to in writing, software distributed 
 an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the License for the
 specific language governing permissions and limitations under the License.
 """
-from django.apps import AppConfig
+from rest_framework import serializers
+
+from .models import Policy
+
+################
+# In
+################
 
 
-class AwardsConfig(AppConfig):
-    default_auto_field = 'django.db.models.BigAutoField'
-    name = 'bk_award.policies'
+class CreatePolicySLZ(serializers.Serializer):
+    """创建 Policy Serializer"""
+
+    name = serializers.CharField()
+
+
+################
+# Out
+################
+class PolicySLZ(serializers.ModelSerializer):
+    class Meta:
+        model = Policy
+        fields = "__all__"

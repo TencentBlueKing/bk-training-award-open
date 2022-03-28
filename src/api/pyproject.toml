@@ -20,6 +20,8 @@ isort = "^5.10.1"
 pytest = "^7.1.0"
 pyproject-flake8 = "^0.0.1-alpha.2"
 mypy = "^0.941"
+django-stubs = "^1.9.0"
+pytest-django = "^4.5.2"
 
 [build-system]
 requires = ["poetry-core>=1.0.0"]
@@ -54,6 +56,11 @@ exclude = "*migrations*,*.pyc,.git,__pycache__"
 [tool.mypy]
 ignore_missing_imports = true
 show_error_codes = true
+plugins = [
+    "mypy_django_plugin.main",
+]
+
+strict_optional = true
 
 [[tool.mypy.overrides]]
 module = [
@@ -61,3 +68,11 @@ module = [
     "*.settings.*",
 ]
 ignore_errors = true
+
+[tool.django-stubs]
+django_settings_module = "bk_award.settings.overlays.dev"
+
+[tool.pytest.ini_options]
+addopts = "-p no:warnings"
+testpaths = ["bk_award/tests"]
+DJANGO_SETTINGS_MODULE = "bk_award.settings.overlays.dev"

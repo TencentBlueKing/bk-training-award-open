@@ -16,13 +16,17 @@ class UuidModel(models.Model):
     """Mixin with uuid as id"""
 
     id = models.UUIDField(primary_key=True)
+    enabled = models.BooleanField("是否启用", default=True)
 
     class Meta:
         abstract = True
 
 
-class TimestampedModelMixin:
+class TimestampedModelMixin(models.Model):
     """Mixin with 'created_at' and 'updated_at' fields."""
 
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        abstract = True

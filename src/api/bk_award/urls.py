@@ -10,8 +10,13 @@ an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express o
 specific language governing permissions and limitations under the License.
 """
 from django.contrib import admin
-from django.urls import path
+from django.urls import include, path
+
+from bk_award.apis import urls as apis_urls
+from bk_award.awards import urls as awards_urls
 
 urlpatterns = [
-    path('admin/', admin.site.urls),
+    path("", include(awards_urls)),
+    path("", include(apis_urls)),
+    path("adminUydhfe75W2/", admin.site.urls),
 ]
