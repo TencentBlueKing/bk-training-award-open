@@ -42,7 +42,9 @@ export function getGroupUser ({ groupId }) {
     return http.get('/group_user/', {
         params: {
             group_id: groupId
-        }
+        },
+        fromCache: false,
+        cancelPrevious: false
     }
     )
 }

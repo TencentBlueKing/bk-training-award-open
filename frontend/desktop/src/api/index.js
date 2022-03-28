@@ -100,6 +100,7 @@ async function getPromise (method, url, data, userConfig = {}) {
     const config = initConfig(method, url, userConfig)
     let promise
     if (config.cancelPrevious) {
+        // TODO: 临时取消重复请求
         await http.cancel(config.requestId)
     }
 
