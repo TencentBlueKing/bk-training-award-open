@@ -43,10 +43,8 @@
                     approval_status: MYAPPLY_ENDED_APPROVAL
                 }
                 return getAwardApproval(params).then(response => {
-                    console.log(response)
                 }).finally(_ => {
                     this.loading = false
-                    console.log(this.loading)
                 })
             }
         }

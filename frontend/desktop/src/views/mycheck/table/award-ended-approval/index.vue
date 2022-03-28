@@ -147,7 +147,6 @@
                 })
             },
             handleGetDetail (approval) {
-                console.log(approval)
                 this.$router.push({
                     name: DETAIL_ROUTE_PATH,
                     query: {
