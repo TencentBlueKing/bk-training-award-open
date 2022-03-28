@@ -477,6 +477,7 @@
 
                 return putAward(this.$route.query['award_id'], form).then(_ => {
                     this.messageSuccess('修改成功')
+                    this.$router.back()
                 }).catch(_ => {
                     this.messageWarn('修改失败')
                 }).finally(_ => {
