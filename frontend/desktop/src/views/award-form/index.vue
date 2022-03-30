@@ -162,7 +162,6 @@
 <script>
     import { formatDate, setTitle } from '@/common/util'
     import {
-        AWARD_LEVEL_MAP,
         AWARD_MANAGER_ROUTE_PATH, AWARD_TYPE_CREATE, AWARD_TYPE_DETAIL,
         AWARD_TYPE_EDIT,
         AWARD_TYPE_ROUTE_KEY
@@ -270,7 +269,6 @@
                         }
                     ]
                 }),
-                awardLevels: AWARD_LEVEL_MAP,
                 submitLoading: false,
                 config: {
                     
