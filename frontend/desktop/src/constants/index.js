@@ -30,19 +30,6 @@ export const APPLY_APPROVAL_STATE_EN_MAP = {
     [DRAFT]: 'draft'
 }
 
-/**
- * 组类型
- * */
-const COMPANY = 0
-const GROUP = 1
-export const AWARD_LEVEL_MAP = {
-    [COMPANY]: '公司',
-    [GROUP]: '小组'
-}
-export const AWARD_LEVEL_EN_MAP = {
-    [COMPANY]: 'company',
-    [GROUP]: 'group'
-}
 /***
  * 组人员缓存键值
  * */
@@ -51,17 +38,7 @@ export const GROUP_USERS_KEYNAME = 'user'
 export const SYS_KEYNAME = 'sys'
 export const GROUP_KEYNAME = 'group'
 export const BK_GROUP_KEYNAME = 'bk-group'
-export const GROUP_SECRETARY_KEYNAME = 'secretary'
 
-/**
- * 权限控制表
- * */
-/**
- * 身份常量表
- * */
-export const IDENT_ADMIN = 'is_admin'
-export const IDENT_SECRETARY = 'is_secretary'
-export const IDENT_COMMON = 'common'
 /**
  * 路由常量表，如果需要携带参数，只需要在 router 创建的时候去拼接一下就能使用对应的动态路由
  * */
@@ -69,25 +46,24 @@ export const HOME_ROUTE_PATH = 'home'
 export const CANAWARDS_ROUTE_PATH = 'canawards'
 export const MYAPPLY_ROUTE_PATH = 'myapply'
 // S 申请路由中的状态量
-// REVIEW_PENDING
-// REVIEW_PASSED
-// REVIEW_NOT_PASSED
-// DRAFT
+// 对应到我的申请页面的关键词
+/**
+ * 这样做的好处是不至于传参很混乱
+ * */
 export const MYAPPLY_ROUTER_KEYNAME = 'myapply_type'
 export const MYAPPLY_DRAFT = 1
 export const MYAPPLY_PENDING_APPLY = 2
 export const MYAPPLY_ENDED_APPROVAL = 3
-
+/**
+ * 这是抽离出来 tak-key 的命名常量,然后这样可以让 组件不是依赖于名字,
+ * 而是专心做自己的事情,只要复合规范就行,因此也强烈建议在使用本项目中 tabs 的组件的时候,
+ * 采用不断把在 tab-key 抽离的方式,
+ * */
 export const MYAPPLY_ING_APPLY_TAB_KEYNAME = 'myapply-ing-apply'
 export const MYAPPLY_ING_APPROVAL_TAB_KEYNAME = 'myapply-ing-approval'
 export const MYAPPLY_ENDED_APPROVAL_TAB_KEYNAME = 'myapply-ended-approval'
 export const MYAPPLY_DRAFT_TAB_KEYNAME = 'myapply-draft'
 
-export const MYAPPLY_TABLE = {
-    [MYAPPLY_PENDING_APPLY]: MYAPPLY_ING_APPLY_TAB_KEYNAME,
-    [MYAPPLY_ENDED_APPROVAL]: MYAPPLY_ENDED_APPROVAL_TAB_KEYNAME,
-    [MYAPPLY_DRAFT]: MYAPPLY_DRAFT_TAB_KEYNAME
-}
 // E 申请路由中的状态量
 
 export const GROUP_MANAGER_ROUTE_PATH = 'group-manager'
@@ -130,96 +106,9 @@ export const DETAIL_DRAFT_DETAIL = 'draft_detail'
 export const DETAIL_APPROVAL_RESULT_DETAIL = 'approval_result'
 // E 详情路由中的类型
 export const BAD_404_ROUTE_PATH = '404'
-export const LOGIN_SUCCESS_ROUTE_PATH = '/account/login_success'
 export const INVITE_ROUTE_PATH = 'invite'
 export const AWARD_APPLICATION_DETAILS_ROUTE_PATH = 'award_application_detail'
 // S 奖项详情路由中的一些类型管理
-
-// E 奖项详情路由中的一些类型管理
-
-export const POWER_CONTROLLER = {
-    [HOME_ROUTE_PATH]: {
-        [IDENT_ADMIN]: {},
-        [IDENT_SECRETARY]: {},
-        [IDENT_COMMON]: {}
-    },
-    [CANAWARDS_ROUTE_PATH]: {
-        [IDENT_ADMIN]: {},
-        [IDENT_SECRETARY]: {},
-        [IDENT_COMMON]: {}
-    },
-    [MYAPPLY_ROUTE_PATH]: {
-        [IDENT_ADMIN]: {},
-        [IDENT_SECRETARY]: {},
-        [IDENT_COMMON]: {}
-    },
-    [GROUP_MANAGER_ROUTE_PATH]: {
-        [IDENT_ADMIN]: {
-            // 是否能创建新的组
-            'add-new-group': true,
-            // 是否能编辑组
-            'table-controller': true
-        },
-        [IDENT_SECRETARY]: {},
-        [IDENT_COMMON]: {}
-    },
-    [AWARD_MANAGER_ROUTE_PATH]: {
-        [IDENT_ADMIN]: {},
-        [IDENT_SECRETARY]: {},
-        [IDENT_COMMON]: {}
-    },
-    [MYCHECK_ROUTE_PATH]: {
-        [IDENT_ADMIN]: {},
-        [IDENT_SECRETARY]: {},
-        [IDENT_COMMON]: {}
-    },
-    [DETAIL_ROUTE_PATH]: {
-        [IDENT_ADMIN]: {},
-        [IDENT_SECRETARY]: {},
-        [IDENT_COMMON]: {}
-    },
-    [AWARD_FORM_ROUTE_PATH]: {
-        [IDENT_ADMIN]: {},
-        [IDENT_SECRETARY]: {},
-        [IDENT_COMMON]: {}
-    },
-    [BAD_404_ROUTE_PATH]: {
-        [IDENT_ADMIN]: {},
-        [IDENT_SECRETARY]: {},
-        [IDENT_COMMON]: {}
-    },
-    [LOGIN_SUCCESS_ROUTE_PATH]: {
-        [IDENT_ADMIN]: {},
-        [IDENT_SECRETARY]: {},
-        [IDENT_COMMON]: {}
-    },
-    [INVITE_ROUTE_PATH]: {
-        [IDENT_ADMIN]: {},
-        [IDENT_SECRETARY]: {},
-        [IDENT_COMMON]: {}
-    },
-    [AWARD_APPLICATION_DETAILS_ROUTE_PATH]: {
-        [IDENT_ADMIN]: {},
-        [IDENT_SECRETARY]: {},
-        [IDENT_COMMON]: {}
-
-    }
-}
-// 放到全局做页面核对用的
-export const ROUTE_TABLE = {
-    HOME_ROUTE_PATH,
-    CANAWARDS_ROUTE_PATH,
-    MYAPPLY_ROUTE_PATH,
-    GROUP_MANAGER_ROUTE_PATH,
-    AWARD_MANAGER_ROUTE_PATH,
-    AWARD_FORM_ROUTE_PATH,
-    MYCHECK_ROUTE_PATH,
-    DETAIL_ROUTE_PATH,
-    BAD_404_ROUTE_PATH,
-    LOGIN_SUCCESS_ROUTE_PATH,
-    INVITE_ROUTE_PATH,
-    AWARD_APPLICATION_DETAILS_ROUTE_PATH
-}
 
 // 事件集
 export const APP_AUTH_NEWER = 'auth-newer'

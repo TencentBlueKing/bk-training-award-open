@@ -87,13 +87,13 @@
                         style: 'background: var(--gradient-orange-red);',
                         description: '创建小组、成员管理',
                         title: '我的小组',
-                        routerParams: () => [self.$constants['ROUTE_TABLE']['GROUP_MANAGER_ROUTE_PATH']]
+                        routerParams: () => [self.$constants['GROUP_MANAGER_ROUTE_PATH']]
                     },
                     {
                         style: 'background: var(--gradient-blue);',
                         description: '为您的小组创建奖项',
                         title: '创建奖项',
-                        routerParams: () => [self.$constants['ROUTE_TABLE']['AWARD_FORM_ROUTE_PATH'], {
+                        routerParams: () => [self.$constants['AWARD_FORM_ROUTE_PATH'], {
                             query: {
                                 [AWARD_TYPE_ROUTE_KEY]: AWARD_TYPE_CREATE
                             }
@@ -103,7 +103,7 @@
                         style: 'background: var(--gradient-orange-pink);',
                         description: '查看申请信息及申请状态',
                         title: '我的申请',
-                        routerParams: () => [self.$constants['ROUTE_TABLE']['MYAPPLY_ROUTE_PATH'], {
+                        routerParams: () => [self.$constants['MYAPPLY_ROUTE_PATH'], {
                             query: {
                                 [MYAPPLY_ROUTER_KEYNAME]: MYAPPLY_DRAFT_TAB_KEYNAME
                             }
@@ -113,13 +113,13 @@
                         style: 'background: var(--gradient-green);',
                         description: '查看创建的奖项',
                         title: '奖项列表',
-                        routerParams: () => [self.$constants['ROUTE_TABLE']['AWARD_MANAGER_ROUTE_PATH']]
+                        routerParams: () => [self.$constants['AWARD_MANAGER_ROUTE_PATH']]
                     },
                     {
                         style: 'background: var(--gradient-purple);',
                         description: '审批入组、审批奖项以及审批记录',
                         title: '我的审批',
-                        routerParams: () => [self.$constants['ROUTE_TABLE']['MYCHECK_ROUTE_PATH']]
+                        routerParams: () => [self.$constants['MYCHECK_ROUTE_PATH']]
                     }
                 ],
                 // controller 的审批面板以及奖项面板配置
