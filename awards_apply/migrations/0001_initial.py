@@ -97,7 +97,8 @@ class Migration(migrations.Migration):
                  models.IntegerField(choices=[(0, '待审核'), (1, '已通过'), (2, '未通过')], default=0, verbose_name='申请状态')),
                 ('approver', models.CharField(blank=True, max_length=128, null=True, verbose_name='审批人账号')),
                 (
-                'approver_display_name', models.CharField(blank=True, max_length=128, null=True, verbose_name='审批人姓名')),
+                    'approver_display_name',
+                    models.CharField(blank=True, max_length=128, null=True, verbose_name='审批人姓名')),
             ],
             options={
                 'abstract': False,
