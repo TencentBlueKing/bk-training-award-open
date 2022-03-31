@@ -28,6 +28,7 @@ BK_STATIC_URL = STATIC_URL + "dist/"
 # from blueapps.conf.log import set_log_level # noqa
 # LOG_LEVEL = "ERROR"
 # LOGGING = set_log_level(locals())
+MEDIA_URL = 'media/'
 
 # 预发布环境数据库可以在这里配置
 
@@ -51,4 +52,14 @@ DATABASES.update(
         },
     }
 )
-
+# 这是最新的数据库配置信息
+# DATABASES = {
+#     'default': {
+#         'ENGINE': 'django.db.backends.mysql',
+#         'NAME': os.environ.get('MYSQL_NAME'),
+#         'USER': os.environ.get('MYSQL_USER'),
+#         'PASSWORD': os.environ.get('MYSQL_PASSWORD'),
+#         'HOST': os.environ.get('MYSQL_HOST'),
+#         'PORT': os.environ.get('MYSQL_PORT'),
+#     }
+# }

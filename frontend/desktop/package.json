@@ -53,15 +53,17 @@
     }
   },
   "dependencies": {
-    "bk-magic-vue": "latest",
     "axios": "~0.18.0",
+    "bk-magic-vue": "latest",
     "cookie": "~0.4.0",
     "jsonp": "~0.2.1",
     "query-string": "~6.5.0",
     "url-parse": "~1.4.7",
     "vue": "~2.5.22",
     "vue-router": "~3.0.6",
-    "vuex": "~3.1.1"
+    "vuex": "~3.1.1",
+    "wangeditor": "^4.7.11",
+    "xss": "^1.0.10"
   },
   "devDependencies": {
     "@babel/core": "~7.4.5",
@@ -69,7 +71,9 @@
     "@babel/plugin-proposal-decorators": "~7.4.4",
     "@babel/plugin-proposal-export-namespace-from": "~7.2.0",
     "@babel/plugin-proposal-function-sent": "~7.2.0",
+    "@babel/plugin-proposal-nullish-coalescing-operator": "^7.16.7",
     "@babel/plugin-proposal-numeric-separator": "~7.2.0",
+    "@babel/plugin-proposal-optional-chaining": "^7.16.7",
     "@babel/plugin-proposal-throw-expressions": "~7.2.0",
     "@babel/plugin-syntax-dynamic-import": "~7.2.0",
     "@babel/plugin-transform-async-to-generator": "~7.4.4",

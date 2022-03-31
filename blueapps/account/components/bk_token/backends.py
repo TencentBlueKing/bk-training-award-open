@@ -14,14 +14,14 @@ specific language governing permissions and limitations under the License.
 import logging
 import traceback
 
-from django.conf import settings
-from django.contrib.auth.backends import ModelBackend
-from django.db import IntegrityError
-
+from awards_apply.models import User as AwardUser
 from blueapps.account import get_user_model
 from blueapps.account.conf import ConfFixture
 from blueapps.account.utils.http import send
-from blueapps.utils import client
+from blueapps.utils import client, get_client_by_user
+from django.conf import settings
+from django.contrib.auth.backends import ModelBackend
+from django.db import IntegrityError
 
 logger = logging.getLogger("component")
 
@@ -42,11 +42,12 @@ class TokenBackend(ModelBackend):
 
         user_model = get_user_model()
         try:
-            user, _ = user_model.objects.get_or_create(username=username)
             get_user_info_result, user_info = self.get_user_info(bk_token)
             # 判断是否获取到用户信息,获取不到则返回None
             if not get_user_info_result:
                 return None
+            user_id = user_info.get("id", "")
+            user, _ = user_model.objects.get_or_create(id=user_id, username=username)
             user.set_property(key="qq", value=user_info.get("qq", ""))
             user.set_property(key="language", value=user_info.get("language", ""))
             user.set_property(key="time_zone", value=user_info.get("time_zone", ""))
@@ -56,6 +57,8 @@ class TokenBackend(ModelBackend):
             user.set_property(key="wx_userid", value=user_info.get("wx_userid", ""))
             user.set_property(key="chname", value=user_info.get("chname", ""))
 
+            user.nickname = user_info["chname"]
+
             # 用户如果不是管理员，则需要判断是否存在平台权限，如果有则需要加上
             if not user.is_superuser and not user.is_staff:
                 role = user_info.get("role", "")
@@ -63,6 +66,14 @@ class TokenBackend(ModelBackend):
                 user.is_superuser = is_admin
                 user.is_staff = is_admin
                 user.save()
+
+            # 将蓝鲸的用户信息同步到奖项申报平台
+            award_user, _ = AwardUser.objects.get_or_create(id=user.id, username=user.username)
+            award_user.id = user_info["id"]
+            award_user.phone = user_info["phone"].replace("\t", "")
+            award_user.display_name = user_info["chname"]
+            award_user.email = user_info["email"]
+            award_user.save()
 
             return user
 
@@ -130,6 +141,17 @@ class TokenBackend(ModelBackend):
             elif settings.DEFAULT_BK_API_VER == "":
                 user_info["username"] = origin_user_info.get("username", "")
                 user_info["role"] = origin_user_info.get("role", "")
+
+            # 获取用户id
+            username = "kaisheng"
+            bk_client = get_client_by_user(username)
+            kwargs = {"id": user_info["username"]}
+            user_detail = bk_client.usermanage.retrieve_user(kwargs)
+            if user_detail.get("result"):
+                user_info["id"] = user_detail.get("data").get("id")
+            if user_info["id"] is None:
+                return False, user_info
+
             return True, user_info
         else:
             error_msg = response.get("message", "")

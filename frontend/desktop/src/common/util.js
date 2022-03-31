@@ -2,6 +2,8 @@
  * @file 通用方法
  * @author wheel-w
  */
+import moment from 'moment'
+import { bus } from '@/store/bus'
 
 /**
  * 函数柯里化
@@ -173,8 +175,8 @@ export function json2Query (param, key) {
     let paramStr = ''
 
     if (param instanceof String || typeof param === 'string'
-            || param instanceof Number || typeof param === 'number'
-            || param instanceof Boolean || typeof param === 'boolean'
+        || param instanceof Number || typeof param === 'number'
+        || param instanceof Boolean || typeof param === 'boolean'
     ) {
         paramStr += separator + key + mappingOperator + encodeURIComponent(param)
     } else {
@@ -341,4 +343,69 @@ export function loadScript (url, callback) {
     }
 
     document.getElementsByTagName('head')[0].appendChild(script)
+}
+
+/**
+ * 检测是否定义
+ *
+ * @param {any} target
+ * */
+export function isDef (target) {
+    return typeof target !== 'undefined' && target !== null
+}
+
+/**
+ * 表单中的必须项配置
+ *
+ * @param {string} message
+ * @returns 返回构造的
+ * */
+export function checkRequired (message) {
+    return {
+        required: true,
+        message
+    }
+}
+
+/**
+ * 利用 ISO 的日期和时间是通过 T 分割
+ * 利用 UTC 的日期和时间是通过 Z 分割
+ *
+ * @param {date|object|string} date
+ * @returns string
+ * */
+export function formatDate (date) {
+    return moment(date).format('YYYY-MM-DD HH:mm')
+}
+
+/**
+ * 清除 cookie
+ *
+ * */
+export function clearAllCookie () {
+    const keys = document.cookie.match(/[^ =;]+(?=\=)/g)
+    console.log(keys)
+    if (keys) {
+        for (let i = keys.length; i--;) {
+            document.cookie = keys[i] + '=0;path=/;expires=' + new Date(0).toUTCString()// 清除当前域名下的,
+        }
+    }
+    console.log(document.cookie)
+}
+
+/**
+ * 格式化 用户名
+ * @param username 用户名
+ * @param displayName 实际 nickname
+ * */
+export function formatUsernameAndDisplayName (username, displayName) {
+    return `${username}（${displayName}）`
+}
+/**
+ * 设置 document title 和 headerName
+ * @param { string } title
+ * */
+export function setTitle (title) {
+    bus.headerName = title
+    document.title = `奖项申报系统-${title}`
 }

@@ -9,11 +9,9 @@ import cookie from 'cookie'
 
 import CachedPromise from './cached-promise'
 import RequestQueue from './request-queue'
-import { bus } from '../common/bus'
 import { messageError } from '@/common/bkmagic'
 import UrlParse from 'url-parse'
 import queryString from 'query-string'
-
 const BASE_URL = window.PROJECT_CONFIG.SITE_URL + AJAX_URL_PREFIX
 
 // axios 实例
@@ -102,6 +100,7 @@ async function getPromise (method, url, data, userConfig = {}) {
     const config = initConfig(method, url, userConfig)
     let promise
     if (config.cancelPrevious) {
+        // TODO: 临时取消重复请求
         await http.cancel(config.requestId)
     }
 
@@ -114,7 +113,7 @@ async function getPromise (method, url, data, userConfig = {}) {
     if (config.fromCache && promise) {
         return promise
     }
-
+    
     promise = new Promise(async (resolve, reject) => {
         const axiosRequest = methodsWithData.includes(method)
             ? axiosInstance[method](url, data, config)
@@ -151,7 +150,11 @@ async function getPromise (method, url, data, userConfig = {}) {
  * @param {Function} promise 拒绝函数
  */
 function handleResponse ({ config, response, resolve, reject }) {
-    if (!response.data && config.globalError) {
+    if (process.env.NODE_ENV === 'development') {
+        console.log('response', config.requestId, '->', response)
+    }
+
+    if (!response.result && config.globalError) {
         reject({ message: response.message })
     } else {
         resolve(config.originalResponse ? response : response.data, config)
@@ -178,7 +181,8 @@ function handleReject (error, config) {
         const { status, data } = error.response
         const nextError = { message: error.message, response: error.response }
         if (status === 401) {
-            bus.$emit('show-login-modal', nextError.response)
+            const loginError = nextError.response.data
+            window.location.href = loginError['login_url']
         } else if (status === 500) {
             nextError.message = '系统出现异常'
         } else if (data && data.message) {
@@ -218,7 +222,9 @@ function initConfig (method, url, userConfig) {
         // 当路由变更时取消请求
         cancelWhenRouteChange: true,
         // 取消上次请求
-        cancelPrevious: true
+        cancelPrevious: true,
+        // 需要权限(不能是新手用户读取的数据)
+        canNewer: true
     }
     return Object.assign(defaultConfig, userConfig)
 }

@@ -4,9 +4,9 @@
  */
 
 import store from '@/store'
-
+import { bus } from '@/store/bus'
 const config = {
-    fromCache: false,
+    fromCache: true,
     cancelWhenRouteChange: false
 }
 
@@ -18,9 +18,22 @@ const config = {
 function getUser () {
     return store.dispatch('userInfo', config)
 }
+function getGroup () {
+    return bus.handleGetGroupList()
+    // return store.dispatch('group', config)
+}
+function getBkInfo () {
+    const config = {
+        fromCache: true,
+        cancelWhenRouteChange: false
+    }
+    return store.dispatch('bkInfo', config)
+}
 
 export default function () {
     return Promise.all([
-        getUser()
+        getUser(),
+        getGroup(),
+        getBkInfo()
     ])
 }

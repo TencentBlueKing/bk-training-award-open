@@ -12,18 +12,27 @@ import store from '@/store'
 import { injectCSRFTokenToHeaders } from '@/api'
 import auth from '@/common/auth'
 import Img403 from '@/images/403.png'
-import Exception from '@/components/exception'
-import { bus } from '@/common/bus'
-import AuthComponent from '@/components/auth'
+import { bus } from '@/store/bus'
+// 蓝鲸组件库
 import '@/common/bkmagic'
-
-Vue.component('app-exception', Exception)
-Vue.component('app-auth', AuthComponent)
+// 自定义的一些全局组件
+import '@/common/self-components'
+// 一些自定义的组件或者指令
+import '@/common/directives'
+// 挂载常量
+import '@/common/constants'
+/**
+ * 生产环境重写 info 级别的信息，不输出
+ * */
+if (process.env.NODE_ENV !== 'production') {
+    window.console.log = () => {}
+}
 
 auth.requestCurrentUser().then(user => {
     injectCSRFTokenToHeaders()
     if (user.isAuthenticated) {
         global.bus = bus
+        Vue.prototype.$bus = bus
         global.mainComponent = new Vue({
             el: '#app',
             router,

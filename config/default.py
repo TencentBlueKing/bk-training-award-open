@@ -35,6 +35,9 @@ from blueapps.conf.log import get_logging_config_dict
 INSTALLED_APPS += (  # noqa
     "home_application",
     "mako_application",
+    "rest_framework",
+    'awards_apply',
+    'django_mysql',
 )
 
 # 这里是默认的中间件，大部分情况下，不需要改动
@@ -65,6 +68,7 @@ INSTALLED_APPS += (  # noqa
 # 自定义中间件
 MIDDLEWARE += (
     "blueapps.middleware.bkui.middlewares.BkuiPageMiddleware",
+    "awards_apply.utils.middlerwares.AppExceptionMiddleware",
 )
 
 # 添加首页搜索范围
@@ -121,7 +125,7 @@ IS_AJAX_PLAIN_MODE = False
 # 国际化配置
 LOCALE_PATHS = (os.path.join(BASE_DIR, "locale"),)  # noqa
 
-USE_TZ = True
+USE_TZ = False
 TIME_ZONE = "Asia/Shanghai"
 LANGUAGE_CODE = "zh-hans"
 
@@ -166,3 +170,20 @@ if locals().get("DISABLED_APPS"):
         locals()[_key] = tuple(
             [_item for _item in locals()[_key] if not _item.startswith(_app + ".")]
         )
+# 上传文件相对路径文件夹
+MEDIA_ROOT = os.path.join(BASE_DIR, "USERRES")
+# rest_framework配置
+REST_FRAMEWORK = {
+    # 自定义rest_framework异常处理,一般为rest_framework.exceptions.APIException
+    'EXCEPTION_HANDLER': 'awards_apply.utils.exception_handler.custom_exception_handler',
+    # 取消rest_framework API 调试页面
+    'DEFAULT_RENDERER_CLASSES':
+        ('rest_framework.renderers.JSONRenderer',)
+}
+
+# BKREPO 相关配置信息, 启用增强服务后会自动往环境变量中添加对应的配置
+BKREPO_ENDPOINT_URL = os.environ['BKREPO_ENDPOINT_URL']
+BKREPO_USERNAME = os.environ['BKREPO_USERNAME']
+BKREPO_PASSWORD = os.environ['BKREPO_PASSWORD']
+BKREPO_PROJECT = os.environ['BKREPO_PROJECT']
+BKREPO_BUCKET = os.environ['BKREPO_BUCKET']

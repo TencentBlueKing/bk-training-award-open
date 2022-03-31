@@ -4,7 +4,6 @@
  */
 
 import Vue from 'vue'
-
 // 全量引入
 import './fully-import'
 
@@ -51,7 +50,6 @@ export const messageWarn = (message, delay = 3000) => {
         hasCloseIcon: true
     })
 }
-
 Vue.prototype.messageError = messageError
 Vue.prototype.messageSuccess = messageSuccess
 Vue.prototype.messageInfo = messageInfo

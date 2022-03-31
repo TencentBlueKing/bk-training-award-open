@@ -1,49 +1,208 @@
 <template>
     <div class="bk-login-dialog" v-if="isShow">
         <div class="bk-login-wrapper">
-            <iframe :src="iframeSrc" scrolling="no" border="0" :width="iframeWidth" :height="iframeHeight"></iframe>
+            <div class="container">
+                <p class="title">
+                    {{ config[createType]['tips'] }}
+                    <span v-bk-tooltips="config[createType]['question']"
+                        v-if="config[createType]['question']"
+                        style="color:dodgerblue;"
+                        class="bottom-middle"
+                    >
+                        <i class="bk-icon icon-info-circle-shape"></i>
+                    </span>
+                </p>
+                <div class="select-panel center-content">
+                    <transition-group name="bk-move-in-right">
+                        <div v-if="isShow && createType === 'create'" key="create">
+                            <div class="dialog-content">
+                                <create-group-form v-if="createType === 'create'" ref="create"></create-group-form>
+                            </div>
+                            <div class="tips-panel center-content mb20">
+                                <bk-link theme="primary" @click=" handleTriggerType('join','加入小组')"> 加入小组？</bk-link>
+                                <bk-link theme="primary" @click=" handleTriggerType('from-bk','从蓝鲸系统迁移')" underline> 从蓝鲸系统迁移？</bk-link>
+                            </div>
+                        </div>
+                        <div v-if="isShow && createType === 'join'" key="join">
+                            <div class="dialog-content">
+                                <user-join-form v-if="isShow && createType === 'join'" ref="join"></user-join-form>
+                            </div>
+                            <div class="tips-panel center-content mb15">
+                                <bk-link theme="primary" @click="handleTriggerType('create','创建小组')"> 创建小组？</bk-link>
+                                <bk-link theme="primary" @click="handleTriggerType('from-bk','从蓝鲸系统迁移')" underline> 从蓝鲸系统迁移？</bk-link>
+                            </div>
+                        </div>
+                        <div v-if="isShow && createType === 'from-bk'" key="from-bk">
+                            <div class="dialog-content">
+                                <bk-group-form v-if="isShow && createType === 'from-bk'" ref="from-bk"></bk-group-form>
+                            </div>
+
+                            <div class="tips-panel center-content mb20">
+                                <bk-link theme="primary" @click=" handleTriggerType('join','加入小组')" underline> 加入小组？</bk-link>
+                                <bk-link theme="primary" @click="handleTriggerType('create','创建小组')"> 创建小组？</bk-link>
+                            </div>
+                        </div>
+                    </transition-group>
+                </div>
+                <div class="button-panel left-content">
+                    <bk-button theme="danger"
+                        class="mr10"
+                        v-if="!isNewer"
+                        @click="isShow = false"
+                    >
+                        取消
+                    </bk-button>
+                    <bk-button theme="warning"
+                        class="mr10"
+                        v-else-if="isNewer"
+                        @click="$router.go(0)"
+                    >
+                        刷新
+                    </bk-button>
+                    <bk-button theme="primary" class="ml10" @click="handleToBeOlder(createType,$refs[createType])">
+                        确认
+                    </bk-button>
+                </div>
+            </div>
         </div>
     </div>
 </template>
 
 <script>
+    import { APP_AUTH_NEWER, APP_GROUP_DIALOG, INVITE_ROUTE_PATH } from '@/constants'
+    import { postGroup, postGroupUser } from '@/api/service/group-service'
+
     export default {
         name: 'app-auth',
+        components: {
+            CreateGroupForm: () => import('@/components/auth/create-group-form'),
+            UserJoinForm: () => import('@/components/auth/user-join-form'),
+            BkGroupForm: () => import('@/components/auth/bk-group-form')
+        },
         data () {
             return {
-                iframeSrc: '',
-                iframeWidth: 500,
-                iframeHeight: 500,
-                isShow: false
+                config: {
+                    'join': {
+                        tips: '加入小组'
+                    },
+                    'create': {
+                        tips: '创建小组'
+                    },
+                    'from-bk': {
+                        tips: '从蓝鲸系统迁移',
+                        question: '从蓝鲸用户管理系统中选取组织'
+                    }
+                },
+                isShow: false,
+                createType: 'join',
+                isNewer: false,
+                groupForm: {
+                    group_name: ''
+                }
+
             }
         },
-        methods: {
-            hideLoginModal () {
-                this.isShow = false
-            },
-            showLoginModal (data) {
-                const url = data.login_url
-                if (!url) {
-                    console.warn('The response don\'t return login_url')
+        computed: {},
+        mounted () {
+            this.$bus.$on(APP_AUTH_NEWER, (isNewer) => {
+                if (this.$route.name === INVITE_ROUTE_PATH) {
                     return
                 }
-                this.iframeSrc = url
-                const iframeWidth = data.width
-                if (iframeWidth) {
-                    this.iframeWidth = iframeWidth
+                this.isShow = isNewer
+                this.isNewer = isNewer
+            })
+            this.$bus.$on(APP_GROUP_DIALOG, ([isShow, canCancel, type = 'join']) => {
+                this.isShow = isShow
+                this.isNewer = !canCancel
+                this.createType = type
+            })
+        },
+        methods: {
+            handleTriggerType (type) {
+                this.createType = type
+            },
+            async handleToBeOlder (createType, formInstance) {
+                const params = await formInstance.getFields()
+                switch (createType) {
+                    case 'join':
+                        this.joinGroup(params)
+                        break
+                    case 'create':
+                        this.createGroup(params)
+                        break
+                    case 'from-bk':
+                        this.fromBkGroup(params)
+                        break
                 }
-                const iframeHeight = data.height
-                if (iframeHeight) {
-                    this.iframeHeight = iframeHeight
-                }
-                setTimeout(() => {
-                    this.isShow = true
-                }, 1000)
+            },
+            joinGroup (params) {
+                return postGroupUser(params).then(res => {
+                    this.messageSuccess('申请加入成功，请耐心等待审批')
+                })
+            },
+            createGroup (params) {
+                return postGroup(params).then(res => {
+                    this.messageSuccess('创建成功！')
+                    this.isShow = false
+                    this.$bus.groupList.push(res.data)
+                    if (this.isNewer) {
+                        this.$router.go(0)
+                    }
+                })
+            },
+            fromBkGroup (params) {
+                return postGroup(params).then(res => {
+                    this.messageSuccess('加入成功！')
+                    this.isShow = false
+                    this.$bus.groupList.push(res.data)
+                    if (this.isNewer) {
+                        this.$router.go(0)
+                    }
+                })
             }
         }
     }
 </script>
 
 <style scoped>
-    @import './index.css';
+@import './index.css';
+
+.title {
+  &::before {
+    content: "";
+    display: inline-block;
+    width: 6px;
+    height: 1em;
+    vertical-align: middle;
+    background-color: #0E7AE2;
+    border-radius: 12px;
+    transform: translateX(-6px);
+  }
+}
+
+.select-panel span {
+  overflow: hidden;
+  display: flex;
+  width: calc(3 * 118px + 2 * 8px);
+  margin: 12px 0;
+
+  .dialog-content {
+
+    min-height: 118px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+  }
+
+  .tips-panel {
+    display: flex;
+    justify-content: space-around;
+  }
+}
+
+.button-panel {
+  display: flex;
+  justify-content: flex-end;
+}
 </style>

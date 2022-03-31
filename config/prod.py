@@ -24,7 +24,8 @@ RUN_MODE = "PRODUCT"
 STATIC_URL = "static/"
 # 前端静态url
 BK_STATIC_URL = STATIC_URL + "dist/"
-
+# 媒体资源配置
+MEDIA_URL = '%smedia/' % SITE_URL
 # 只对正式环境日志级别进行配置，可以在这里修改
 # from blueapps.conf.log import set_log_level # noqa
 # LOG_LEVEL = "ERROR"
@@ -44,3 +45,14 @@ DATABASES.update(
         },
     }
 )
+# # 这是最新的数据库配置信息
+# DATABASES = {
+#     'default': {
+#         'ENGINE': 'django.db.backends.mysql',
+#         'NAME': os.environ.get('MYSQL_NAME'),
+#         'USER': os.environ.get('MYSQL_USER'),
+#         'PASSWORD': os.environ.get('MYSQL_PASSWORD'),
+#         'HOST': os.environ.get('MYSQL_HOST'),
+#         'PORT': os.environ.get('MYSQL_PORT'),
+#     }
+# }
