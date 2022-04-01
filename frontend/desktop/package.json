@@ -61,9 +61,7 @@
     "url-parse": "~1.4.7",
     "vue": "~2.5.22",
     "vue-router": "~3.0.6",
-    "vuex": "~3.1.1",
-    "wangeditor": "^4.7.11",
-    "xss": "^1.0.10"
+    "vuex": "~3.1.1"
   },
   "devDependencies": {
     "@babel/core": "~7.4.5",
